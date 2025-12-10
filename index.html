@@ -16,6 +16,89 @@
 					font-size: 1.5em;
 				}
 			}
+
+			/* Portfolio Grid Styles */
+			.portfolio-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+				gap: 1.5rem;
+				margin-top: 1.5rem;
+			}
+
+			.project-card {
+				background: rgba(255, 255, 255, 0.05);
+				border: 1px solid rgba(255, 255, 255, 0.15);
+				border-radius: 8px;
+				overflow: hidden;
+				transition: transform 0.3s ease, border-color 0.3s ease;
+			}
+
+			.project-card:hover {
+				transform: translateY(-4px);
+				border-color: rgba(255, 255, 255, 0.35);
+			}
+
+			.project-image {
+				width: 100%;
+				height: 180px;
+				overflow: hidden;
+				background: rgba(0, 0, 0, 0.2);
+			}
+
+			.project-image img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				opacity: 0.8;
+				transition: opacity 0.3s ease;
+			}
+
+			.project-card:hover .project-image img {
+				opacity: 1;
+			}
+
+			.project-content {
+				padding: 1.25rem;
+			}
+
+			.project-content h3 {
+				font-size: 1rem;
+				margin-bottom: 0.75rem;
+				letter-spacing: 0.1rem;
+			}
+
+			.project-content p {
+				font-size: 0.9rem;
+				margin-bottom: 1rem;
+				opacity: 0.85;
+				line-height: 1.5;
+			}
+
+			.project-tech {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+			}
+
+			.tech-tag {
+				font-size: 0.7rem;
+				padding: 0.25rem 0.6rem;
+				background: rgba(255, 255, 255, 0.1);
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				border-radius: 3px;
+				text-transform: uppercase;
+				letter-spacing: 0.05rem;
+			}
+
+			@media screen and (max-width: 480px) {
+				.portfolio-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.project-image {
+					height: 160px;
+				}
+			}
 		</style>
 	</head>
 	<body class="is-preload">
@@ -29,15 +112,18 @@
 						<div class="content">
 							<div class="inner">
 								<h1>Lanting Digital</h1>
-								<p>Our full website is launching soon.<br />
-								Discover the difference that a partnership with us can make.</p>
+								<p>Custom Web & Mobile Apps for Growing Businesses</p>
+								<p style="font-size: 0.9em; opacity: 0.8;">Bespoke digital solutions, built in close partnership with you.</p>
 							</div>
 						</div>
 						<nav>
 							<ul>
 								<li><a href="#intro">Intro</a></li>
-								<li><a href="#work">Work</a></li>
+								<li><a href="#work">Services</a></li>
+								<li><a href="#portfolio">Portfolio</a></li>
+								<li><a href="#process">Process</a></li>
 								<li><a href="#about">About</a></li>
+								<li><a href="#faq">FAQ</a></li>
 								<li><a href="#contact">Contact</a></li>
 							</ul>
 						</nav>
@@ -74,6 +160,63 @@
 									</li>
 								</ul>
 							</article>
+
+						<article id="portfolio">
+							<h2 class="major">Portfolio</h2>
+							<p>A selection of projects showcasing our expertise in web and mobile development.</p>
+
+							<div class="portfolio-grid">
+								<!-- Project 1: Lanting Platform -->
+								<div class="project-card">
+									<div class="project-image">
+										<img src="images/pic01.jpg" alt="Lanting Platform Screenshot" />
+									</div>
+									<div class="project-content">
+										<h3>Lanting Platform</h3>
+										<p>Internal business management system with quote-to-contract workflows, client management, and project tracking.</p>
+										<div class="project-tech">
+											<span class="tech-tag">Next.js</span>
+											<span class="tech-tag">TypeScript</span>
+											<span class="tech-tag">Supabase</span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Project 2: Roller Coaster Enthusiast App -->
+								<div class="project-card">
+									<div class="project-image">
+										<img src="images/pic02.jpg" alt="Roller Coaster App Screenshot" />
+									</div>
+									<div class="project-content">
+										<h3>Coaster Companion</h3>
+										<p>React Native app for roller coaster enthusiasts featuring ride logging, weighted rankings, social features, and mini-games.</p>
+										<div class="project-tech">
+											<span class="tech-tag">React Native</span>
+											<span class="tech-tag">TypeScript</span>
+											<span class="tech-tag">Firebase</span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Project 3: Client Work Placeholder -->
+								<div class="project-card">
+									<div class="project-image">
+										<img src="images/pic03.jpg" alt="Client Project Screenshot" />
+									</div>
+									<div class="project-content">
+										<h3>Client Project</h3>
+										<p>Custom web solution tailored to client needs. More details coming soon.</p>
+										<div class="project-tech">
+											<span class="tech-tag">React</span>
+											<span class="tech-tag">Node.js</span>
+											<span class="tech-tag">Firebase</span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<p style="margin-top: 2rem; text-align: center;"><a href="#contact" class="button primary">Start Your Project</a></p>
+						</article>
 
 						<article id="about">
 								<h2 class="major">Our Story</h2>
