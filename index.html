@@ -189,6 +189,89 @@
 					grid-template-columns: 1fr;
 				}
 			}
+
+			/* Process Section Styles */
+			.process-steps {
+				display: flex;
+				flex-direction: column;
+				gap: 1.5rem;
+				margin-top: 1.5rem;
+			}
+
+			.process-step {
+				display: flex;
+				align-items: flex-start;
+				gap: 1.25rem;
+				padding: 1.25rem;
+				background: rgba(255, 255, 255, 0.03);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				border-radius: 8px;
+				transition: border-color 0.3s ease;
+			}
+
+			.process-step:hover {
+				border-color: rgba(255, 255, 255, 0.25);
+			}
+
+			.step-number {
+				flex-shrink: 0;
+				width: 40px;
+				height: 40px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: rgba(255, 255, 255, 0.1);
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				border-radius: 50%;
+				font-weight: 600;
+				font-size: 1rem;
+			}
+
+			.process-step h3 {
+				font-size: 0.9rem;
+				margin-bottom: 0.5rem;
+				letter-spacing: 0.1rem;
+			}
+
+			.process-step p {
+				font-size: 0.85rem;
+				opacity: 0.85;
+				line-height: 1.5;
+				margin: 0;
+			}
+
+			/* FAQ Section Styles */
+			.faq-list {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+				margin-top: 1.5rem;
+			}
+
+			.faq-item {
+				padding: 1.25rem;
+				background: rgba(255, 255, 255, 0.03);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				border-radius: 8px;
+				transition: border-color 0.3s ease;
+			}
+
+			.faq-item:hover {
+				border-color: rgba(255, 255, 255, 0.25);
+			}
+
+			.faq-item h3 {
+				font-size: 0.9rem;
+				margin-bottom: 0.75rem;
+				letter-spacing: 0.05rem;
+			}
+
+			.faq-item p {
+				font-size: 0.85rem;
+				opacity: 0.85;
+				line-height: 1.6;
+				margin: 0;
+			}
 		</style>
 	</head>
 	<body class="is-preload">
@@ -333,6 +416,82 @@
 							</div>
 
 							<p style="margin-top: 2rem; text-align: center;"><a href="#contact" class="button primary">Start Your Project</a></p>
+						</article>
+
+						<article id="process">
+							<h2 class="major">How We Work</h2>
+							<p>A straightforward process designed around clear communication and collaboration.</p>
+
+							<div class="process-steps">
+								<div class="process-step">
+									<div class="step-number">1</div>
+									<h3>Discovery Call</h3>
+									<p>A free consultation to understand your vision, goals, and requirements. No pressure, just conversation.</p>
+								</div>
+
+								<div class="process-step">
+									<div class="step-number">2</div>
+									<h3>Proposal & Quote</h3>
+									<p>A detailed scope document with transparent pricing. You'll know exactly what you're getting and what it costs.</p>
+								</div>
+
+								<div class="process-step">
+									<div class="step-number">3</div>
+									<h3>Design & Development</h3>
+									<p>Regular updates and check-ins as your project takes shape. Your feedback drives every decision.</p>
+								</div>
+
+								<div class="process-step">
+									<div class="step-number">4</div>
+									<h3>Review & Revisions</h3>
+									<p>Thorough testing and refinement until you're completely satisfied with the result.</p>
+								</div>
+
+								<div class="process-step">
+									<div class="step-number">5</div>
+									<h3>Launch & Support</h3>
+									<p>Smooth deployment and ongoing partnership. I'm here for you long after launch day.</p>
+								</div>
+							</div>
+
+							<p style="margin-top: 2rem; text-align: center;"><a href="#contact" class="button primary">Schedule Your Free Call</a></p>
+						</article>
+
+						<article id="faq">
+							<h2 class="major">FAQ</h2>
+							<p>Common questions answered. Still curious? <a href="#contact">Just ask</a>.</p>
+
+							<div class="faq-list">
+								<div class="faq-item">
+									<h3>How long does a typical project take?</h3>
+									<p>It depends on scope, but most projects range from 2-8 weeks. A simple landing page might take a week, while a full mobile app could take 2-3 months. I'll give you a realistic timeline during our discovery call.</p>
+								</div>
+
+								<div class="faq-item">
+									<h3>Do you work with existing codebases?</h3>
+									<p>Absolutely. Whether you need to enhance an existing application, fix bugs, or add new features to legacy code, I'm comfortable diving into established projects.</p>
+								</div>
+
+								<div class="faq-item">
+									<h3>What if I need changes after launch?</h3>
+									<p>All projects include a revision period. For ongoing changes, I offer maintenance retainers starting at $149/month, or you can request changes on an hourly basis.</p>
+								</div>
+
+								<div class="faq-item">
+									<h3>How does pricing work?</h3>
+									<p>I offer both project-based pricing and hourly rates ($75/hr). Most clients prefer project-based quotes for predictable budgeting. Every quote is custom—you'll never pay for features you don't need.</p>
+								</div>
+
+								<div class="faq-item">
+									<h3>What technologies do you specialize in?</h3>
+									<p>My core stack is React, React Native, TypeScript, Next.js, and Firebase/Supabase. I focus on these tools because they're powerful, well-supported, and let me build high-quality applications efficiently.</p>
+								</div>
+
+								<div class="faq-item">
+									<h3>Do you offer payment plans?</h3>
+									<p>Yes. For larger projects, I typically structure payments as 50% upfront and 50% on completion. For very large projects, we can arrange milestone-based payments.</p>
+								</div>
+							</div>
 						</article>
 
 						<article id="about">
