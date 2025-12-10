@@ -272,6 +272,110 @@
 				line-height: 1.6;
 				margin: 0;
 			}
+
+			/* About Section Styles */
+			.about-intro {
+				display: flex;
+				align-items: flex-start;
+				gap: 2rem;
+				margin-bottom: 2rem;
+			}
+
+			.about-headshot {
+				flex-shrink: 0;
+			}
+
+			.about-headshot img {
+				width: 150px;
+				height: 150px;
+				object-fit: cover;
+				border-radius: 50%;
+				border: 3px solid rgba(255, 255, 255, 0.2);
+			}
+
+			.about-text h3 {
+				font-size: 1.1rem;
+				margin-bottom: 0.75rem;
+			}
+
+			.about-text p {
+				font-size: 0.9rem;
+				line-height: 1.6;
+				opacity: 0.9;
+				margin: 0;
+			}
+
+			.about-section {
+				margin-bottom: 2rem;
+			}
+
+			.about-section h3 {
+				font-size: 1rem;
+				margin-bottom: 1rem;
+			}
+
+			.about-section p {
+				font-size: 0.9rem;
+				line-height: 1.7;
+				opacity: 0.85;
+			}
+
+			.about-values {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 1.5rem;
+				margin: 2rem 0;
+			}
+
+			.value-item {
+				text-align: center;
+				padding: 1.25rem;
+				background: rgba(255, 255, 255, 0.03);
+				border: 1px solid rgba(255, 255, 255, 0.1);
+				border-radius: 8px;
+			}
+
+			.value-item .icon {
+				font-size: 1.5rem;
+				margin-bottom: 0.75rem;
+				opacity: 0.9;
+			}
+
+			.value-item h4 {
+				font-size: 0.85rem;
+				margin-bottom: 0.5rem;
+				letter-spacing: 0.1rem;
+			}
+
+			.value-item p {
+				font-size: 0.8rem;
+				opacity: 0.8;
+				line-height: 1.5;
+				margin: 0;
+			}
+
+			.about-location {
+				text-align: center;
+				font-size: 0.9rem;
+				opacity: 0.7;
+				margin-top: 2rem;
+			}
+
+			.about-location .icon {
+				margin-right: 0.5rem;
+			}
+
+			@media screen and (max-width: 736px) {
+				.about-intro {
+					flex-direction: column;
+					align-items: center;
+					text-align: center;
+				}
+
+				.about-values {
+					grid-template-columns: 1fr;
+				}
+			}
 		</style>
 	</head>
 	<body class="is-preload">
@@ -495,11 +599,46 @@
 						</article>
 
 						<article id="about">
-								<h2 class="major">Our Story</h2>
-								<span class="image main"><img src="images/pic03.jpg" alt="" /></span>
-								<p>Lanting Digital was founded on the principle of stewardship—a belief that our talents are a gift to be used in service of others. This principle guides everything we do. We approach every project with integrity, honesty, and a commitment to excellence, seeing our work as an opportunity to build lasting relationships and contribute positively to the world.</p>
-								<p>We see ourselves as more than just a service provider; we are your partner in success. Our goal is to truly understand you and your vision, creating tailored solutions that feel like a natural extension of your brand. Every project is a new opportunity to build something amazing, together.</p>
-								<p>I can't wait to hear about your project.</p>
+								<h2 class="major">About</h2>
+
+								<div class="about-intro">
+									<!-- PLACEHOLDER: Replace images/pic03.jpg with your professional headshot (square 1:1) -->
+									<div class="about-headshot">
+										<img src="images/pic03.jpg" alt="Caleb Lanting - Founder of Lanting Digital" />
+									</div>
+									<div class="about-text">
+										<h3>Hi, I'm Caleb</h3>
+										<p>I'm a front-end developer specializing in React, React Native, and TypeScript. For me, building software isn't just a job—it's a calling. I find genuine joy in the creative process of taking a unique idea and shaping it into a beautiful, functional tool that solves real problems.</p>
+									</div>
+								</div>
+
+								<div class="about-section">
+									<h3>My Approach</h3>
+									<p>I believe my skills are a gift meant to serve others. Every project is an opportunity for excellent stewardship—to build something that truly helps people and honors the trust clients place in me. This faith-driven perspective shapes how I work: with integrity, honesty, and a commitment to excellence that goes beyond just meeting requirements.</p>
+									<p>When you work with me, you're not getting a faceless agency or a revolving door of developers. You're getting a dedicated partner who genuinely cares about your success and treats your project as if it were my own.</p>
+								</div>
+
+								<div class="about-values">
+									<div class="value-item">
+										<span class="icon solid fa-gem"></span>
+										<h4>Quality</h4>
+										<p>Every line of code is crafted with care. Polish isn't an afterthought—it's built in from the start.</p>
+									</div>
+									<div class="value-item">
+										<span class="icon solid fa-handshake"></span>
+										<h4>Integrity</h4>
+										<p>Honest communication, transparent pricing, and promises kept. No surprises, no runaround.</p>
+									</div>
+									<div class="value-item">
+										<span class="icon solid fa-heart"></span>
+										<h4>Partnership</h4>
+										<p>Your success is my success. I'm invested in your project beyond just the paycheck.</p>
+									</div>
+								</div>
+
+								<p class="about-location"><span class="icon solid fa-map-marker-alt"></span> Based in Riverside, CA — serving clients nationwide</p>
+
+								<p style="margin-top: 1.5rem; text-align: center;"><a href="#contact" class="button primary">Let's Work Together</a></p>
 							</article>
 
 						<article id="contact">
