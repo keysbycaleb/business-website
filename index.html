@@ -99,6 +99,62 @@
 					height: 160px;
 				}
 			}
+
+			/* Services Grid Styles */
+			.services-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				gap: 1.5rem;
+				margin-top: 1.5rem;
+			}
+
+			.service-card {
+				background: rgba(255, 255, 255, 0.05);
+				border: 1px solid rgba(255, 255, 255, 0.15);
+				border-radius: 8px;
+				padding: 1.5rem;
+				text-align: center;
+				transition: transform 0.3s ease, border-color 0.3s ease;
+			}
+
+			.service-card:hover {
+				transform: translateY(-4px);
+				border-color: rgba(255, 255, 255, 0.35);
+			}
+
+			.service-card .icon {
+				font-size: 2rem;
+				margin-bottom: 1rem;
+				opacity: 0.9;
+			}
+
+			.service-card h3 {
+				font-size: 0.9rem;
+				margin-bottom: 0.75rem;
+				letter-spacing: 0.1rem;
+			}
+
+			.service-card p {
+				font-size: 0.85rem;
+				opacity: 0.85;
+				line-height: 1.5;
+				margin-bottom: 0.75rem;
+			}
+
+			.service-card .price {
+				font-size: 0.8rem;
+				font-weight: 600;
+				color: rgba(255, 255, 255, 0.9);
+				margin-bottom: 0;
+				padding-top: 0.5rem;
+				border-top: 1px solid rgba(255, 255, 255, 0.1);
+			}
+
+			@media screen and (max-width: 480px) {
+				.services-grid {
+					grid-template-columns: 1fr;
+				}
+			}
 		</style>
 	</head>
 	<body class="is-preload">
@@ -139,26 +195,47 @@
 							</article>
 
 						<article id="work">
-								<h2 class="major">Our Services</h2>
-								<span class="image main"><img src="images/pic02.jpg" alt="" /></span>
-								<p>From the initial idea to the final launch, we provide comprehensive development services. We build both the beautiful, user-facing front-end and the powerful, secure back-end for a seamless digital experience. Our modern technology stack, including Firebase and GitHub, ensures your project is scalable, reliable, and ready for the future.</p>
-								
-								<ul class="alt">
-									
-									<li>
-										<h3><span class="icon solid fa-desktop"></span> Websites & Web Apps</h3>
-										<p>Stunning, responsive websites and powerful web applications built to perform. Whether you need a simple landing page or a complex enterprise platform, we create digital experiences that captivate and convert.</p>
-									
-										<h3><span class="icon solid fa-mobile-alt"></span> Mobile & Progressive Web Apps</h3>
-										<p>Engage your users on any device. We develop native mobile apps and Progressive Web Apps (PWAs) that offer an app-like experience directly in the browser, ensuring maximum reach and accessibility.</p>
-									
-										<h3><span class="icon solid fa-cogs"></span> Full-Stack Development</h3>
-										<p>Complete end-to-end solutions. We handle everything from the intuitive user interface (front-end) to the complex server logic and database management (back-end), creating a cohesive and robust final product.</p>
-									
-										<h3><span class="icon solid fa-server"></span> Cloud Hosting & Deployment</h3>
-										<p>Reliable and scalable hosting. We leverage modern cloud infrastructure like Firebase and professional deployment workflows with GitHub to ensure your application is secure, fast, and always available to your users.</p>
-									</li>
-								</ul>
+								<h2 class="major">Services</h2>
+								<p>From initial concept to final launch, we build custom digital solutions tailored to your unique business needs. Every project receives personal attention and expert craftsmanship.</p>
+
+								<div class="services-grid">
+									<div class="service-card">
+										<span class="icon solid fa-desktop"></span>
+										<h3>Custom Web Applications</h3>
+										<p>Powerful dashboards, admin panels, and business tools built with React, Next.js, and TypeScript. Designed to streamline your operations and delight your users.</p>
+										<p class="price">Starting at $2,500</p>
+									</div>
+
+									<div class="service-card">
+										<span class="icon solid fa-mobile-alt"></span>
+										<h3>Mobile Apps</h3>
+										<p>Cross-platform mobile applications built with React Native. One codebase, native performance on both iOS and Android.</p>
+										<p class="price">Starting at $5,000</p>
+									</div>
+
+									<div class="service-card">
+										<span class="icon solid fa-globe"></span>
+										<h3>Progressive Web Apps</h3>
+										<p>App-like experiences that work directly in the browser. No app store required—maximum reach with minimal friction.</p>
+										<p class="price">Starting at $2,000</p>
+									</div>
+
+									<div class="service-card">
+										<span class="icon solid fa-paint-brush"></span>
+										<h3>Figma to Code</h3>
+										<p>Pixel-perfect implementation of your designs. Hand off your Figma files and receive production-ready, responsive code.</p>
+										<p class="price">Starting at $75/hr</p>
+									</div>
+
+									<div class="service-card">
+										<span class="icon solid fa-life-ring"></span>
+										<h3>Ongoing Support</h3>
+										<p>Maintenance retainers and SaaS hosting packages to keep your application running smoothly. Updates, monitoring, and peace of mind.</p>
+										<p class="price">Starting at $149/mo</p>
+									</div>
+								</div>
+
+								<p style="margin-top: 2rem; text-align: center;"><a href="#contact" class="button primary">Get a Custom Quote</a></p>
 							</article>
 
 						<article id="portfolio">
