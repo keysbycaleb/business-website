@@ -1,17 +1,13 @@
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
 
 admin.initializeApp();
 
-// Gmail transporter - uses environment variables
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.GMAIL_EMAIL,
-    pass: process.env.GMAIL_PASSWORD,
-  },
-});
+// Define secrets
+const gmailEmail = defineSecret("GMAIL_EMAIL");
+const gmailPassword = defineSecret("GMAIL_PASSWORD");
 
 /**
  * Cloud Function triggered when a new document is created in the
@@ -21,6 +17,7 @@ exports.sendEmailOnSubmission = onDocumentCreated(
   {
     document: "submissions/{submissionId}",
     region: "us-central1",
+    secrets: [gmailEmail, gmailPassword],
   },
   async (event) => {
     const snapshot = event.data;
@@ -31,6 +28,15 @@ exports.sendEmailOnSubmission = onDocumentCreated(
 
     const data = snapshot.data();
     const db = admin.firestore();
+
+    // Create transporter with secrets (must be inside function)
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: gmailEmail.value(),
+        pass: gmailPassword.value(),
+      },
+    });
 
     // Get form config for recipient emails
     let recipientEmails = ["caleb@lantingdigital.com"];
@@ -90,7 +96,7 @@ exports.sendEmailOnSubmission = onDocumentCreated(
     `;
 
     const mailOptions = {
-      from: `"Lanting Digital" <${process.env.GMAIL_EMAIL}>`,
+      from: `"Lanting Digital" <${gmailEmail.value()}>`,
       to: recipientEmails.join(", "),
       subject: `New Lead: ${data.name || "Contact Form Submission"}`,
       html: emailBody,
