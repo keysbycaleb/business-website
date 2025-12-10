@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "lanting-digital-website"
-  }
+  },
+  "targets": {
+    "lanting-digital-website": {
+      "hosting": {
+        "main": [
+          "lanting-digital-website"
+        ],
+        "admin": [
+          "lanting-digital-admin"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

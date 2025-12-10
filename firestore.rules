@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Existing contacts collection (keep for backwards compatibility)
+    match /contacts/{contactId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    // New submissions collection - anyone can create, only authenticated users can manage
+    match /submissions/{submissionId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+
+    // Archived submissions - authenticated users only
+    match /archived-submissions/{submissionId} {
+      allow read, create, update, delete: if request.auth != null;
+    }
+
+    // Forms config - anyone can read (for email recipients), no one can write (console only)
+    match /forms/{formId} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

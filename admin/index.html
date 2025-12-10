@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin Dashboard | Lanting Digital</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="https://lantingdigital.com/images/favicon.ico">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Admin Styles -->
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen active">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>Lanting Digital</h1>
+                <p>Admin Dashboard</p>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" required placeholder="caleb@lantingdigital.com">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required placeholder="Enter your password">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">
+                    <i class="fas fa-sign-in-alt"></i> Sign In
+                </button>
+                <p id="login-error" class="error-message"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboard-screen" class="screen">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1><i class="fas fa-chart-line"></i> Lanting Digital Admin</h1>
+            </div>
+            <div class="header-right">
+                <span id="user-email" class="user-info"></span>
+                <button id="logout-btn" class="btn btn-outline">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <i class="fas fa-inbox"></i>
+                    <div class="stat-content">
+                        <span id="total-submissions" class="stat-number">0</span>
+                        <span class="stat-label">Total Leads</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-clock"></i>
+                    <div class="stat-content">
+                        <span id="today-submissions" class="stat-number">0</span>
+                        <span class="stat-label">Today</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-archive"></i>
+                    <div class="stat-content">
+                        <span id="archived-count" class="stat-number">0</span>
+                        <span class="stat-label">Archived</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls-bar">
+                <div class="controls-left">
+                    <div class="view-toggle">
+                        <button id="view-active" class="btn btn-toggle active">
+                            <i class="fas fa-inbox"></i> Active
+                        </button>
+                        <button id="view-archived" class="btn btn-toggle">
+                            <i class="fas fa-archive"></i> Archived
+                        </button>
+                    </div>
+                </div>
+                <div class="controls-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-input" placeholder="Search leads...">
+                    </div>
+                    <button id="export-btn" class="btn btn-secondary">
+                        <i class="fas fa-download"></i> Export CSV
+                    </button>
+                    <button id="refresh-btn" class="btn btn-secondary">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submissions Table -->
+            <div class="table-container">
+                <table id="submissions-table">
+                    <thead>
+                        <tr>
+                            <th data-sort="name">Name <i class="fas fa-sort"></i></th>
+                            <th data-sort="email">Email <i class="fas fa-sort"></i></th>
+                            <th data-sort="message">Message</th>
+                            <th data-sort="timestamp">Date <i class="fas fa-sort"></i></th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="submissions-body">
+                        <!-- Submissions will be loaded here -->
+                    </tbody>
+                </table>
+                <div id="empty-state" class="empty-state hidden">
+                    <i class="fas fa-inbox"></i>
+                    <p>No submissions found</p>
+                </div>
+                <div id="loading-state" class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading submissions...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-user"></i> <span id="modal-name">Lead Details</span></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-row">
+                    <label>Email:</label>
+                    <span id="modal-email"></span>
+                    <a id="modal-email-link" class="btn btn-sm" target="_blank">
+                        <i class="fas fa-envelope"></i> Send Email
+                    </a>
+                </div>
+                <div class="detail-row">
+                    <label>Submitted:</label>
+                    <span id="modal-date"></span>
+                </div>
+                <div class="detail-row detail-message">
+                    <label>Message:</label>
+                    <p id="modal-message"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-archive" class="btn btn-secondary">
+                    <i class="fas fa-archive"></i> Archive
+                </button>
+                <button id="modal-delete" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="confirm-modal" class="modal">
+        <div class="modal-content modal-sm">
+            <div class="modal-header">
+                <h2><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to permanently delete this submission? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-cancel">Cancel</button>
+                <button id="confirm-delete" class="btn btn-danger">Delete Forever</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+
+    <!-- Admin Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

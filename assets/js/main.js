@@ -430,12 +430,13 @@
         
         console.log('Database object (window.db) found. Attempting to write...'); // Log 4: Confirm db object exists
 
-        // 6. Save the data to Firestore
-        window.db.collection('contacts').add({
+        // 6. Save the data to Firestore (submissions collection triggers email notification)
+        window.db.collection('submissions').add({
             name: name,
             email: email,
             message: message,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp() // Adds a server-side timestamp
+            formId: 'lanting-digital',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
         })
         .then(function(docRef) {
             // 7. Success!
