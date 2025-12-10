@@ -1,0 +1,12 @@
+# Robots.txt for Lanting Digital
+# https://lantingdigital.com
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://lantingdigital.com/sitemap.xml
+
+# Disallow assets that don't need indexing
+Disallow: /assets/js/
+Disallow: /assets/webfonts/
