@@ -376,6 +376,51 @@
 					grid-template-columns: 1fr;
 				}
 			}
+
+			/* Contact Section Styles */
+			.contact-methods {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 1rem;
+				margin: 1.5rem 0 2rem;
+			}
+
+			.contact-method {
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+				padding: 0.75rem 1.25rem;
+				background: rgba(255, 255, 255, 0.05);
+				border: 1px solid rgba(255, 255, 255, 0.15);
+				border-radius: 6px;
+				text-decoration: none;
+				color: inherit;
+				transition: border-color 0.3s ease, background 0.3s ease;
+			}
+
+			.contact-method:hover {
+				border-color: rgba(255, 255, 255, 0.35);
+				background: rgba(255, 255, 255, 0.08);
+			}
+
+			.contact-method .icon {
+				font-size: 1.1rem;
+				opacity: 0.9;
+			}
+
+			.contact-method span:last-child {
+				font-size: 0.9rem;
+			}
+
+			@media screen and (max-width: 480px) {
+				.contact-methods {
+					flex-direction: column;
+				}
+
+				.contact-method {
+					justify-content: center;
+				}
+			}
 		</style>
 	</head>
 	<body class="is-preload">
@@ -642,23 +687,34 @@
 							</article>
 
 						<article id="contact">
-								<h2 class="major">Let's Connect</h2>
-								<h3>Join Us on Our Journey.</h3>
-								<p>We're excited about what's ahead and would love for you to be a part of it. Be the first to know when our full site launches and receive exclusive early access offers.</p>
-								<p>Sign up for our early access list and get <strong>10% off</strong> your first year of service as a thank you for your early support.</p>
+								<h2 class="major">Contact</h2>
+								<h3>Start a Conversation</h3>
+								<p>Ready to discuss your project? Reach out directly or use the form below. I typically respond within 24 hours.</p>
+
+								<div class="contact-methods">
+									<a href="mailto:caleb@lantingdigital.com" class="contact-method">
+										<span class="icon solid fa-envelope"></span>
+										<span>caleb@lantingdigital.com</span>
+									</a>
+									<a href="tel:+19514608140" class="contact-method">
+										<span class="icon solid fa-phone"></span>
+										<span>(951) 460-8140</span>
+									</a>
+								</div>
+
 								<form method="post" action="#">
 									<div class="fields">
 										<div class="field half">
 											<label for="name">Name</label>
-											<input type="text" name="name" id="name" />
+											<input type="text" name="name" id="name" required />
 										</div>
 										<div class="field half">
 											<label for="email">Email</label>
-											<input type="text" name="email" id="email" />
+											<input type="email" name="email" id="email" required />
 										</div>
 										<div class="field">
-											<label for="message">Message</label>
-											<textarea name="message" id="message" rows="4"></textarea>
+											<label for="message">Tell me about your project</label>
+											<textarea name="message" id="message" rows="4" placeholder="What are you looking to build? What problem are you trying to solve?"></textarea>
 										</div>
 									</div>
 									<ul class="actions">
@@ -666,11 +722,12 @@
 										<li><input type="reset" value="Reset" /></li>
 									</ul>
 								</form>
+
 								<ul class="icons">
-									<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
-									<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+									<li><a href="https://www.linkedin.com/in/caleb-lanting-559321238/" target="_blank" rel="noopener noreferrer" class="icon brands fa-linkedin"><span class="label">LinkedIn</span></a></li>
+									<li><a href="https://github.com/LantingDigital" target="_blank" rel="noopener noreferrer" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+									<!-- PLACEHOLDER: Add Instagram URL when ready -->
 									<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
-									<li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
 								</ul>
 							</article>
 
