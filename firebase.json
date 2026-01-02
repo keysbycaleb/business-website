@@ -8,12 +8,22 @@
         "**/.*",
         "**/node_modules/**",
         "functions/**",
-        "admin/**"
+        "admin/**",
+        "sign/**"
       ]
     },
     {
       "target": "admin",
       "public": "admin",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ]
+    },
+    {
+      "target": "sign",
+      "public": "sign",
       "ignore": [
         "firebase.json",
         "**/.*",

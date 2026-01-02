@@ -58,8 +58,18 @@
             </div>
         </header>
 
-        <!-- Main Content -->
-        <main class="dashboard-main">
+        <!-- Navigation Tabs -->
+        <nav class="dashboard-nav">
+            <button class="nav-tab active" data-section="leads">
+                <i class="fas fa-inbox"></i> Leads
+            </button>
+            <button class="nav-tab" data-section="contracts">
+                <i class="fas fa-file-signature"></i> Contracts
+            </button>
+        </nav>
+
+        <!-- Leads Section -->
+        <main id="leads-section" class="dashboard-main section-content active">
             <!-- Stats Bar -->
             <div class="stats-bar">
                 <div class="stat-card">
@@ -137,6 +147,87 @@
                 </div>
             </div>
         </main>
+
+        <!-- Contracts Section -->
+        <main id="contracts-section" class="dashboard-main section-content">
+            <!-- Contracts Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <i class="fas fa-file-signature"></i>
+                    <div class="stat-content">
+                        <span id="total-contracts" class="stat-number">0</span>
+                        <span class="stat-label">Total Contracts</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-paper-plane"></i>
+                    <div class="stat-content">
+                        <span id="sent-contracts" class="stat-number">0</span>
+                        <span class="stat-label">Sent</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-check-circle"></i>
+                    <div class="stat-content">
+                        <span id="signed-contracts" class="stat-number">0</span>
+                        <span class="stat-label">Signed</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contracts Controls -->
+            <div class="controls-bar">
+                <div class="controls-left">
+                    <div class="view-toggle">
+                        <button id="view-all-contracts" class="btn btn-toggle active">
+                            <i class="fas fa-list"></i> All
+                        </button>
+                        <button id="view-pending-contracts" class="btn btn-toggle">
+                            <i class="fas fa-clock"></i> Pending
+                        </button>
+                        <button id="view-signed-contracts" class="btn btn-toggle">
+                            <i class="fas fa-check"></i> Signed
+                        </button>
+                    </div>
+                </div>
+                <div class="controls-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="contracts-search-input" placeholder="Search contracts...">
+                    </div>
+                    <button id="refresh-contracts-btn" class="btn btn-secondary">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contracts Table -->
+            <div class="table-container">
+                <table id="contracts-table">
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Contract</th>
+                            <th>Status</th>
+                            <th>Sent</th>
+                            <th>Signed</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contracts-body">
+                        <!-- Contracts will be loaded here -->
+                    </tbody>
+                </table>
+                <div id="contracts-empty-state" class="empty-state hidden">
+                    <i class="fas fa-file-signature"></i>
+                    <p>No contracts found</p>
+                </div>
+                <div id="contracts-loading-state" class="loading-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <p>Loading contracts...</p>
+                </div>
+            </div>
+        </main>
     </div>
 
     <!-- Detail Modal -->
@@ -191,6 +282,89 @@
         </div>
     </div>
 
+    <!-- Contract Detail Modal -->
+    <div id="contract-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2><i class="fas fa-file-signature"></i> <span id="contract-modal-name">Contract Details</span></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="contract-detail-grid">
+                    <div class="detail-column">
+                        <h4>Client Information</h4>
+                        <div class="detail-row">
+                            <label>Company:</label>
+                            <span id="contract-client-company"></span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Email:</label>
+                            <span id="contract-client-email"></span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Signed By:</label>
+                            <span id="contract-client-name"></span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Title:</label>
+                            <span id="contract-client-title"></span>
+                        </div>
+                    </div>
+                    <div class="detail-column">
+                        <h4>Contract Status</h4>
+                        <div class="detail-row">
+                            <label>Status:</label>
+                            <span id="contract-status" class="status-badge"></span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Effective Date:</label>
+                            <span id="contract-effective-date"></span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Sent:</label>
+                            <span id="contract-sent-date"></span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Signed:</label>
+                            <span id="contract-signed-date"></span>
+                        </div>
+                        <div class="detail-row">
+                            <label>Portfolio Permission:</label>
+                            <span id="contract-portfolio"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Client Signature Display -->
+                <div id="signature-display" class="signature-display-section hidden">
+                    <h4>Client Signature</h4>
+                    <div class="signature-image-container">
+                        <img id="contract-signature-img" src="" alt="Client Signature">
+                    </div>
+                    <p class="signature-meta">
+                        IP Address: <span id="contract-ip"></span>
+                    </p>
+                </div>
+
+                <!-- Signing Link -->
+                <div id="signing-link-section" class="signing-link-section">
+                    <h4>Signing Link</h4>
+                    <div class="signing-link-box">
+                        <input type="text" id="signing-link-input" readonly>
+                        <button id="copy-link-btn" class="btn btn-secondary">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="contract-delete-btn" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Delete Contract
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
@@ -200,5 +374,6 @@
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/dashboard.js"></script>
+    <script src="js/contracts.js"></script>
 </body>
 </html>

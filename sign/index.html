@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Sign Contract | Lanting Digital</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="https://lantingdigital.com/images/favicon.ico">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/sign.css">
+</head>
+<body>
+    <!-- Loading State -->
+    <div id="loading-screen" class="screen active">
+        <div class="loading-container">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading contract...</p>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="error-screen" class="screen">
+        <div class="error-container">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h1>Contract Not Found</h1>
+            <p id="error-message">This contract link is invalid or has expired.</p>
+            <a href="https://lantingdigital.com" class="btn btn-primary">Visit Lanting Digital</a>
+        </div>
+    </div>
+
+    <!-- Already Signed State -->
+    <div id="signed-screen" class="screen">
+        <div class="signed-container">
+            <i class="fas fa-check-circle"></i>
+            <h1>Contract Already Signed</h1>
+            <p>This contract was signed on <span id="signed-date"></span>.</p>
+            <p>If you need a copy, please contact <a href="mailto:caleb@lantingdigital.com">caleb@lantingdigital.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- Main Signing Page -->
+    <div id="signing-screen" class="screen">
+        <header class="sign-header">
+            <div class="header-content">
+                <h1>Lanting Digital</h1>
+                <p>Contract Signing</p>
+            </div>
+        </header>
+
+        <main class="sign-main">
+            <!-- Contract Info -->
+            <div class="contract-info">
+                <h2 id="contract-name">Loading...</h2>
+                <p class="contract-parties">
+                    <span id="client-company"></span> &amp; Lanting Digital LLC
+                </p>
+            </div>
+
+            <!-- Contract Content -->
+            <div class="contract-document">
+                <div id="contract-content">
+                    <!-- Contract HTML will be injected here -->
+                </div>
+            </div>
+
+            <!-- Signature Section -->
+            <div class="signature-section">
+                <h3>Signatures</h3>
+
+                <!-- Provider Signature (Pre-filled) -->
+                <div class="signature-block provider-signature">
+                    <h4>Provider</h4>
+                    <div class="signature-display">
+                        <p class="signature-script" id="provider-signature">Caleb Lanting</p>
+                        <div class="signature-line"></div>
+                    </div>
+                    <div class="signature-details">
+                        <p><strong>Name:</strong> <span id="provider-name">Caleb Lanting</span></p>
+                        <p><strong>Title:</strong> <span id="provider-title">Owner / Member</span></p>
+                        <p><strong>Date:</strong> <span id="provider-date"></span></p>
+                    </div>
+                </div>
+
+                <!-- Client Signature Form -->
+                <div class="signature-block client-signature">
+                    <h4>Client</h4>
+
+                    <form id="signing-form">
+                        <!-- Effective Date -->
+                        <div class="form-group">
+                            <label for="effective-date">Effective Date</label>
+                            <input type="date" id="effective-date" required>
+                            <small>The date this agreement takes effect</small>
+                        </div>
+
+                        <!-- Name -->
+                        <div class="form-group">
+                            <label for="client-name">Full Name *</label>
+                            <input type="text" id="client-name" required placeholder="Your full legal name">
+                        </div>
+
+                        <!-- Title -->
+                        <div class="form-group">
+                            <label for="client-title">Title *</label>
+                            <input type="text" id="client-title" required placeholder="e.g., CEO, Owner, Manager">
+                        </div>
+
+                        <!-- Signature Pad -->
+                        <div class="form-group signature-pad-group">
+                            <label>Signature *</label>
+                            <div class="signature-pad-container">
+                                <canvas id="signature-pad"></canvas>
+                                <button type="button" id="clear-signature" class="btn btn-sm btn-secondary">
+                                    <i class="fas fa-eraser"></i> Clear
+                                </button>
+                            </div>
+                            <small>Draw your signature using mouse, touch, or stylus</small>
+                        </div>
+
+                        <!-- Portfolio Permission -->
+                        <div class="form-group portfolio-permission">
+                            <label>Portfolio Permission (Section 16)</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="portfolio" value="true" required>
+                                    <span>I agree to allow portfolio use after launch, subject to prior written approval</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="portfolio" value="false">
+                                    <span>I do not wish to be featured in Provider's portfolio</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Agreement Checkbox -->
+                        <div class="form-group agreement-checkbox">
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="agree-terms" required>
+                                <span>I have read and agree to the terms of this Agreement *</span>
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" id="submit-btn" class="btn btn-primary btn-full">
+                            <i class="fas fa-signature"></i> Sign &amp; Submit
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+
+        <footer class="sign-footer">
+            <p>&copy; Lanting Digital LLC | <a href="https://lantingdigital.com">lantingdigital.com</a></p>
+        </footer>
+    </div>
+
+    <!-- Success State -->
+    <div id="success-screen" class="screen">
+        <div class="success-container">
+            <i class="fas fa-check-circle"></i>
+            <h1>Contract Signed Successfully!</h1>
+            <p>Thank you for signing. A confirmation email will be sent to <span id="success-email"></span>.</p>
+            <div class="success-details">
+                <p><strong>Contract:</strong> <span id="success-contract-name"></span></p>
+                <p><strong>Signed:</strong> <span id="success-timestamp"></span></p>
+            </div>
+            <a href="https://lantingdigital.com" class="btn btn-primary">Visit Lanting Digital</a>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+
+    <!-- Signature Pad Library -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+
+    <!-- App Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/sign.js"></script>
+</body>
+</html>

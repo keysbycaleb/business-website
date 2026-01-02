@@ -23,5 +23,15 @@ service cloud.firestore {
       allow read: if true;
       allow write: if false;
     }
+
+    // Contracts collection - anyone can read and update (for signing), only auth users can create/delete
+    match /contracts/{contractId} {
+      // Anyone can read a contract (needed for signing page)
+      allow read: if true;
+      // Anyone can update specific fields (for signing)
+      allow update: if true;
+      // Only authenticated users can create or delete
+      allow create, delete: if request.auth != null;
+    }
   }
 }

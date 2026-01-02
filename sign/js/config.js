@@ -1,4 +1,4 @@
-// Firebase Configuration for Lanting Digital Admin Panel
+// Firebase Configuration for Lanting Digital Contract Signing
 const firebaseConfig = {
     apiKey: "AIzaSyBUs5dd7zghmv8dQen9bdqROmHyKSupcEE",
     authDomain: "lanting-digital-website.firebaseapp.com",
@@ -12,17 +12,8 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-// Initialize services
-const auth = firebase.auth();
+// Initialize Firestore
 const db = firebase.firestore();
 
-// Collection names
-const COLLECTIONS = {
-    SUBMISSIONS: 'submissions',
-    ARCHIVED: 'archived-submissions',
-    FORMS: 'forms',
-    CONTRACTS: 'contracts'
-};
-
-// Signing page URL
-const SIGNING_BASE_URL = 'https://sign.lantingdigital.com';
+// Collection name
+const CONTRACTS_COLLECTION = 'contracts';

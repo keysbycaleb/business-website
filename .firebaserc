@@ -10,6 +10,9 @@
         ],
         "admin": [
           "lanting-digital-admin"
+        ],
+        "sign": [
+          "lanting-digital-sign"
         ]
       }
     }
