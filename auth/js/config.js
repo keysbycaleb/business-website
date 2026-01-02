@@ -1,4 +1,4 @@
-// Firebase Configuration for Lanting Digital Contract Signing
+// Firebase Configuration for Lanting Digital Auth
 const firebaseConfig = {
     apiKey: "AIzaSyBUs5dd7zghmv8dQen9bdqROmHyKSupcEE",
     authDomain: "lanting-digital-website.firebaseapp.com",
@@ -14,18 +14,9 @@ let db, auth, googleProvider;
 
 try {
     firebase.initializeApp(firebaseConfig);
-
-    // Initialize Firestore
     db = firebase.firestore();
-
-    // Initialize Auth
     auth = firebase.auth();
-
-    // Google Auth Provider - force account selection every time
     googleProvider = new firebase.auth.GoogleAuthProvider();
-    googleProvider.setCustomParameters({
-        prompt: 'select_account'
-    });
 } catch (error) {
     console.error('Firebase initialization error:', error);
 }
@@ -33,8 +24,6 @@ try {
 // Collection name
 const CONTRACTS_COLLECTION = 'contracts';
 
-// Signing page base URL
-const SIGNING_BASE_URL = 'https://sign.lantingdigital.com';
-
-// Auth subdomain
+// URLs
+const SIGN_BASE_URL = 'https://sign.lantingdigital.com';
 const AUTH_BASE_URL = 'https://auth.lantingdigital.com';

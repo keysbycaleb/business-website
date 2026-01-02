@@ -9,81 +9,170 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="https://lantingdigital.com/images/favicon.ico">
 
-    <!-- Google Fonts - Georgia for contract, Dancing Script for signature -->
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="css/sign.css">
+    <link rel="stylesheet" href="css/sign.css?v=20260102b">
 </head>
 <body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>Lanting Digital</h1>
+                <p>Sign in to view and sign your contract</p>
+            </div>
+            <button type="button" class="btn-google" id="google-login-btn">
+                <i class="fab fa-google"></i> Sign in with Google
+            </button>
+            <p class="login-note">
+                <i class="fas fa-lock"></i> Your information is secure and encrypted
+            </p>
+        </div>
+    </div>
+
     <!-- Loading State -->
     <div id="loading-screen" class="screen active">
         <div class="loading-container">
             <i class="fas fa-spinner fa-spin"></i>
-            <p>Loading contract...</p>
+            <h1>Loading Contract</h1>
+            <p>Please wait while we retrieve your document...</p>
         </div>
     </div>
 
     <!-- Error State -->
     <div id="error-screen" class="screen">
-        <div class="error-container">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h1>Contract Not Found</h1>
-            <p id="error-message">This contract link is invalid or has expired.</p>
-            <a href="https://lantingdigital.com" class="btn btn-primary">Visit Lanting Digital</a>
+        <div class="state-card error-card">
+            <div class="state-icon error-icon">
+                <i class="fas fa-file-circle-xmark"></i>
+            </div>
+            <h1>Unable to Load Contract</h1>
+            <p id="error-message">This contract link may be invalid or has expired.</p>
+            <div class="state-actions">
+                <a href="mailto:caleb@lantingdigital.com" class="btn-elegant">
+                    <i class="fas fa-envelope"></i> Contact Support
+                </a>
+            </div>
+            <p class="state-footer">
+                <a href="https://lantingdigital.com">lantingdigital.com</a>
+            </p>
         </div>
     </div>
 
     <!-- Already Signed State -->
     <div id="signed-screen" class="screen">
-        <div class="signed-container">
-            <i class="fas fa-check-circle"></i>
-            <h1>Contract Already Signed</h1>
-            <p>This contract was signed on <span id="signed-date"></span>.</p>
-            <p>If you need a copy, please contact <a href="mailto:caleb@lantingdigital.com">caleb@lantingdigital.com</a>.</p>
+        <div class="state-card success-card">
+            <div class="state-icon success-icon">
+                <i class="fas fa-file-circle-check"></i>
+            </div>
+            <h1>Already Signed</h1>
+            <p>This contract was completed on <span id="signed-date"></span>.</p>
+            <p class="state-note">A copy was sent to your email. Need another copy?</p>
+            <div class="state-actions">
+                <a href="mailto:caleb@lantingdigital.com?subject=Contract%20Copy%20Request" class="btn-elegant">
+                    <i class="fas fa-envelope"></i> Request Copy
+                </a>
+            </div>
+            <p class="state-footer">
+                <a href="https://lantingdigital.com">lantingdigital.com</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Success State -->
+    <div id="success-screen" class="screen">
+        <div class="state-card success-card">
+            <div class="state-icon success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <h1>Contract Signed</h1>
+            <p>Your agreement has been executed successfully.</p>
+            <div class="success-details">
+                <div class="detail-item">
+                    <span class="detail-label">Contract</span>
+                    <span class="detail-value" id="success-contract-name"></span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Signed</span>
+                    <span class="detail-value" id="success-timestamp"></span>
+                </div>
+            </div>
+            <p class="state-note">A confirmation email has been sent to you and the provider.</p>
+            <p class="state-footer">
+                <a href="https://lantingdigital.com">lantingdigital.com</a>
+            </p>
         </div>
     </div>
 
     <!-- Main Signing Page -->
     <div id="signing-screen" class="screen">
-        <header class="sign-header">
-            <div class="header-content">
-                <h1>Lanting Digital</h1>
-                <p>Contract Review &amp; Signing</p>
+        <!-- Top Navigation -->
+        <nav class="navbar">
+            <div class="brand">
+                Lanting Digital <span class="brand-badge">Secure Sign</span>
             </div>
-        </header>
+            <div class="secure-badge">
+                <i class="fas fa-lock"></i> AES-256 Encrypted
+            </div>
+        </nav>
 
-        <main class="sign-main">
-            <form id="signing-form">
-                <!-- Contract Document (includes signature section) -->
-                <div class="contract-document">
-                    <div id="contract-content">
-                        <!-- Contract HTML will be injected here, including signature section -->
-                    </div>
+        <div class="main-container">
+            <!-- LEFT: Document Preview -->
+            <div class="doc-viewer">
+                <div class="paper-document" id="contract-content">
+                    <!-- Contract HTML will be injected here -->
+                </div>
+            </div>
+
+            <!-- RIGHT: Action Panel -->
+            <aside class="action-panel">
+                <div class="action-header">
+                    <h2>Finalize Contract</h2>
+                    <p>Please fill in your details to execute this agreement.</p>
                 </div>
 
-                <!-- Draw Signature Section (only thing outside the contract) -->
-                <div class="signature-pad-section">
-                    <h3><i class="fas fa-pen-nib"></i> Draw Your Signature</h3>
-                    <p class="signature-instructions">Use your mouse, finger, or stylus to sign below. This signature will appear on the contract above.</p>
-
-                    <div class="signature-pad-container">
-                        <canvas id="signature-pad"></canvas>
-                        <button type="button" id="clear-signature" class="btn btn-sm btn-secondary">
-                            <i class="fas fa-eraser"></i> Clear
-                        </button>
+                <form id="signing-form" class="action-body">
+                    <!-- Step 1: Your Details + Signature -->
+                    <div class="form-step">
+                        <span class="step-label">Step 1: Your Details</span>
+                        <div class="input-group">
+                            <label for="input-name">Full Name</label>
+                            <input type="text" id="input-name" class="form-input" placeholder="e.g. Pete Anderson" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="input-title">Job Title</label>
+                            <input type="text" id="input-title" class="form-input" placeholder="e.g. CEO" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="input-entity">Company/Entity Name</label>
+                            <input type="text" id="input-entity" class="form-input" placeholder="e.g. iAttend LLC">
+                        </div>
+                        <div class="input-group">
+                            <label for="input-signature">Signature</label>
+                            <div class="signature-input-wrapper">
+                                <input type="text" id="input-signature" class="form-input signature-input" placeholder="Type your full name" readonly>
+                                <span class="signature-lock-icon"><i class="fas fa-pen-nib"></i></span>
+                            </div>
+                            <p class="signature-hint" id="signature-hint">Click to add your signature</p>
+                            <p class="signature-acknowledged hidden" id="signature-acknowledged">
+                                <i class="fas fa-check-circle"></i> Signature acknowledged
+                            </p>
+                        </div>
                     </div>
 
-                    <!-- Portfolio Permission -->
-                    <div class="form-group portfolio-permission">
-                        <label><strong>Portfolio Permission</strong> (Section 16)</label>
+                    <!-- Step 2: Portfolio Permission -->
+                    <div class="form-step portfolio-section">
+                        <span class="step-label">Step 2: Portfolio Permission</span>
                         <div class="radio-group">
                             <label class="radio-option">
                                 <input type="radio" name="portfolio" value="true" required>
-                                <span>I agree to allow portfolio use after launch, subject to prior written approval</span>
+                                <span>I agree to allow portfolio use after launch</span>
                             </label>
                             <label class="radio-option">
                                 <input type="radio" name="portfolio" value="false">
@@ -91,51 +180,60 @@
                             </label>
                         </div>
                     </div>
+                </form>
 
-                    <!-- Agreement Checkbox -->
-                    <div class="form-group agreement-checkbox">
-                        <label class="checkbox-option">
-                            <input type="checkbox" id="agree-terms" required>
-                            <span><strong>I have read and agree to all terms of this Agreement</strong></span>
-                        </label>
-                    </div>
-
-                    <!-- Submit Button -->
-                    <button type="submit" id="submit-btn" class="btn btn-primary btn-full">
-                        <i class="fas fa-file-signature"></i> Sign &amp; Submit Contract
+                <div class="action-footer">
+                    <button type="button" id="submit-btn" class="btn-sign">
+                        <i class="fas fa-file-signature"></i> Sign Agreement
                     </button>
                 </div>
-            </form>
-        </main>
-
-        <footer class="sign-footer">
-            <p>&copy; Lanting Digital LLC | <a href="https://lantingdigital.com">lantingdigital.com</a></p>
-        </footer>
+            </aside>
+        </div>
     </div>
 
-    <!-- Success State -->
-    <div id="success-screen" class="screen">
-        <div class="success-container">
-            <i class="fas fa-check-circle"></i>
-            <h1>Contract Signed Successfully!</h1>
-            <p>Thank you for signing. A confirmation email will be sent to <span id="success-email"></span>.</p>
-            <div class="success-details">
-                <p><strong>Contract:</strong> <span id="success-contract-name"></span></p>
-                <p><strong>Signed:</strong> <span id="success-timestamp"></span></p>
+    <!-- Signature Acknowledgment Modal -->
+    <div id="signature-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-pen-fancy"></i> Electronic Signature</h2>
+                <button class="modal-close" id="signature-modal-close"><i class="fas fa-times"></i></button>
             </div>
-            <a href="https://lantingdigital.com" class="btn btn-primary">Visit Lanting Digital</a>
+            <div class="modal-body">
+                <p class="modal-description">
+                    By typing your name below, you acknowledge that this constitutes your legal electronic signature
+                    and that you agree to be bound by the terms of this agreement.
+                </p>
+                <div class="input-group">
+                    <label for="modal-signature-input">Type Your Full Name</label>
+                    <input type="text" id="modal-signature-input" class="form-input signature-preview-input" placeholder="Your signature will appear here">
+                </div>
+                <div class="signature-preview-box">
+                    <span class="preview-label">Signature Preview</span>
+                    <div class="signature-preview" id="signature-preview">
+                        <!-- Signature preview appears here -->
+                    </div>
+                </div>
+                <label class="terms-check modal-terms">
+                    <input type="checkbox" id="signature-acknowledge-checkbox">
+                    <span>I acknowledge that typing my name above constitutes my legal electronic signature and is binding.</span>
+                </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="signature-cancel-btn">Cancel</button>
+                <button type="button" class="btn-primary" id="signature-confirm-btn" disabled>
+                    <i class="fas fa-check"></i> Confirm Signature
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
 
-    <!-- Signature Pad Library -->
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
-
     <!-- App Scripts -->
-    <script src="js/config.js"></script>
-    <script src="js/sign.js"></script>
+    <script src="js/config.js?v=20260102b"></script>
+    <script src="js/sign.js?v=20260102f"></script>
 </body>
 </html>

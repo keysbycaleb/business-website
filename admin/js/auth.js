@@ -5,14 +5,22 @@ const loginScreen = document.getElementById('login-screen');
 const dashboardScreen = document.getElementById('dashboard-screen');
 const loginForm = document.getElementById('login-form');
 const loginError = document.getElementById('login-error');
-const userEmailSpan = document.getElementById('user-email');
+const sidebarUserName = document.getElementById('sidebar-user-name');
 const logoutBtn = document.getElementById('logout-btn');
+const googleSigninBtn = document.getElementById('google-signin-btn');
 
 // Auth State Observer
 auth.onAuthStateChanged((user) => {
     if (user) {
-        // User is signed in
-        showDashboard(user);
+        // Check if user is an admin
+        if (isAdminEmail(user.email)) {
+            showDashboard(user);
+        } else {
+            // Not an admin - sign them out
+            auth.signOut();
+            loginError.textContent = 'Access denied. This portal is for administrators only.';
+            showLogin();
+        }
     } else {
         // User is signed out
         showLogin();
@@ -23,14 +31,37 @@ auth.onAuthStateChanged((user) => {
 function showLogin() {
     loginScreen.classList.add('active');
     dashboardScreen.classList.remove('active');
-    loginError.textContent = '';
+
+    // Reset Google sign-in button state
+    if (googleSigninBtn) {
+        googleSigninBtn.disabled = false;
+        googleSigninBtn.innerHTML = '<i class="fab fa-google"></i> Sign in with Google';
+    }
+
+    // Reset email/password button state
+    const submitBtn = loginForm ? loginForm.querySelector('button[type="submit"]') : null;
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+    }
 }
 
 // Show Dashboard Screen
 function showDashboard(user) {
     loginScreen.classList.remove('active');
     dashboardScreen.classList.add('active');
-    userEmailSpan.textContent = user.email;
+    loginError.textContent = '';
+
+    // Update sidebar user name
+    if (sidebarUserName && user.email) {
+        // Use display name if available, otherwise extract from email
+        if (user.displayName) {
+            sidebarUserName.textContent = user.displayName.split(' ')[0];
+        } else {
+            const name = user.email.split('@')[0];
+            sidebarUserName.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+        }
+    }
 
     // Initialize dashboard
     if (typeof initDashboard === 'function') {
@@ -38,7 +69,30 @@ function showDashboard(user) {
     }
 }
 
-// Handle Login
+// Handle Google Sign-In
+if (googleSigninBtn) {
+    googleSigninBtn.addEventListener('click', async () => {
+        googleSigninBtn.disabled = true;
+        googleSigninBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+        loginError.textContent = '';
+
+        try {
+            await auth.signInWithPopup(googleProvider);
+            // Auth state observer will handle the redirect and admin check
+        } catch (error) {
+            console.error('Google sign-in error:', error);
+
+            if (error.code !== 'auth/popup-closed-by-user') {
+                loginError.textContent = 'Google sign-in failed. Please try again.';
+            }
+
+            googleSigninBtn.disabled = false;
+            googleSigninBtn.innerHTML = '<i class="fab fa-google"></i> Sign in with Google';
+        }
+    });
+}
+
+// Handle Email/Password Login
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 

@@ -1,6 +1,7 @@
 // Lanting Digital - Contract Signing Logic
+// Typed signature with modal acknowledgment
 
-// DOM Elements
+// DOM Elements - Screens
 const loadingScreen = document.getElementById('loading-screen');
 const errorScreen = document.getElementById('error-screen');
 const signedScreen = document.getElementById('signed-screen');
@@ -9,44 +10,271 @@ const successScreen = document.getElementById('success-screen');
 const errorMessage = document.getElementById('error-message');
 const signedDate = document.getElementById('signed-date');
 
-// Contract display elements
+// Contract display
 const contractContent = document.getElementById('contract-content');
 
 // Form elements
 const signingForm = document.getElementById('signing-form');
-const agreeTermsCheckbox = document.getElementById('agree-terms');
+const inputName = document.getElementById('input-name');
+const inputTitle = document.getElementById('input-title');
+const inputEntity = document.getElementById('input-entity');
+const inputSignature = document.getElementById('input-signature');
+const signatureHint = document.getElementById('signature-hint');
+const signatureAcknowledged = document.getElementById('signature-acknowledged');
 const submitBtn = document.getElementById('submit-btn');
-const clearSignatureBtn = document.getElementById('clear-signature');
+
+// Signature Modal elements
+const signatureModal = document.getElementById('signature-modal');
+const modalSignatureInput = document.getElementById('modal-signature-input');
+const signaturePreview = document.getElementById('signature-preview');
+const signatureAcknowledgeCheckbox = document.getElementById('signature-acknowledge-checkbox');
+const signatureConfirmBtn = document.getElementById('signature-confirm-btn');
+const signatureCancelBtn = document.getElementById('signature-cancel-btn');
+const signatureModalClose = document.getElementById('signature-modal-close');
 
 // Success screen elements
-const successEmail = document.getElementById('success-email');
 const successContractName = document.getElementById('success-contract-name');
 const successTimestamp = document.getElementById('success-timestamp');
 
-// Signature Pad
-let signaturePad;
+// State
 let currentContract = null;
+let signatureConfirmed = false;
+let currentUser = null;
+let contractId = null;
+let isProcessingAuth = false;
+let hasInitialized = false;
+let authProcessedOnce = false;
+let lastAuthTime = 0;
+let inactivityTimer = null;
+const INACTIVITY_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
 // Initialize
 document.addEventListener('DOMContentLoaded', init);
 
 async function init() {
+    // Prevent double initialization
+    if (hasInitialized) return;
+    hasInitialized = true;
+
+    console.log('[Sign] Initializing...');
+
     // Get contract ID from URL
-    const contractId = getContractIdFromUrl();
+    contractId = getContractIdFromUrl();
 
     if (!contractId) {
         showError('No contract ID provided in the URL.');
         return;
     }
 
-    // Initialize signature pad
-    initSignaturePad();
+    // SECURITY: Set session-only persistence (doesn't persist after browser/tab close)
+    try {
+        await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+        console.log('[Sign] Auth persistence set to SESSION');
+    } catch (e) {
+        console.warn('[Sign] Could not set auth persistence:', e);
+    }
 
-    // Load contract
-    await loadContract(contractId);
+    // SECURITY: Sign out any existing session on page load - require fresh sign-in every time
+    if (auth.currentUser) {
+        console.log('[Sign] Clearing existing session for security...');
+        await auth.signOut();
+    }
 
-    // Setup form handlers
-    setupFormHandlers();
+    // Setup login button handler
+    setupLoginHandler();
+
+    // Setup inactivity timeout (5 minutes)
+    setupInactivityTimeout();
+
+    // Show login screen - always require sign-in
+    showScreen('login');
+
+    // Check authentication state
+    auth.onAuthStateChanged(async (user) => {
+        const now = Date.now();
+
+        // Debounce: ignore auth changes within 1 second of each other
+        if (now - lastAuthTime < 1000) {
+            console.log('[Sign] Auth change debounced (too fast)');
+            return;
+        }
+        lastAuthTime = now;
+
+        // Prevent multiple simultaneous auth processing
+        if (isProcessingAuth) {
+            console.log('[Sign] Auth already processing, skipping...');
+            return;
+        }
+
+        isProcessingAuth = true;
+        console.log('[Sign] Processing auth state change, user:', user ? user.email : 'none');
+
+        try {
+            if (user) {
+                currentUser = user;
+
+                // If we already processed auth once and user is the same, skip
+                if (authProcessedOnce && currentContract) {
+                    console.log('[Sign] Auth already processed, contract loaded, skipping...');
+                    isProcessingAuth = false;
+                    return;
+                }
+
+                // Load contract and verify access
+                const hasAccess = await loadContractWithAccessCheck(contractId, user.email);
+
+                if (hasAccess) {
+                    authProcessedOnce = true;
+
+                    // Setup form handlers (only once)
+                    if (!signingForm.dataset.handlersAttached) {
+                        setupFormHandlers();
+                        setupLivePreview();
+                        setupSignatureModal();
+                        signingForm.dataset.handlersAttached = 'true';
+                    }
+
+                    // Pre-fill name from user profile if available
+                    if (user.displayName && !inputName.value) {
+                        inputName.value = user.displayName;
+                        inputName.dispatchEvent(new Event('input'));
+                    }
+                }
+            } else {
+                console.log('[Sign] User not authenticated, showing login');
+                currentUser = null;
+                authProcessedOnce = false;
+                showLoginScreen();
+            }
+        } catch (error) {
+            console.error('[Sign] Auth processing error:', error);
+            showError('An error occurred. Please refresh the page and try again.');
+        } finally {
+            isProcessingAuth = false;
+        }
+    });
+}
+
+// Setup login button handler
+function setupLoginHandler() {
+    const googleLoginBtn = document.getElementById('google-login-btn');
+    if (googleLoginBtn) {
+        googleLoginBtn.addEventListener('click', handleGoogleLogin);
+    }
+}
+
+// Handle Google login on sign page
+async function handleGoogleLogin() {
+    const btn = document.getElementById('google-login-btn');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+    }
+
+    try {
+        await auth.signInWithPopup(googleProvider);
+        // Auth state change handler will take over
+    } catch (error) {
+        console.error('Google sign-in error:', error);
+        if (error.code !== 'auth/popup-closed-by-user') {
+            showToast('Sign-in failed. Please try again.', 'error');
+        }
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fab fa-google"></i> Sign in with Google';
+        }
+    }
+}
+
+// Show login screen
+function showLoginScreen() {
+    showScreen('login');
+}
+
+async function loadContractWithAccessCheck(contractId, userEmail) {
+    try {
+        console.log('[Sign] Loading contract:', contractId, 'for user:', userEmail);
+        console.log('[Sign] Fetching from Firestore...');
+        const doc = await db.collection(CONTRACTS_COLLECTION).doc(contractId).get();
+        console.log('[Sign] Firestore response received, exists:', doc.exists);
+
+        if (!doc.exists) {
+            showError('This contract does not exist or has been removed.');
+            return false;
+        }
+
+        currentContract = { id: doc.id, ...doc.data() };
+        console.log('[Sign] Contract data loaded, status:', currentContract.status);
+
+        // SECURITY: Check if contract has email restriction
+        console.log('[Sign] Contract clientEmail:', currentContract.clientEmail || 'NOT SET');
+        console.log('[Sign] User signed in as:', userEmail);
+
+        if (currentContract.clientEmail) {
+            const contractEmail = String(currentContract.clientEmail).toLowerCase().trim();
+            const signInEmail = String(userEmail).toLowerCase().trim();
+
+            console.log('[Sign] Email comparison:', signInEmail, '===', contractEmail, '?', signInEmail === contractEmail);
+
+            if (signInEmail !== contractEmail) {
+                console.log('[Sign] ACCESS DENIED - Email mismatch');
+                showAccessDenied(userEmail, currentContract.clientEmail);
+                return false;
+            }
+            console.log('[Sign] Email verified - access granted');
+        } else {
+            // SECURITY WARNING: Contract has no email restriction!
+            console.warn('[Sign] WARNING: Contract has no clientEmail restriction - anyone can access!');
+        }
+
+        // Check if already signed
+        if (currentContract.status === 'signed' && currentContract.clientSignedAt) {
+            showAlreadySigned(currentContract.clientSignedAt);
+            return false;
+        }
+
+        // Display contract
+        displayContract(currentContract);
+
+        // Pre-fill entity if available
+        if (currentContract.clientCompany) {
+            inputEntity.value = currentContract.clientCompany;
+        }
+
+        showScreen('signing');
+        return true;
+
+    } catch (error) {
+        console.error('[Sign] Error loading contract:', error);
+        showError('Failed to load contract. Please try again later.');
+        return false;
+    }
+}
+
+// Show access denied with option to sign out
+function showAccessDenied(currentEmail, expectedEmail) {
+    const maskedExpected = expectedEmail.replace(/(.{2})(.*)(@.*)/, '$1***$3');
+    errorMessage.innerHTML = `
+        This contract is for <strong>${maskedExpected}</strong>, but you're signed in as <strong>${currentEmail}</strong>.
+        <br><br>
+        <button onclick="signOutAndRetry()" class="btn-secondary" style="margin-top: 10px;">
+            <i class="fas fa-sign-out-alt"></i> Sign out and try again
+        </button>
+    `;
+    showScreen('error');
+}
+
+// Sign out and let user retry
+async function signOutAndRetry() {
+    try {
+        await auth.signOut();
+        authProcessedOnce = false;
+        currentContract = null;
+        // Auth state observer will handle showing login screen
+    } catch (error) {
+        console.error('[Sign] Error signing out:', error);
+        showError('Failed to sign out. Please try refreshing the page.');
+    }
 }
 
 function getContractIdFromUrl() {
@@ -66,73 +294,6 @@ function getContractIdFromUrl() {
     return contractId;
 }
 
-function initSignaturePad() {
-    const canvas = document.getElementById('signature-pad');
-    const container = canvas.parentElement;
-
-    // Set canvas size
-    function setCanvasSize() {
-        const rect = container.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = 200;
-    }
-
-    setCanvasSize();
-
-    // Initialize SignaturePad
-    signaturePad = new SignaturePad(canvas, {
-        backgroundColor: 'rgb(255, 255, 255)',
-        penColor: 'rgb(0, 0, 0)',
-        minWidth: 1,
-        maxWidth: 3
-    });
-
-    // Handle window resize
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
-            const data = signaturePad.toData();
-            setCanvasSize();
-            signaturePad.clear();
-            if (data && data.length > 0) {
-                signaturePad.fromData(data);
-            }
-        }, 100);
-    });
-
-    // Clear button
-    clearSignatureBtn.addEventListener('click', () => {
-        signaturePad.clear();
-    });
-}
-
-async function loadContract(contractId) {
-    try {
-        const doc = await db.collection(CONTRACTS_COLLECTION).doc(contractId).get();
-
-        if (!doc.exists) {
-            showError('This contract does not exist or has been removed.');
-            return;
-        }
-
-        currentContract = { id: doc.id, ...doc.data() };
-
-        // Check if already signed
-        if (currentContract.status === 'signed' && currentContract.clientSignedAt) {
-            showAlreadySigned(currentContract.clientSignedAt);
-            return;
-        }
-
-        // Display contract with signature section
-        displayContract(currentContract);
-        showScreen('signing');
-
-    } catch (error) {
-        console.error('Error loading contract:', error);
-        showError('Failed to load contract. Please try again later.');
-    }
-}
 
 function displayContract(contract) {
     // Get provider date
@@ -146,40 +307,203 @@ function displayContract(contract) {
         providerDateStr = formatDate(new Date());
     }
 
-    // Get today's date for default
-    const today = new Date().toISOString().split('T')[0];
-
-    // Build the signature section HTML that will be appended to the contract
+    // Build the signature section HTML
     const signatureHtml = `
-<div class="signature-section">
-    <div class="signature-block">
-        <p><strong>PROVIDER: Lanting Digital LLC</strong></p>
-        <p>Signature:</p>
-        <div class="signature-line">
-            <span class="provider-signature-text">${contract.providerName || 'Caleb Lanting'}</span>
-        </div>
-        <p>Name: ${contract.providerName || 'Caleb Lanting'}</p>
-        <p>Title: ${contract.providerTitle || 'Owner / Member'}</p>
-        <p>Date: ${providerDateStr}</p>
+<div class="signature-area-preview">
+    <div class="sig-block">
+        <p><strong>Provider:</strong> Lanting Digital LLC</p>
+        <div class="sig-line">${contract.providerName || 'Caleb Lanting'}</div>
+        <p style="font-size: 0.9em; color: #666;">${contract.providerName || 'Caleb Lanting'}, ${contract.providerTitle || 'Owner / Member'}</p>
+        <p style="font-size: 0.9em; color: #666;">Date: ${providerDateStr}</p>
     </div>
-    <div class="signature-block">
-        <p><strong>CLIENT: ${contract.clientCompany || 'Client'}</strong></p>
-        <p>Signature: <em style="color: #666; font-size: 10pt;">(Draw below)</em></p>
-        <div class="signature-line" id="client-signature-display">
-            <!-- Signature image will appear here after signing -->
+    <div class="sig-block">
+        <p><strong>Client:</strong> <span id="doc-preview-entity" class="placeholder-text">${contract.clientCompany || '[Company Name]'}</span></p>
+        <div class="sig-line client-sig" id="doc-preview-sig">
+            <span class="placeholder-text" style="font-family: 'Inter', sans-serif; font-size: 10pt; align-self: center;">Signature will appear here</span>
         </div>
-        <p>Name: <input type="text" class="client-input" id="client-name" required placeholder="Your full name"></p>
-        <p>Title: <input type="text" class="client-input" id="client-title" required placeholder="Your title"></p>
-        <p>Date: <input type="date" class="date-input" id="effective-date" value="${today}" required></p>
+        <p style="font-size: 0.9em; color: #666;">
+            <span id="doc-preview-name">[Client Name]</span>,
+            <span id="doc-preview-title">[Title]</span>
+        </p>
+        <p style="font-size: 0.9em; color: #666;">Date: ${formatDate(new Date())}</p>
     </div>
 </div>
 `;
 
-    // Inject contract HTML with signature section
-    contractContent.innerHTML = contract.contractHtml + signatureHtml;
+    // Build document content
+    let documentHtml = '';
+
+    // Add title if contract has a name
+    if (contract.contractName) {
+        documentHtml += `<h1 class="doc-title">${escapeHtml(contract.contractName)}</h1>`;
+        if (contract.contractSubtitle) {
+            documentHtml += `<p class="doc-subtitle">${escapeHtml(contract.contractSubtitle)}</p>`;
+        } else {
+            documentHtml += `<p class="doc-subtitle">Service Agreement</p>`;
+        }
+    }
+
+    // Add contract HTML content
+    if (contract.contractHtml) {
+        documentHtml += contract.contractHtml;
+    }
+
+    // Add signature section
+    documentHtml += signatureHtml;
+
+    // Inject into document
+    contractContent.innerHTML = documentHtml;
+
+    // Update placeholders if entity is pre-filled
+    if (contract.clientCompany) {
+        const entityPreview = document.getElementById('doc-preview-entity');
+        if (entityPreview) {
+            entityPreview.textContent = contract.clientCompany;
+            entityPreview.classList.remove('placeholder-text');
+        }
+    }
+}
+
+function setupLivePreview() {
+    // Mirror inputs to document preview
+    const previews = {
+        name: document.getElementById('doc-preview-name'),
+        title: document.getElementById('doc-preview-title'),
+        entity: document.getElementById('doc-preview-entity')
+    };
+
+    // Name input
+    inputName.addEventListener('input', (e) => {
+        const val = e.target.value;
+        if (previews.name) {
+            previews.name.textContent = val || '[Client Name]';
+            previews.name.classList.toggle('placeholder-text', !val);
+        }
+    });
+
+    // Title input
+    inputTitle.addEventListener('input', (e) => {
+        const val = e.target.value;
+        if (previews.title) {
+            previews.title.textContent = val || '[Title]';
+            previews.title.classList.toggle('placeholder-text', !val);
+        }
+    });
+
+    // Entity input
+    inputEntity.addEventListener('input', (e) => {
+        const val = e.target.value;
+        if (previews.entity) {
+            previews.entity.textContent = val || '[Company Name]';
+            previews.entity.classList.toggle('placeholder-text', !val);
+        }
+    });
+}
+
+function setupSignatureModal() {
+    // Open modal when clicking signature input or hint
+    inputSignature.addEventListener('click', openSignatureModal);
+    inputSignature.addEventListener('focus', openSignatureModal);
+    signatureHint.addEventListener('click', openSignatureModal);
+
+    // Close modal
+    signatureModalClose.addEventListener('click', closeSignatureModal);
+    signatureCancelBtn.addEventListener('click', closeSignatureModal);
+
+    // Close on backdrop click
+    signatureModal.addEventListener('click', (e) => {
+        if (e.target === signatureModal) closeSignatureModal();
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && signatureModal.classList.contains('active')) {
+            closeSignatureModal();
+        }
+    });
+
+    // Update preview as user types
+    modalSignatureInput.addEventListener('input', updateModalSignaturePreview);
+
+    // Checkbox enables/disables confirm button
+    signatureAcknowledgeCheckbox.addEventListener('change', updateConfirmButtonState);
+
+    // Confirm signature
+    signatureConfirmBtn.addEventListener('click', confirmSignature);
+}
+
+function openSignatureModal() {
+    // Pre-fill with name if available
+    if (inputName.value && !modalSignatureInput.value) {
+        modalSignatureInput.value = inputName.value;
+        updateModalSignaturePreview();
+    }
+
+    signatureModal.classList.add('active');
+    modalSignatureInput.focus();
+}
+
+function closeSignatureModal() {
+    signatureModal.classList.remove('active');
+}
+
+function updateModalSignaturePreview() {
+    const val = modalSignatureInput.value.trim();
+    if (val) {
+        signaturePreview.textContent = val;
+        signaturePreview.classList.remove('empty');
+    } else {
+        signaturePreview.textContent = 'Your signature will appear here';
+        signaturePreview.classList.add('empty');
+    }
+    updateConfirmButtonState();
+}
+
+function updateConfirmButtonState() {
+    const hasSignature = modalSignatureInput.value.trim().length > 0;
+    const isAcknowledged = signatureAcknowledgeCheckbox.checked;
+    signatureConfirmBtn.disabled = !(hasSignature && isAcknowledged);
+}
+
+function confirmSignature() {
+    const signatureValue = modalSignatureInput.value.trim();
+    if (!signatureValue || !signatureAcknowledgeCheckbox.checked) return;
+
+    // Set signature in main form
+    inputSignature.value = signatureValue;
+    signatureConfirmed = true;
+
+    // Update UI
+    signatureHint.classList.add('hidden');
+    signatureAcknowledged.classList.remove('hidden');
+
+    // Update document preview
+    updateSignaturePreview(signatureValue);
+
+    // Close modal
+    closeSignatureModal();
+}
+
+function updateSignaturePreview(signatureValue) {
+    const docSig = document.getElementById('doc-preview-sig');
+    if (!docSig) return;
+
+    if (signatureValue) {
+        docSig.innerHTML = signatureValue;
+        docSig.style.fontFamily = "'Dancing Script', cursive";
+    } else {
+        docSig.innerHTML = '<span class="placeholder-text" style="font-family: \'Inter\', sans-serif; font-size: 10pt; align-self: center;">Signature will appear here</span>';
+    }
 }
 
 function setupFormHandlers() {
+    // Submit button click
+    submitBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        await submitSignature();
+    });
+
+    // Also handle form submit event
     signingForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         await submitSignature();
@@ -187,29 +511,22 @@ function setupFormHandlers() {
 }
 
 async function submitSignature() {
-    // Get form values from inputs inside the contract
-    const clientNameInput = document.getElementById('client-name');
-    const clientTitleInput = document.getElementById('client-title');
-    const effectiveDateInput = document.getElementById('effective-date');
-
     // Validate
-    if (!clientNameInput.value.trim()) {
-        showToast('Please enter your full name in the contract.', 'error');
-        clientNameInput.focus();
-        clientNameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (!inputName.value.trim()) {
+        showToast('Please enter your full name.', 'error');
+        inputName.focus();
         return;
     }
 
-    if (!clientTitleInput.value.trim()) {
-        showToast('Please enter your title in the contract.', 'error');
-        clientTitleInput.focus();
-        clientTitleInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (!inputTitle.value.trim()) {
+        showToast('Please enter your title.', 'error');
+        inputTitle.focus();
         return;
     }
 
-    if (signaturePad.isEmpty()) {
-        showToast('Please draw your signature below.', 'error');
-        document.querySelector('.signature-pad-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (!signatureConfirmed || !inputSignature.value.trim()) {
+        showToast('Please add your signature.', 'error');
+        openSignatureModal();
         return;
     }
 
@@ -219,19 +536,11 @@ async function submitSignature() {
         return;
     }
 
-    if (!agreeTermsCheckbox.checked) {
-        showToast('Please agree to the terms of the agreement.', 'error');
-        return;
-    }
-
     // Disable submit button
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
 
     try {
-        // Get signature as base64
-        const signatureData = signaturePad.toDataURL('image/png');
-
         // Get portfolio permission
         const portfolioPermission = portfolioRadio.value === 'true';
 
@@ -247,13 +556,14 @@ async function submitSignature() {
 
         // Prepare update data
         const updateData = {
-            clientName: clientNameInput.value.trim(),
-            clientTitle: clientTitleInput.value.trim(),
-            clientSignatureData: signatureData,
+            clientName: inputName.value.trim(),
+            clientTitle: inputTitle.value.trim(),
+            clientCompany: inputEntity.value.trim() || currentContract.clientCompany || '',
+            clientSignature: inputSignature.value.trim(),
             clientSignedAt: firebase.firestore.FieldValue.serverTimestamp(),
             clientIpAddress: clientIp,
             portfolioPermission: portfolioPermission,
-            effectiveDate: effectiveDateInput.value,
+            effectiveDate: new Date().toISOString().split('T')[0],
             status: 'signed'
         };
 
@@ -269,12 +579,11 @@ async function submitSignature() {
 
         // Re-enable button
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-file-signature"></i> Sign & Submit Contract';
+        submitBtn.innerHTML = '<i class="fas fa-file-signature"></i> Sign Agreement';
     }
 }
 
 function showSuccess() {
-    successEmail.textContent = currentContract.clientEmail || 'your email';
     successContractName.textContent = currentContract.contractName || 'Contract';
     successTimestamp.textContent = new Date().toLocaleString('en-US', {
         weekday: 'long',
@@ -301,7 +610,9 @@ function showError(message) {
 }
 
 function showScreen(screen) {
-    // Hide all screens
+    // Hide all screens (including login screen)
+    const loginScreen = document.getElementById('login-screen');
+    if (loginScreen) loginScreen.classList.remove('active');
     loadingScreen.classList.remove('active');
     errorScreen.classList.remove('active');
     signedScreen.classList.remove('active');
@@ -325,6 +636,9 @@ function showScreen(screen) {
         case 'success':
             successScreen.classList.add('active');
             break;
+        case 'login':
+            if (loginScreen) loginScreen.classList.add('active');
+            break;
     }
 }
 
@@ -342,6 +656,12 @@ function formatDate(date, includeTime = false) {
     }
 
     return date.toLocaleDateString('en-US', options);
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 function showToast(message, type = 'info') {
@@ -362,4 +682,39 @@ function showToast(message, type = 'info') {
         toast.style.animation = 'slideIn 0.3s ease reverse';
         setTimeout(() => toast.remove(), 300);
     }, 4000);
+}
+
+// =============================================
+// SECURITY: Inactivity Timeout
+// =============================================
+function setupInactivityTimeout() {
+    const resetTimer = () => {
+        clearTimeout(inactivityTimer);
+        inactivityTimer = setTimeout(handleInactivityTimeout, INACTIVITY_TIMEOUT);
+    };
+
+    // Reset timer on any user activity
+    ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'].forEach(event => {
+        document.addEventListener(event, resetTimer, { passive: true });
+    });
+
+    // Start the timer
+    resetTimer();
+}
+
+async function handleInactivityTimeout() {
+    if (auth.currentUser) {
+        console.log('[Sign] Session timeout due to inactivity');
+        showToast('Session expired due to inactivity. Please sign in again.', 'info');
+
+        // Sign out and reset state
+        await auth.signOut();
+        currentContract = null;
+        currentUser = null;
+        authProcessedOnce = false;
+        signatureConfirmed = false;
+
+        // Show login screen
+        showScreen('login');
+    }
 }

@@ -4,28 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Admin Dashboard | Lanting Digital</title>
+    <title>Admin Portal | Lanting Digital</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="https://lantingdigital.com/images/favicon.ico">
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-    <!-- Admin Styles -->
-    <link rel="stylesheet" href="css/admin.css">
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/admin.css?v=20260102f">
 </head>
 <body>
-    <!-- Login Screen -->
-    <div id="login-screen" class="screen active">
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="screen login-screen active">
         <div class="login-container">
             <div class="login-header">
                 <h1>Lanting Digital</h1>
-                <p>Admin Dashboard</p>
+                <p>Admin Portal</p>
             </div>
+
+            <!-- Google Sign-In Button -->
+            <button type="button" class="btn btn-google btn-full" id="google-signin-btn">
+                <i class="fab fa-google"></i> Sign in with Google
+            </button>
+
+            <div class="login-divider">
+                <span>or</span>
+            </div>
+
             <form id="login-form">
                 <div class="form-group">
                     <label for="login-email">Email</label>
@@ -43,234 +55,247 @@
         </div>
     </div>
 
-    <!-- Dashboard Screen -->
+    <!-- DASHBOARD SCREEN -->
     <div id="dashboard-screen" class="screen">
-        <!-- Header -->
-        <header class="dashboard-header">
-            <div class="header-left">
-                <h1><i class="fas fa-chart-line"></i> Lanting Digital Admin</h1>
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <i class="fas fa-layer-group"></i>
+                <span>Lanting Digital</span>
             </div>
-            <div class="header-right">
-                <span id="user-email" class="user-info"></span>
-                <button id="logout-btn" class="btn btn-outline">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+
+            <nav class="nav-links">
+                <button class="nav-tab active" data-section="leads">
+                    <i class="fas fa-envelope-open-text"></i>
+                    Leads & Inquiries
+                </button>
+                <button class="nav-tab" data-section="contracts">
+                    <i class="fas fa-file-signature"></i>
+                    Contracts & Proposals
+                </button>
+                <button class="nav-tab disabled">
+                    <i class="fas fa-users"></i>
+                    Clients (Coming Soon)
+                </button>
+            </nav>
+
+            <div class="user-profile">
+                <div class="user-info-mini">
+                    <span class="user-name" id="sidebar-user-name">Admin</span>
+                    <span class="user-role">Administrator</span>
+                </div>
+                <button class="logout-icon" id="logout-btn" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
-        </header>
+        </aside>
 
-        <!-- Navigation Tabs -->
-        <nav class="dashboard-nav">
-            <button class="nav-tab active" data-section="leads">
-                <i class="fas fa-inbox"></i> Leads
-            </button>
-            <button class="nav-tab" data-section="contracts">
-                <i class="fas fa-file-signature"></i> Contracts
-            </button>
-        </nav>
-
-        <!-- Leads Section -->
-        <main id="leads-section" class="dashboard-main section-content active">
-            <!-- Stats Bar -->
-            <div class="stats-bar">
-                <div class="stat-card">
-                    <i class="fas fa-inbox"></i>
-                    <div class="stat-content">
-                        <span id="total-submissions" class="stat-number">0</span>
-                        <span class="stat-label">Total Leads</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-clock"></i>
-                    <div class="stat-content">
-                        <span id="today-submissions" class="stat-number">0</span>
-                        <span class="stat-label">Today</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-archive"></i>
-                    <div class="stat-content">
-                        <span id="archived-count" class="stat-number">0</span>
-                        <span class="stat-label">Archived</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Controls -->
-            <div class="controls-bar">
-                <div class="controls-left">
-                    <div class="view-toggle">
-                        <button id="view-active" class="btn btn-toggle active">
-                            <i class="fas fa-inbox"></i> Active
-                        </button>
-                        <button id="view-archived" class="btn btn-toggle">
-                            <i class="fas fa-archive"></i> Archived
-                        </button>
-                    </div>
-                </div>
-                <div class="controls-right">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="search-input" placeholder="Search leads...">
-                    </div>
-                    <button id="export-btn" class="btn btn-secondary">
-                        <i class="fas fa-download"></i> Export CSV
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="top-bar-left">
+                    <button class="mobile-menu-btn" id="mobile-menu-btn">
+                        <i class="fas fa-bars"></i>
                     </button>
-                    <button id="refresh-btn" class="btn btn-secondary">
+                    <div class="page-title">
+                        <h1 id="page-header-title">Leads & Inquiries</h1>
+                        <p id="page-header-date"></p>
+                    </div>
+                </div>
+
+                <div class="action-bar">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="search-input" id="search-input" placeholder="Search records...">
+                    </div>
+                    <button class="btn btn-secondary" id="refresh-btn">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Submissions Table -->
-            <div class="table-container">
-                <table id="submissions-table">
-                    <thead>
-                        <tr>
-                            <th data-sort="name">Name <i class="fas fa-sort"></i></th>
-                            <th data-sort="email">Email <i class="fas fa-sort"></i></th>
-                            <th data-sort="message">Message</th>
-                            <th data-sort="timestamp">Date <i class="fas fa-sort"></i></th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="submissions-body">
-                        <!-- Submissions will be loaded here -->
-                    </tbody>
-                </table>
-                <div id="empty-state" class="empty-state hidden">
-                    <i class="fas fa-inbox"></i>
-                    <p>No submissions found</p>
+            <!-- LEADS SECTION -->
+            <div id="leads-section" class="section-content active">
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-inbox"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-submissions">0</span>
+                            <span class="stat-label">Active Leads</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="today-submissions">0</span>
+                            <span class="stat-label">New Today</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon muted"><i class="fas fa-archive"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value muted" id="archived-count">0</span>
+                            <span class="stat-label">Archived</span>
+                        </div>
+                    </div>
                 </div>
-                <div id="loading-state" class="loading-state">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Loading submissions...</p>
-                </div>
-            </div>
-        </main>
 
-        <!-- Contracts Section -->
-        <main id="contracts-section" class="dashboard-main section-content">
-            <!-- Contracts Stats Bar -->
-            <div class="stats-bar">
-                <div class="stat-card">
-                    <i class="fas fa-file-signature"></i>
-                    <div class="stat-content">
-                        <span id="total-contracts" class="stat-number">0</span>
-                        <span class="stat-label">Total Contracts</span>
+                <!-- Table Panel -->
+                <div class="content-panel">
+                    <div class="panel-header">
+                        <h3>Recent Submissions</h3>
+                        <div class="filter-group">
+                            <button class="filter-btn active" id="view-active">All</button>
+                            <button class="filter-btn" id="filter-active">Active</button>
+                            <button class="filter-btn" id="view-archived">Archived</button>
+                        </div>
                     </div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-paper-plane"></i>
-                    <div class="stat-content">
-                        <span id="sent-contracts" class="stat-number">0</span>
-                        <span class="stat-label">Sent</span>
+                    <div class="table-responsive">
+                        <table id="submissions-table">
+                            <thead>
+                                <tr>
+                                    <th>Client Name</th>
+                                    <th>Subject/Message</th>
+                                    <th>Date Received</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="submissions-body">
+                                <!-- Data loaded by JS -->
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-check-circle"></i>
-                    <div class="stat-content">
-                        <span id="signed-contracts" class="stat-number">0</span>
-                        <span class="stat-label">Signed</span>
+                    <div id="loading-state" class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading submissions...</p>
                     </div>
-                </div>
-            </div>
-
-            <!-- Contracts Controls -->
-            <div class="controls-bar">
-                <div class="controls-left">
-                    <div class="view-toggle">
-                        <button id="view-all-contracts" class="btn btn-toggle active">
-                            <i class="fas fa-list"></i> All
-                        </button>
-                        <button id="view-pending-contracts" class="btn btn-toggle">
-                            <i class="fas fa-clock"></i> Pending
-                        </button>
-                        <button id="view-signed-contracts" class="btn btn-toggle">
-                            <i class="fas fa-check"></i> Signed
-                        </button>
+                    <div id="empty-state" class="empty-state hidden">
+                        <i class="fas fa-inbox"></i>
+                        <p>No submissions found</p>
                     </div>
-                </div>
-                <div class="controls-right">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="contracts-search-input" placeholder="Search contracts...">
-                    </div>
-                    <button id="refresh-contracts-btn" class="btn btn-secondary">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
                 </div>
             </div>
 
-            <!-- Contracts Table -->
-            <div class="table-container">
-                <table id="contracts-table">
-                    <thead>
-                        <tr>
-                            <th>Client</th>
-                            <th>Contract</th>
-                            <th>Status</th>
-                            <th>Sent</th>
-                            <th>Signed</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="contracts-body">
-                        <!-- Contracts will be loaded here -->
-                    </tbody>
-                </table>
-                <div id="contracts-empty-state" class="empty-state hidden">
-                    <i class="fas fa-file-signature"></i>
-                    <p>No contracts found</p>
+            <!-- CONTRACTS SECTION -->
+            <div id="contracts-section" class="section-content">
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-file-contract"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-contracts">0</span>
+                            <span class="stat-label">Total Contracts</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning"><i class="fas fa-hourglass-half"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value warning" id="sent-contracts">0</span>
+                            <span class="stat-label">Pending Sign</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success"><i class="fas fa-check-double"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value success" id="signed-contracts">0</span>
+                            <span class="stat-label">Completed</span>
+                        </div>
+                    </div>
                 </div>
-                <div id="contracts-loading-state" class="loading-state">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p>Loading contracts...</p>
+
+                <!-- Table Panel -->
+                <div class="content-panel">
+                    <div class="panel-header">
+                        <h3>Contract Management</h3>
+                        <div class="panel-header-actions">
+                            <button class="btn btn-primary btn-sm" id="create-contract-btn">
+                                <i class="fas fa-plus"></i> Create Contract
+                            </button>
+                            <div class="filter-group">
+                                <button class="filter-btn active" id="view-all-contracts">All</button>
+                                <button class="filter-btn" id="view-pending-contracts">Pending</button>
+                                <button class="filter-btn" id="view-signed-contracts">Signed</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="contracts-table">
+                            <thead>
+                                <tr>
+                                    <th>Client Entity</th>
+                                    <th>Project Scope</th>
+                                    <th>Status</th>
+                                    <th>Timeline</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="contracts-body">
+                                <!-- Data loaded by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="contracts-loading-state" class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading contracts...</p>
+                    </div>
+                    <div id="contracts-empty-state" class="empty-state hidden">
+                        <i class="fas fa-file-signature"></i>
+                        <p>No contracts found</p>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Detail Modal -->
+    <!-- LEAD DETAIL MODAL -->
     <div id="detail-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-user"></i> <span id="modal-name">Lead Details</span></h2>
-                <button class="modal-close">&times;</button>
+                <h2>Lead Details</h2>
+                <button class="modal-close"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
-                <div class="detail-row">
-                    <label>Email:</label>
-                    <span id="modal-email"></span>
-                    <a id="modal-email-link" class="btn btn-sm" target="_blank">
-                        <i class="fas fa-envelope"></i> Send Email
-                    </a>
+                <div class="detail-grid">
+                    <div>
+                        <span class="detail-label">Client Name</span>
+                        <div class="detail-value highlight" id="modal-name"></div>
+                    </div>
+                    <div>
+                        <span class="detail-label">Email Address</span>
+                        <div class="detail-value" id="modal-email"></div>
+                    </div>
                 </div>
-                <div class="detail-row">
-                    <label>Submitted:</label>
-                    <span id="modal-date"></span>
+                <div class="detail-group">
+                    <span class="detail-label">Submission Date</span>
+                    <div class="detail-value" id="modal-date"></div>
                 </div>
-                <div class="detail-row detail-message">
-                    <label>Message:</label>
-                    <p id="modal-message"></p>
+                <div class="detail-group">
+                    <span class="detail-label">Project Inquiry</span>
+                    <div class="message-box" id="modal-message"></div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button id="modal-archive" class="btn btn-secondary">
+                <button class="btn btn-outline" id="modal-archive">
                     <i class="fas fa-archive"></i> Archive
                 </button>
-                <button id="modal-delete" class="btn btn-danger">
+                <button class="btn btn-danger" id="modal-delete">
                     <i class="fas fa-trash"></i> Delete
                 </button>
+                <a id="modal-email-link" class="btn btn-primary" href="#">
+                    <i class="fas fa-envelope"></i> Reply via Email
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
+    <!-- DELETE CONFIRMATION MODAL -->
     <div id="confirm-modal" class="modal">
         <div class="modal-content modal-sm">
             <div class="modal-header">
-                <h2><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h2>
-                <button class="modal-close">&times;</button>
+                <h2>Confirm Delete</h2>
+                <button class="modal-close"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <p>Are you sure you want to permanently delete this submission? This action cannot be undone.</p>
@@ -282,84 +307,134 @@
         </div>
     </div>
 
-    <!-- Contract Detail Modal -->
+    <!-- CONTRACT DETAIL MODAL -->
     <div id="contract-modal" class="modal">
         <div class="modal-content modal-lg">
             <div class="modal-header">
-                <h2><i class="fas fa-file-signature"></i> <span id="contract-modal-name">Contract Details</span></h2>
-                <button class="modal-close">&times;</button>
+                <h2>Contract Details</h2>
+                <button class="modal-close"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
-                <div class="contract-detail-grid">
-                    <div class="detail-column">
-                        <h4>Client Information</h4>
-                        <div class="detail-row">
-                            <label>Company:</label>
-                            <span id="contract-client-company"></span>
-                        </div>
-                        <div class="detail-row">
-                            <label>Email:</label>
-                            <span id="contract-client-email"></span>
-                        </div>
-                        <div class="detail-row">
-                            <label>Signed By:</label>
-                            <span id="contract-client-name"></span>
-                        </div>
-                        <div class="detail-row">
-                            <label>Title:</label>
-                            <span id="contract-client-title"></span>
-                        </div>
+                <div class="detail-grid">
+                    <div>
+                        <span class="detail-label">Contract Name</span>
+                        <div class="detail-value highlight" id="contract-modal-name"></div>
+                        <br>
+                        <span class="detail-label">Client Entity</span>
+                        <div class="detail-value" id="contract-client-company"></div>
                     </div>
-                    <div class="detail-column">
-                        <h4>Contract Status</h4>
-                        <div class="detail-row">
-                            <label>Status:</label>
-                            <span id="contract-status" class="status-badge"></span>
-                        </div>
-                        <div class="detail-row">
-                            <label>Effective Date:</label>
+                    <div>
+                        <span class="detail-label">Current Status</span>
+                        <div id="contract-status"></div>
+                        <br>
+                        <span class="detail-label">Timeline</span>
+                        <div class="detail-value">
                             <span id="contract-effective-date"></span>
-                        </div>
-                        <div class="detail-row">
-                            <label>Sent:</label>
-                            <span id="contract-sent-date"></span>
-                        </div>
-                        <div class="detail-row">
-                            <label>Signed:</label>
-                            <span id="contract-signed-date"></span>
-                        </div>
-                        <div class="detail-row">
-                            <label>Portfolio Permission:</label>
-                            <span id="contract-portfolio"></span>
+                            <br><span class="text-muted" id="contract-sent-date"></span>
+                            <br><span class="text-muted" id="contract-signed-date"></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Client Signature Display -->
-                <div id="signature-display" class="signature-display-section hidden">
-                    <h4>Client Signature</h4>
-                    <div class="signature-image-container">
-                        <img id="contract-signature-img" src="" alt="Client Signature">
+                <div class="detail-group" id="contract-client-info">
+                    <span class="detail-label">Client Signature Info</span>
+                    <div class="detail-value">
+                        <strong id="contract-client-name"></strong> (<span id="contract-client-title"></span>)
                     </div>
-                    <p class="signature-meta">
-                        IP Address: <span id="contract-ip"></span>
-                    </p>
+                    <div class="detail-value text-muted" id="contract-client-email"></div>
+                    <div class="detail-value">
+                        <span class="detail-label">Portfolio Permission:</span> <span id="contract-portfolio"></span>
+                    </div>
                 </div>
 
-                <!-- Signing Link -->
-                <div id="signing-link-section" class="signing-link-section">
+                <!-- Signing Link (for pending contracts) -->
+                <div id="signing-link-section" class="signing-link-section hidden">
                     <h4>Signing Link</h4>
                     <div class="signing-link-box">
                         <input type="text" id="signing-link-input" readonly>
-                        <button id="copy-link-btn" class="btn btn-secondary">
+                        <button class="btn btn-secondary btn-sm" id="copy-link-btn">
                             <i class="fas fa-copy"></i> Copy
                         </button>
                     </div>
                 </div>
+
+                <!-- Contract Content Preview -->
+                <div id="contract-content-section" class="contract-content-section">
+                    <div class="contract-content-header">
+                        <h4>Contract Content</h4>
+                        <button class="btn btn-sm btn-secondary" id="toggle-contract-content">
+                            <i class="fas fa-chevron-down"></i> Show
+                        </button>
+                    </div>
+                    <div id="contract-content-preview" class="contract-content-preview hidden">
+                        <!-- Contract HTML will be injected here -->
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button id="contract-delete-btn" class="btn btn-danger">
-                    <i class="fas fa-trash"></i> Delete Contract
+                <button class="btn btn-danger" id="contract-delete-btn">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+                <button class="btn btn-primary" id="view-contract-btn">
+                    <i class="fas fa-external-link-alt"></i> View Full Contract
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CREATE CONTRACT MODAL -->
+    <div id="create-contract-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>Create New Contract</h2>
+                <button class="modal-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="create-contract-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="contract-name-input">Contract Name <span class="required">*</span></label>
+                            <input type="text" id="contract-name-input" placeholder="e.g., Website Development Agreement" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contract-subtitle-input">Subtitle</label>
+                            <input type="text" id="contract-subtitle-input" placeholder="e.g., Service Agreement">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="client-email-input">Client Email <span class="required">*</span></label>
+                            <input type="email" id="client-email-input" placeholder="client@company.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="client-company-input">Client Company</label>
+                            <input type="text" id="client-company-input" placeholder="Company Name">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contract-html-input">Contract HTML Content <span class="required">*</span></label>
+                        <textarea id="contract-html-input" rows="12" placeholder="Paste your contract HTML content here..." required></textarea>
+                        <span class="form-hint">Paste the HTML content of your contract. The signature section will be added automatically.</span>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="provider-name-input">Provider Name</label>
+                            <input type="text" id="provider-name-input" value="Caleb Lanting" placeholder="Your Name">
+                        </div>
+                        <div class="form-group">
+                            <label for="provider-title-input">Provider Title</label>
+                            <input type="text" id="provider-title-input" value="Owner / Member" placeholder="Your Title">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-cancel">Cancel</button>
+                <button class="btn btn-primary" id="save-contract-btn">
+                    <i class="fas fa-save"></i> Create Contract
                 </button>
             </div>
         </div>
@@ -371,9 +446,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
 
     <!-- Admin Scripts -->
-    <script src="js/config.js"></script>
-    <script src="js/auth.js"></script>
+    <script src="js/config.js?v=20260102g"></script>
+    <script src="js/auth.js?v=20260102g"></script>
     <script src="js/dashboard.js"></script>
-    <script src="js/contracts.js"></script>
+    <script src="js/contracts.js?v=20260102f"></script>
 </body>
 </html>

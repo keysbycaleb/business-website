@@ -1,7 +1,8 @@
 // Dashboard Logic for Lanting Digital Admin Panel
+// Updated for new sidebar navigation layout
 
 // State
-let currentView = 'active'; // 'active' or 'archived'
+let currentView = 'all'; // 'all', 'active', or 'archived'
 let allSubmissions = [];
 let currentSubmission = null;
 let sortField = 'timestamp';
@@ -16,46 +17,43 @@ const todaySubmissions = document.getElementById('today-submissions');
 const archivedCount = document.getElementById('archived-count');
 const searchInput = document.getElementById('search-input');
 const viewActiveBtn = document.getElementById('view-active');
+const filterActiveBtn = document.getElementById('filter-active');
 const viewArchivedBtn = document.getElementById('view-archived');
-const exportBtn = document.getElementById('export-btn');
 const refreshBtn = document.getElementById('refresh-btn');
 const detailModal = document.getElementById('detail-modal');
 const confirmModal = document.getElementById('confirm-modal');
+const pageHeaderTitle = document.getElementById('page-header-title');
+const pageHeaderDate = document.getElementById('page-header-date');
+const sidebar = document.getElementById('sidebar');
+const mobileMenuBtn = document.getElementById('mobile-menu-btn');
 
 // Initialize Dashboard
 function initDashboard() {
     loadSubmissions();
     setupEventListeners();
+    setupSidebarNavigation();
+    updateHeaderDate();
 }
 
 // Setup Event Listeners
 function setupEventListeners() {
-    // View toggle
-    viewActiveBtn.addEventListener('click', () => setView('active'));
-    viewArchivedBtn.addEventListener('click', () => setView('archived'));
+    // Filter buttons
+    if (viewActiveBtn) viewActiveBtn.addEventListener('click', () => setView('all'));
+    if (filterActiveBtn) filterActiveBtn.addEventListener('click', () => setView('active'));
+    if (viewArchivedBtn) viewArchivedBtn.addEventListener('click', () => setView('archived'));
 
     // Search
-    searchInput.addEventListener('input', debounce(filterSubmissions, 300));
-
-    // Export
-    exportBtn.addEventListener('click', exportToCSV);
+    if (searchInput) searchInput.addEventListener('input', debounce(filterSubmissions, 300));
 
     // Refresh
-    refreshBtn.addEventListener('click', loadSubmissions);
+    if (refreshBtn) refreshBtn.addEventListener('click', loadSubmissions);
 
-    // Table sorting
-    document.querySelectorAll('th[data-sort]').forEach(th => {
-        th.addEventListener('click', () => {
-            const field = th.dataset.sort;
-            if (sortField === field) {
-                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-            } else {
-                sortField = field;
-                sortDirection = 'desc';
-            }
-            renderSubmissions(allSubmissions);
+    // Mobile menu toggle
+    if (mobileMenuBtn && sidebar) {
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('mobile-open');
         });
-    });
+    }
 
     // Modal close buttons
     document.querySelectorAll('.modal-close, .modal-cancel').forEach(btn => {
@@ -63,15 +61,21 @@ function setupEventListeners() {
     });
 
     // Modal actions
-    document.getElementById('modal-archive').addEventListener('click', handleArchiveToggle);
-    document.getElementById('modal-delete').addEventListener('click', showDeleteConfirm);
-    document.getElementById('confirm-delete').addEventListener('click', handleDelete);
+    const modalArchiveBtn = document.getElementById('modal-archive');
+    const modalDeleteBtn = document.getElementById('modal-delete');
+    const confirmDeleteBtn = document.getElementById('confirm-delete');
+
+    if (modalArchiveBtn) modalArchiveBtn.addEventListener('click', handleArchiveToggle);
+    if (modalDeleteBtn) modalDeleteBtn.addEventListener('click', showDeleteConfirm);
+    if (confirmDeleteBtn) confirmDeleteBtn.addEventListener('click', handleDelete);
 
     // Close modal on backdrop click
     [detailModal, confirmModal].forEach(modal => {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeAllModals();
-        });
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeAllModals();
+            });
+        }
     });
 
     // Keyboard shortcuts
@@ -80,11 +84,71 @@ function setupEventListeners() {
     });
 }
 
-// Set View (Active/Archived)
+// Setup Sidebar Navigation
+function setupSidebarNavigation() {
+    const navTabs = document.querySelectorAll('.nav-tab[data-section]');
+    const sections = document.querySelectorAll('.section-content');
+
+    navTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            if (tab.classList.contains('disabled')) return;
+
+            // Update active tab
+            navTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            // Update active section
+            const sectionId = tab.dataset.section + '-section';
+            sections.forEach(s => s.classList.remove('active'));
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) targetSection.classList.add('active');
+
+            // Update page title
+            if (pageHeaderTitle) {
+                if (tab.dataset.section === 'leads') {
+                    pageHeaderTitle.textContent = 'Leads & Inquiries';
+                } else if (tab.dataset.section === 'contracts') {
+                    pageHeaderTitle.textContent = 'Contracts & Proposals';
+                }
+            }
+
+            // Close mobile sidebar
+            if (sidebar) sidebar.classList.remove('mobile-open');
+
+            // Load contracts if switching to that section
+            if (tab.dataset.section === 'contracts' && typeof loadContracts === 'function') {
+                loadContracts();
+            }
+        });
+    });
+
+    // Update sidebar user name
+    const sidebarUserName = document.getElementById('sidebar-user-name');
+    if (sidebarUserName && auth.currentUser) {
+        const email = auth.currentUser.email;
+        const name = email.split('@')[0];
+        sidebarUserName.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+    }
+}
+
+// Update Header Date
+function updateHeaderDate() {
+    if (pageHeaderDate) {
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        pageHeaderDate.textContent = today.toLocaleDateString('en-US', options);
+    }
+}
+
+// Set View (All/Active/Archived)
 function setView(view) {
     currentView = view;
-    viewActiveBtn.classList.toggle('active', view === 'active');
-    viewArchivedBtn.classList.toggle('active', view === 'archived');
+
+    // Update filter button states
+    if (viewActiveBtn) viewActiveBtn.classList.toggle('active', view === 'all');
+    if (filterActiveBtn) filterActiveBtn.classList.toggle('active', view === 'active');
+    if (viewArchivedBtn) viewArchivedBtn.classList.toggle('active', view === 'archived');
+
     loadSubmissions();
 }
 
@@ -92,14 +156,26 @@ function setView(view) {
 async function loadSubmissions() {
     showLoading(true);
 
+    // Set a timeout to show empty state if loading takes too long
+    const loadingTimeout = setTimeout(() => {
+        console.warn('Loading submissions is taking longer than expected');
+        showLoading(false);
+        if (allSubmissions.length === 0) {
+            emptyState.classList.remove('hidden');
+        }
+    }, 5000);
+
     try {
-        const collection = currentView === 'active'
-            ? COLLECTIONS.SUBMISSIONS
-            : COLLECTIONS.ARCHIVED;
+        // 'all' and 'active' both load from submissions, 'archived' loads from archived
+        const collection = currentView === 'archived'
+            ? COLLECTIONS.ARCHIVED
+            : COLLECTIONS.SUBMISSIONS;
 
         const snapshot = await db.collection(collection)
             .orderBy('timestamp', 'desc')
             .get();
+
+        clearTimeout(loadingTimeout);
 
         allSubmissions = snapshot.docs.map(doc => ({
             id: doc.id,
@@ -109,8 +185,15 @@ async function loadSubmissions() {
         renderSubmissions(allSubmissions);
         updateStats();
     } catch (error) {
+        clearTimeout(loadingTimeout);
         console.error('Error loading submissions:', error);
         showToast('Failed to load submissions', 'error');
+        // Show empty state with error indication
+        emptyState.classList.remove('hidden');
+        emptyState.innerHTML = `
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Unable to load submissions</p>
+        `;
     } finally {
         showLoading(false);
     }
@@ -184,26 +267,28 @@ function renderSubmissions(submissions) {
 
     emptyState.classList.add('hidden');
 
-    // Render table rows
+    // Render table rows with new cell-primary/cell-sub structure
     submissionsBody.innerHTML = filtered.map(sub => `
         <tr class="clickable-row" data-id="${sub.id}">
-            <td><strong>${escapeHtml(sub.name || 'No name')}</strong></td>
-            <td>${escapeHtml(sub.email || 'No email')}</td>
-            <td class="message-preview">${escapeHtml(sub.message || 'No message')}</td>
+            <td>
+                <span class="cell-primary">${escapeHtml(sub.name || 'No name')}</span>
+                <span class="cell-sub">${escapeHtml(sub.email || 'No email')}</span>
+            </td>
+            <td class="message-preview">${escapeHtml(truncateMessage(sub.message || 'No message'))}</td>
             <td class="date-cell">${formatDate(sub.timestamp)}</td>
             <td class="actions-cell">
-                <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); viewSubmission('${sub.id}')">
+                <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); viewSubmission('${sub.id}')" title="View Details">
                     <i class="fas fa-eye"></i>
                 </button>
-                <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); quickArchive('${sub.id}')">
-                    <i class="fas fa-${currentView === 'active' ? 'archive' : 'undo'}"></i>
+                <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); quickArchive('${sub.id}')" title="${currentView === 'archived' ? 'Restore' : 'Archive'}">
+                    <i class="fas fa-${currentView === 'archived' ? 'undo' : 'archive'}"></i>
                 </button>
             </td>
         </tr>
     `).join('');
 
-    // Add click handlers to rows
-    document.querySelectorAll('.clickable-row').forEach(row => {
+    // Add click handlers to rows (scoped to submissions table only)
+    submissionsBody.querySelectorAll('.clickable-row').forEach(row => {
         row.addEventListener('click', () => viewSubmission(row.dataset.id));
     });
 }
@@ -441,4 +526,9 @@ function debounce(func, wait) {
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
     };
+}
+
+function truncateMessage(message, maxLength = 80) {
+    if (!message || message.length <= maxLength) return message;
+    return message.substring(0, maxLength).trim() + '...';
 }

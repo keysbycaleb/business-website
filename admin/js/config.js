@@ -15,6 +15,12 @@ firebase.initializeApp(firebaseConfig);
 // Initialize services
 const auth = firebase.auth();
 const db = firebase.firestore();
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+// Admin email(s) - only these can access admin portal
+const ADMIN_EMAILS = [
+    'caleb@lantingdigital.com'
+];
 
 // Collection names
 const COLLECTIONS = {
@@ -26,3 +32,8 @@ const COLLECTIONS = {
 
 // Signing page URL
 const SIGNING_BASE_URL = 'https://sign.lantingdigital.com';
+
+// Helper function to check if email is admin
+function isAdminEmail(email) {
+    return ADMIN_EMAILS.includes(email.toLowerCase());
+}

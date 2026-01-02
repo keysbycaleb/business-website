@@ -1,349 +1,334 @@
-/* Lanting Digital - Contract Signing Page */
+/* =============================================
+   LANTING DIGITAL - UX FOCUSED SPLIT THEME
+   Contract Signing Page
+   ============================================= */
 
 :root {
-    --bg-primary: #1b1f22;
-    --bg-secondary: #252a2e;
-    --text-primary: #ffffff;
-    --text-secondary: #a0a0a0;
-    --accent: #4a9eff;
-    --accent-hover: #6bb3ff;
-    --success: #4caf50;
-    --danger: #f44336;
-    --border: #3d444a;
+    --bg-app: #f3f4f6;          /* Light cool grey */
+    --bg-panel: #ffffff;
+    --text-primary: #111827;    /* Almost black */
+    --text-secondary: #4b5563;  /* Cool grey */
+    --text-muted: #9ca3af;
+
+    --accent-gold: #b45309;     /* Refined Gold */
+    --accent-gold-light: #fffbeb;
+    --accent-dark: #1e1e1e;     /* Luxury Dark */
+
+    --success: #059669;
+    --success-bg: #dcfce7;
+    --danger: #dc2626;
+
+    --border: #e5e7eb;
+    --shadow-float: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: var(--bg-primary);
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-app);
     color: var(--text-primary);
-    min-height: 100vh;
-    line-height: 1.6;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
-/* Screens */
+/* =============================================
+   SCREENS
+   ============================================= */
 .screen {
     display: none;
 }
 
 .screen.active {
-    display: block;
-}
-
-/* Loading/Error/Success Screens */
-.loading-container,
-.error-container,
-.signed-container,
-.success-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    text-align: center;
-    padding: 40px;
+    height: 100%;
 }
 
-.loading-container i,
-.error-container i,
-.signed-container i,
-.success-container i {
-    font-size: 4rem;
-    margin-bottom: 20px;
-}
-
-.loading-container i { color: var(--accent); }
-.error-container i { color: var(--danger); }
-.signed-container i,
-.success-container i { color: var(--success); }
-
-.loading-container p,
-.error-container p,
-.signed-container p,
-.success-container p {
-    color: var(--text-secondary);
-    margin-bottom: 10px;
-}
-
-.error-container h1,
-.signed-container h1,
-.success-container h1 {
-    margin-bottom: 15px;
-    font-size: 1.8rem;
-}
-
-.success-details {
-    background: var(--bg-secondary);
-    padding: 20px 30px;
-    border-radius: 8px;
-    margin: 20px 0;
-}
-
-/* Header */
-.sign-header {
-    background: var(--bg-secondary);
-    padding: 20px;
-    text-align: center;
+/* =============================================
+   NAVBAR
+   ============================================= */
+.navbar {
+    height: 60px;
+    background: #fff;
     border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    flex-shrink: 0;
+    z-index: 20;
 }
 
-.header-content h1 {
-    font-size: 1.5rem;
+.brand {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand-badge {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    background: var(--accent-gold-light);
+    color: var(--accent-gold);
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     font-weight: 600;
 }
 
-.header-content p {
+.secure-badge {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.secure-badge i {
+    color: var(--success);
+}
+
+/* =============================================
+   SPLIT LAYOUT
+   ============================================= */
+.main-container {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 60px);
+    position: relative;
+}
+
+/* LEFT PANEL: DOCUMENT VIEWER */
+.doc-viewer {
+    flex: 1;
+    background: #d1d5db;
+    overflow-y: auto;
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+}
+
+.paper-document {
+    background: #fff;
+    width: 100%;
+    max-width: 800px;
+    padding: 60px;
+    box-shadow: var(--shadow-float);
+    color: #333;
+    font-family: 'Times New Roman', serif;
+    font-size: 11pt;
+    line-height: 1.6;
+    margin: 0 auto 40px auto;
+    /* Allow document to grow to fit content */
+    height: auto;
+    min-height: fit-content;
+    /* Prevent content overflow */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
+/* Ensure contract content stays within bounds */
+.paper-document * {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.paper-document img {
+    max-width: 100%;
+    height: auto;
+}
+
+.paper-document table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+/* RIGHT PANEL: ACTION CENTER */
+.action-panel {
+    width: 400px;
+    background: #fff;
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.03);
+}
+
+.action-header {
+    padding: 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.action-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+}
+
+.action-header p {
     color: var(--text-secondary);
     font-size: 0.9rem;
 }
 
-/* Main Content */
-.sign-main {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 30px 20px;
+.action-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
 }
 
-/* ============================================
-   CONTRACT DOCUMENT - Matches original styling
-   ============================================ */
-.contract-document {
-    background: #fff;
-    color: #333;
-    border-radius: 4px;
-    padding: 0.75in;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    max-height: none;
-    overflow: visible;
+.action-footer {
+    padding: 20px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-app);
 }
 
-#contract-content {
-    font-family: 'Georgia', serif;
-    font-size: 12pt;
-    line-height: 1.6;
-}
-
-/* Contract headings */
-#contract-content h1 {
-    text-align: center;
-    font-size: 18pt;
-    margin-bottom: 8px;
-    color: #1a1a1a;
-}
-
-#contract-content .subtitle {
-    text-align: center;
-    font-size: 11pt;
-    color: #666;
+/* =============================================
+   FORM ELEMENTS (SIDEBAR)
+   ============================================= */
+.form-step {
     margin-bottom: 32px;
 }
 
-#contract-content h2 {
-    font-size: 12pt;
-    margin-top: 24px;
+.step-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    font-weight: 700;
     margin-bottom: 12px;
-    color: #1a1a1a;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 4px;
+    display: block;
 }
 
-#contract-content p {
-    margin-bottom: 12px;
-    text-align: justify;
+.input-group {
+    margin-bottom: 16px;
 }
 
-/* Parties section */
-#contract-content .parties {
-    margin: 24px 0;
-}
-
-#contract-content .parties p {
-    margin-bottom: 8px;
-}
-
-/* Tables - with visible borders like original */
-#contract-content table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 16px 0;
-}
-
-#contract-content th,
-#contract-content td {
-    border: 1px solid #ccc;
-    padding: 8px 12px;
-    text-align: left;
-    font-size: 11pt;
-}
-
-#contract-content th {
-    background-color: #f5f5f5;
-}
-
-/* Lists */
-#contract-content ul,
-#contract-content ol {
-    margin: 12px 0;
-    padding-left: 24px;
-}
-
-#contract-content li {
-    margin-bottom: 8px;
-}
-
-/* ============================================
-   SIGNATURE SECTION (inside contract)
-   ============================================ */
-#contract-content .signature-section {
-    margin-top: 48px;
-    page-break-inside: avoid;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4%;
-}
-
-#contract-content .signature-block {
-    flex: 0 0 46%;
-    margin-bottom: 20px;
-}
-
-#contract-content .signature-block p {
-    margin: 4px 0;
-    text-align: left;
-}
-
-/* Signature lines */
-#contract-content .signature-line {
-    border-bottom: 1px solid #333;
-    height: 30px;
-    margin: 8px 0;
-    display: flex;
-    align-items: flex-end;
-    padding-bottom: 2px;
-}
-
-/* Provider signature - cursive font, no box */
-#contract-content .provider-signature-text {
-    font-family: 'Dancing Script', cursive;
-    font-size: 24pt;
-    color: #000;
-}
-
-/* Client editable fields inside contract */
-#contract-content .client-input {
-    border: none;
-    border-bottom: 1px solid #333;
-    background: transparent;
-    font-family: 'Georgia', serif;
-    font-size: 12pt;
-    padding: 4px 0;
-    width: 200px;
-    color: #333;
-}
-
-#contract-content .client-input:focus {
-    outline: none;
-    border-bottom-color: var(--accent);
-    background: #f0f7ff;
-}
-
-#contract-content .client-input::placeholder {
-    color: #999;
-    font-style: italic;
-}
-
-/* Date input styling */
-#contract-content .date-input {
-    border: none;
-    border-bottom: 1px solid #333;
-    background: transparent;
-    font-family: 'Georgia', serif;
-    font-size: 12pt;
-    padding: 4px 0;
-    color: #333;
-}
-
-#contract-content .date-input:focus {
-    outline: none;
-    border-bottom-color: var(--accent);
-    background: #f0f7ff;
-}
-
-/* ============================================
-   SIGNATURE PAD SECTION (outside contract)
-   ============================================ */
-.signature-pad-section {
-    background: var(--bg-secondary);
-    border-radius: 12px;
-    padding: 30px;
-    border: 1px solid var(--border);
-}
-
-.signature-pad-section h3 {
-    text-align: center;
-    margin-bottom: 10px;
-    font-size: 1.3rem;
-    color: var(--text-primary);
-}
-
-.signature-pad-section h3 i {
-    margin-right: 8px;
-    color: var(--accent);
-}
-
-.signature-instructions {
-    text-align: center;
-    color: var(--text-secondary);
-    margin-bottom: 20px;
+.input-group label {
+    display: block;
     font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text-secondary);
 }
 
-/* Signature Pad */
-.signature-pad-container {
-    position: relative;
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 2px solid var(--border);
-    margin-bottom: 25px;
-}
-
-#signature-pad {
-    display: block;
+.form-input {
     width: 100%;
-    height: 200px;
-    cursor: crosshair;
-    touch-action: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    transition: all 0.2s;
+    background: #fff;
 }
 
-#clear-signature {
+.form-input:focus {
+    outline: none;
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 0 3px var(--accent-gold-light);
+}
+
+/* Typed Signature Input */
+.signature-input-wrapper {
+    position: relative;
+}
+
+.signature-input {
+    font-family: 'Dancing Script', cursive !important;
+    font-size: 1.5rem !important;
+    padding-right: 40px !important;
+    cursor: pointer;
+    background: #fafafa;
+}
+
+.signature-input:focus {
+    background: #fff;
+}
+
+.signature-input::placeholder {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: var(--text-muted);
+}
+
+.signature-lock-icon {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent-gold);
+    font-size: 1.1rem;
 }
 
-/* Form elements */
-.form-group {
-    margin-bottom: 20px;
+.signature-hint {
+    font-size: 0.8rem;
+    color: var(--accent-gold);
+    margin-top: 6px;
+    cursor: pointer;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--text-primary);
+.signature-hint:hover {
+    text-decoration: underline;
 }
 
-/* Radio Groups */
+.signature-acknowledged {
+    font-size: 0.85rem;
+    color: var(--success);
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Checkbox / Terms */
+.terms-check {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    background: var(--accent-gold-light);
+    border: 1px solid rgba(180, 83, 9, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.terms-check input {
+    margin-top: 4px;
+    accent-color: var(--accent-gold);
+    width: 18px;
+    height: 18px;
+}
+
+.terms-check span {
+    font-size: 0.85rem;
+    color: var(--accent-gold);
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+/* Portfolio Permission */
+.portfolio-section {
+    margin-bottom: 24px;
+}
+
+.portfolio-section label.step-label {
+    margin-bottom: 12px;
+}
+
 .radio-group {
     display: flex;
     flex-direction: column;
@@ -355,7 +340,7 @@ body {
     align-items: flex-start;
     gap: 12px;
     padding: 12px 15px;
-    background: var(--bg-primary);
+    background: #fff;
     border: 1px solid var(--border);
     border-radius: 8px;
     cursor: pointer;
@@ -363,172 +348,535 @@ body {
 }
 
 .radio-option:hover {
-    border-color: var(--accent);
+    border-color: var(--accent-gold);
 }
 
 .radio-option input[type="radio"] {
     margin-top: 3px;
     width: 18px;
     height: 18px;
-    accent-color: var(--accent);
+    accent-color: var(--accent-gold);
 }
 
 .radio-option span {
     flex: 1;
     line-height: 1.4;
     color: var(--text-secondary);
+    font-size: 0.9rem;
 }
 
-/* Checkbox */
-.checkbox-option {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 15px;
-    background: var(--bg-primary);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.checkbox-option input[type="checkbox"] {
-    margin-top: 3px;
-    width: 18px;
-    height: 18px;
-    accent-color: var(--accent);
-}
-
-.checkbox-option span {
-    color: var(--text-primary);
-}
-
-/* Buttons */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 24px;
+/* Main Button */
+.btn-sign {
+    width: 100%;
+    padding: 16px;
+    background: var(--text-primary);
+    color: #fff;
     border: none;
     border-radius: 8px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
-    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: 'Inter', sans-serif;
 }
 
-.btn i {
+.btn-sign:hover {
+    background: #000;
+    transform: translateY(-1px);
+}
+
+.btn-sign:disabled {
+    background: var(--text-muted);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* =============================================
+   DOCUMENT STYLING
+   ============================================= */
+h1.doc-title {
+    text-align: center;
+    font-size: 24pt;
+    font-family: 'Playfair Display', serif;
+    margin-bottom: 10px;
+    color: #1a1a1a;
+}
+
+p.doc-subtitle {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.doc-section {
+    margin-bottom: 24px;
+}
+
+.doc-section h3 {
+    font-size: 12pt;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.doc-section p {
+    margin-bottom: 12px;
+    text-align: justify;
+}
+
+table.doc-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 10pt;
+}
+
+table.doc-table th {
+    border-bottom: 2px solid #000;
+    text-align: left;
+    padding: 8px;
+    font-weight: 700;
+}
+
+table.doc-table td {
+    border-bottom: 1px solid #eee;
+    padding: 8px;
+}
+
+/* Signature Preview Area in Document */
+.signature-area-preview {
+    margin-top: 50px;
+    padding-top: 30px;
+    border-top: 2px solid #eee;
+    display: flex;
+    justify-content: space-between;
+}
+
+.sig-block {
+    width: 45%;
+}
+
+.sig-block p {
+    margin: 4px 0;
+    text-align: left;
+}
+
+.sig-line {
+    border-bottom: 1px solid #000;
+    height: 40px;
+    margin: 10px 0;
+    display: flex;
+    align-items: flex-end;
+    font-family: 'Dancing Script', cursive;
+    font-size: 20pt;
+    color: var(--accent-gold);
+    padding-bottom: 2px;
+}
+
+.sig-line.client-sig {
+    color: #111;
+}
+
+/* Placeholder text inside doc */
+.placeholder-text {
+    color: #9ca3af;
+    font-style: italic;
+    font-size: 0.9em;
+}
+
+/* =============================================
+   LOADING/ERROR/SUCCESS SCREENS
+   ============================================= */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    padding: 40px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.loading-container i {
+    font-size: 3rem;
+    color: var(--accent-gold);
+    margin-bottom: 24px;
+}
+
+.loading-container h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.loading-container p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* State Cards - Elegant minimal design */
+.state-card {
+    background: #fff;
+    padding: 60px 48px;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+}
+
+#error-screen.active,
+#signed-screen.active,
+#success-screen.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 40px 20px;
+}
+
+.state-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+    font-size: 1.8rem;
+}
+
+.state-icon.error-icon {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.state-icon.success-icon {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.state-card h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.state-card p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 8px;
+}
+
+.state-note {
+    font-size: 0.85rem !important;
+    color: var(--text-muted) !important;
+    margin-top: 16px !important;
+}
+
+.state-actions {
+    margin-top: 28px;
+}
+
+.btn-elegant {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: var(--text-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
     font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-elegant:hover {
+    background: #374151;
+    transform: translateY(-1px);
+}
+
+.state-footer {
+    margin-top: 32px !important;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+}
+
+.state-footer a {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+}
+
+.state-footer a:hover {
+    color: var(--accent-gold);
+}
+
+/* Success Details */
+.success-details {
+    background: var(--bg-app);
+    padding: 20px 24px;
+    border-radius: 12px;
+    margin: 24px 0 0;
+    border: 1px solid var(--border);
+    text-align: left;
+}
+
+.success-details .detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.success-details .detail-item:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+}
+
+.success-details .detail-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.success-details .detail-value {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.btn-link {
+    text-decoration: none;
+    color: var(--text-primary);
+    font-weight: 600;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 2px;
+}
+
+.btn-link:hover {
+    color: var(--accent-gold);
 }
 
 .btn-primary {
-    background: var(--accent);
-    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: var(--text-primary);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
 }
 
 .btn-primary:hover {
-    background: var(--accent-hover);
+    background: #000;
+    transform: translateY(-1px);
 }
 
-.btn-primary:disabled {
-    background: var(--text-secondary);
-    cursor: not-allowed;
+/* =============================================
+   SIGNATURE MODAL
+   ============================================= */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: var(--shadow-float);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-header h2 i {
+    color: var(--accent-gold);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px;
+}
+
+.modal-close:hover {
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-description {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.signature-preview-input {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+}
+
+.signature-preview-box {
+    margin: 20px 0;
+    padding: 20px;
+    background: #fafafa;
+    border: 1px dashed var(--border);
+    border-radius: 8px;
+    text-align: center;
+}
+
+.preview-label {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.signature-preview {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2rem;
+    color: var(--text-primary);
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.signature-preview.empty {
+    color: var(--text-muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+.modal-terms {
+    margin-top: 16px;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: var(--bg-app);
+    border-radius: 0 0 12px 12px;
 }
 
 .btn-secondary {
-    background: var(--bg-secondary);
+    padding: 10px 20px;
+    background: #fff;
     color: var(--text-primary);
     border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Inter', sans-serif;
 }
 
 .btn-secondary:hover {
-    background: var(--border);
+    background: var(--bg-app);
+    border-color: var(--text-muted);
 }
 
-.btn-sm {
-    padding: 6px 12px;
-    font-size: 0.85rem;
-}
-
-.btn-full {
-    width: 100%;
-    padding: 16px;
-    font-size: 1.1rem;
-}
-
-/* Footer */
-.sign-footer {
-    text-align: center;
-    padding: 30px;
-    color: var(--text-secondary);
+.modal .btn-primary {
+    padding: 10px 20px;
     font-size: 0.9rem;
 }
 
-.sign-footer a {
-    color: var(--accent);
-    text-decoration: none;
+.modal .btn-primary:disabled {
+    background: var(--text-muted);
+    cursor: not-allowed;
+    transform: none;
 }
 
-.sign-footer a:hover {
-    text-decoration: underline;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .sign-main {
-        padding: 15px 10px;
-    }
-
-    .contract-document {
-        padding: 20px 15px;
-    }
-
-    #contract-content {
-        font-size: 10pt;
-    }
-
-    #contract-content h1 {
-        font-size: 14pt;
-    }
-
-    #contract-content h2 {
-        font-size: 11pt;
-    }
-
-    #contract-content th,
-    #contract-content td {
-        padding: 6px 8px;
-        font-size: 9pt;
-    }
-
-    #contract-content .signature-block {
-        flex: 0 0 100%;
-    }
-
-    .signature-pad-section {
-        padding: 20px 15px;
-    }
-
-    #signature-pad {
-        height: 150px;
-    }
-
-    #contract-content .client-input {
-        width: 150px;
-    }
-}
-
-/* Toast Notification */
+/* =============================================
+   TOAST NOTIFICATION
+   ============================================= */
 .toast {
     position: fixed;
     bottom: 30px;
     right: 30px;
     padding: 15px 25px;
-    background: var(--bg-secondary);
+    background: #fff;
     border: 1px solid var(--border);
     border-radius: 8px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-float);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -555,21 +903,167 @@ body {
     }
 }
 
-/* Print styles */
+/* =============================================
+   RESPONSIVE (MOBILE)
+   ============================================= */
+@media (max-width: 900px) {
+    body {
+        overflow: auto;
+        display: block;
+        height: auto;
+    }
+
+    .screen.active {
+        display: block;
+        height: auto;
+    }
+
+    .main-container {
+        display: block;
+        height: auto;
+    }
+
+    .doc-viewer {
+        height: auto;
+        max-height: 500px;
+        padding: 20px;
+    }
+
+    .action-panel {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid var(--border);
+    }
+
+    .paper-document {
+        padding: 30px;
+        min-height: auto;
+    }
+
+    .signature-area-preview {
+        flex-direction: column;
+    }
+
+    .sig-block {
+        width: 100%;
+        margin-bottom: 30px;
+    }
+
+    .navbar {
+        padding: 0 16px;
+    }
+
+    .brand-badge {
+        display: none;
+    }
+}
+
+/* =============================================
+   PRINT STYLES
+   ============================================= */
 @media print {
     body {
         background: white;
+        overflow: visible;
+        height: auto;
     }
 
-    .sign-header,
-    .signature-pad-section,
-    .sign-footer {
-        display: none;
+    .navbar,
+    .action-panel {
+        display: none !important;
     }
 
-    .contract-document {
+    .doc-viewer {
+        padding: 0;
+        background: white;
+    }
+
+    .paper-document {
         box-shadow: none;
         padding: 0;
         margin: 0;
     }
+}
+
+/* =============================================
+   LOGIN SCREEN
+   ============================================= */
+#login-screen {
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.login-container {
+    background: #fff;
+    padding: 48px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-float);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+
+.login-header {
+    margin-bottom: 32px;
+}
+
+.login-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.login-header p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.btn-google {
+    width: 100%;
+    padding: 14px 24px;
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-google:hover {
+    background: #f8f9fa;
+    border-color: var(--text-secondary);
+}
+
+.btn-google:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.btn-google i {
+    font-size: 1.2rem;
+    color: #4285f4;
+}
+
+.login-note {
+    margin-top: 24px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.login-note i {
+    color: var(--success);
 }
