@@ -10,19 +10,10 @@ const errorMessage = document.getElementById('error-message');
 const signedDate = document.getElementById('signed-date');
 
 // Contract display elements
-const contractName = document.getElementById('contract-name');
-const clientCompany = document.getElementById('client-company');
 const contractContent = document.getElementById('contract-content');
-const providerName = document.getElementById('provider-name');
-const providerTitle = document.getElementById('provider-title');
-const providerDate = document.getElementById('provider-date');
-const providerSignature = document.getElementById('provider-signature');
 
 // Form elements
 const signingForm = document.getElementById('signing-form');
-const effectiveDateInput = document.getElementById('effective-date');
-const clientNameInput = document.getElementById('client-name');
-const clientTitleInput = document.getElementById('client-title');
 const agreeTermsCheckbox = document.getElementById('agree-terms');
 const submitBtn = document.getElementById('submit-btn');
 const clearSignatureBtn = document.getElementById('clear-signature');
@@ -51,10 +42,6 @@ async function init() {
     // Initialize signature pad
     initSignaturePad();
 
-    // Set default effective date to today
-    const today = new Date().toISOString().split('T')[0];
-    effectiveDateInput.value = today;
-
     // Load contract
     await loadContract(contractId);
 
@@ -63,19 +50,13 @@ async function init() {
 }
 
 function getContractIdFromUrl() {
-    // URL format: sign.lantingdigital.com/[contractId]
-    // or sign.lantingdigital.com?id=[contractId]
-    // or sign.lantingdigital.com/?id=[contractId]
-
     const urlParams = new URLSearchParams(window.location.search);
     let contractId = urlParams.get('id');
 
     if (!contractId) {
-        // Check if ID is in the path
         const pathParts = window.location.pathname.split('/').filter(Boolean);
         if (pathParts.length > 0) {
             contractId = pathParts[pathParts.length - 1];
-            // Ignore if it's index.html
             if (contractId === 'index.html') {
                 contractId = null;
             }
@@ -89,9 +70,14 @@ function initSignaturePad() {
     const canvas = document.getElementById('signature-pad');
     const container = canvas.parentElement;
 
-    // Set initial canvas size
-    canvas.width = container.offsetWidth;
-    canvas.height = 200;
+    // Set canvas size
+    function setCanvasSize() {
+        const rect = container.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = 200;
+    }
+
+    setCanvasSize();
 
     // Initialize SignaturePad
     signaturePad = new SignaturePad(canvas, {
@@ -101,31 +87,24 @@ function initSignaturePad() {
         maxWidth: 3
     });
 
-    // Handle window resize with debounce
+    // Handle window resize
     let resizeTimeout;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => resizeCanvas(canvas), 100);
+        resizeTimeout = setTimeout(() => {
+            const data = signaturePad.toData();
+            setCanvasSize();
+            signaturePad.clear();
+            if (data && data.length > 0) {
+                signaturePad.fromData(data);
+            }
+        }, 100);
     });
 
     // Clear button
     clearSignatureBtn.addEventListener('click', () => {
         signaturePad.clear();
     });
-}
-
-function resizeCanvas(canvas) {
-    const container = canvas.parentElement;
-    const data = signaturePad.toData(); // Save current signature data
-
-    canvas.width = container.offsetWidth;
-    canvas.height = 200;
-
-    signaturePad.clear(); // Clear and reset
-
-    if (data && data.length > 0) {
-        signaturePad.fromData(data); // Restore signature
-    }
 }
 
 async function loadContract(contractId) {
@@ -145,7 +124,7 @@ async function loadContract(contractId) {
             return;
         }
 
-        // Display contract
+        // Display contract with signature section
         displayContract(currentContract);
         showScreen('signing');
 
@@ -156,24 +135,48 @@ async function loadContract(contractId) {
 }
 
 function displayContract(contract) {
-    contractName.textContent = contract.contractName || 'Contract';
-    clientCompany.textContent = contract.clientCompany || 'Client';
-    contractContent.innerHTML = contract.contractHtml || '<p>Contract content not available.</p>';
-
-    // Provider signature
-    providerName.textContent = contract.providerName || 'Caleb Lanting';
-    providerTitle.textContent = contract.providerTitle || 'Owner / Member';
-    providerSignature.textContent = contract.providerName || 'Caleb Lanting';
-
-    // Provider date
+    // Get provider date
+    let providerDateStr = '';
     if (contract.providerSignedAt) {
         const date = contract.providerSignedAt.toDate ?
             contract.providerSignedAt.toDate() :
             new Date(contract.providerSignedAt);
-        providerDate.textContent = formatDate(date);
+        providerDateStr = formatDate(date);
     } else {
-        providerDate.textContent = formatDate(new Date());
+        providerDateStr = formatDate(new Date());
     }
+
+    // Get today's date for default
+    const today = new Date().toISOString().split('T')[0];
+
+    // Build the signature section HTML that will be appended to the contract
+    const signatureHtml = `
+<div class="signature-section">
+    <div class="signature-block">
+        <p><strong>PROVIDER: Lanting Digital LLC</strong></p>
+        <p>Signature:</p>
+        <div class="signature-line">
+            <span class="provider-signature-text">${contract.providerName || 'Caleb Lanting'}</span>
+        </div>
+        <p>Name: ${contract.providerName || 'Caleb Lanting'}</p>
+        <p>Title: ${contract.providerTitle || 'Owner / Member'}</p>
+        <p>Date: ${providerDateStr}</p>
+    </div>
+    <div class="signature-block">
+        <p><strong>CLIENT: ${contract.clientCompany || 'Client'}</strong></p>
+        <p>Signature: <em style="color: #666; font-size: 10pt;">(Draw below)</em></p>
+        <div class="signature-line" id="client-signature-display">
+            <!-- Signature image will appear here after signing -->
+        </div>
+        <p>Name: <input type="text" class="client-input" id="client-name" required placeholder="Your full name"></p>
+        <p>Title: <input type="text" class="client-input" id="client-title" required placeholder="Your title"></p>
+        <p>Date: <input type="date" class="date-input" id="effective-date" value="${today}" required></p>
+    </div>
+</div>
+`;
+
+    // Inject contract HTML with signature section
+    contractContent.innerHTML = contract.contractHtml + signatureHtml;
 }
 
 function setupFormHandlers() {
@@ -184,8 +187,40 @@ function setupFormHandlers() {
 }
 
 async function submitSignature() {
+    // Get form values from inputs inside the contract
+    const clientNameInput = document.getElementById('client-name');
+    const clientTitleInput = document.getElementById('client-title');
+    const effectiveDateInput = document.getElementById('effective-date');
+
     // Validate
-    if (!validateForm()) {
+    if (!clientNameInput.value.trim()) {
+        showToast('Please enter your full name in the contract.', 'error');
+        clientNameInput.focus();
+        clientNameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+
+    if (!clientTitleInput.value.trim()) {
+        showToast('Please enter your title in the contract.', 'error');
+        clientTitleInput.focus();
+        clientTitleInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+
+    if (signaturePad.isEmpty()) {
+        showToast('Please draw your signature below.', 'error');
+        document.querySelector('.signature-pad-section').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+
+    const portfolioRadio = document.querySelector('input[name="portfolio"]:checked');
+    if (!portfolioRadio) {
+        showToast('Please select a portfolio permission option.', 'error');
+        return;
+    }
+
+    if (!agreeTermsCheckbox.checked) {
+        showToast('Please agree to the terms of the agreement.', 'error');
         return;
     }
 
@@ -198,10 +233,9 @@ async function submitSignature() {
         const signatureData = signaturePad.toDataURL('image/png');
 
         // Get portfolio permission
-        const portfolioRadio = document.querySelector('input[name="portfolio"]:checked');
-        const portfolioPermission = portfolioRadio ? portfolioRadio.value === 'true' : false;
+        const portfolioPermission = portfolioRadio.value === 'true';
 
-        // Get client IP (optional - will be null if blocked)
+        // Get client IP (optional)
         let clientIp = null;
         try {
             const ipResponse = await fetch('https://api.ipify.org?format=json');
@@ -235,45 +269,8 @@ async function submitSignature() {
 
         // Re-enable button
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-signature"></i> Sign & Submit';
+        submitBtn.innerHTML = '<i class="fas fa-file-signature"></i> Sign & Submit Contract';
     }
-}
-
-function validateForm() {
-    // Check name
-    if (!clientNameInput.value.trim()) {
-        showToast('Please enter your full name.', 'error');
-        clientNameInput.focus();
-        return false;
-    }
-
-    // Check title
-    if (!clientTitleInput.value.trim()) {
-        showToast('Please enter your title.', 'error');
-        clientTitleInput.focus();
-        return false;
-    }
-
-    // Check signature
-    if (signaturePad.isEmpty()) {
-        showToast('Please draw your signature.', 'error');
-        return false;
-    }
-
-    // Check portfolio permission
-    const portfolioRadio = document.querySelector('input[name="portfolio"]:checked');
-    if (!portfolioRadio) {
-        showToast('Please select a portfolio permission option.', 'error');
-        return false;
-    }
-
-    // Check agreement
-    if (!agreeTermsCheckbox.checked) {
-        showToast('Please agree to the terms of the agreement.', 'error');
-        return false;
-    }
-
-    return true;
 }
 
 function showSuccess() {

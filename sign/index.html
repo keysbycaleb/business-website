@@ -9,8 +9,8 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="https://lantingdigital.com/images/favicon.ico">
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <!-- Google Fonts - Georgia for contract, Dancing Script for signature -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -52,110 +52,60 @@
         <header class="sign-header">
             <div class="header-content">
                 <h1>Lanting Digital</h1>
-                <p>Contract Signing</p>
+                <p>Contract Review &amp; Signing</p>
             </div>
         </header>
 
         <main class="sign-main">
-            <!-- Contract Info -->
-            <div class="contract-info">
-                <h2 id="contract-name">Loading...</h2>
-                <p class="contract-parties">
-                    <span id="client-company"></span> &amp; Lanting Digital LLC
-                </p>
-            </div>
-
-            <!-- Contract Content -->
-            <div class="contract-document">
-                <div id="contract-content">
-                    <!-- Contract HTML will be injected here -->
-                </div>
-            </div>
-
-            <!-- Signature Section -->
-            <div class="signature-section">
-                <h3>Signatures</h3>
-
-                <!-- Provider Signature (Pre-filled) -->
-                <div class="signature-block provider-signature">
-                    <h4>Provider</h4>
-                    <div class="signature-display">
-                        <p class="signature-script" id="provider-signature">Caleb Lanting</p>
-                        <div class="signature-line"></div>
-                    </div>
-                    <div class="signature-details">
-                        <p><strong>Name:</strong> <span id="provider-name">Caleb Lanting</span></p>
-                        <p><strong>Title:</strong> <span id="provider-title">Owner / Member</span></p>
-                        <p><strong>Date:</strong> <span id="provider-date"></span></p>
+            <form id="signing-form">
+                <!-- Contract Document (includes signature section) -->
+                <div class="contract-document">
+                    <div id="contract-content">
+                        <!-- Contract HTML will be injected here, including signature section -->
                     </div>
                 </div>
 
-                <!-- Client Signature Form -->
-                <div class="signature-block client-signature">
-                    <h4>Client</h4>
+                <!-- Draw Signature Section (only thing outside the contract) -->
+                <div class="signature-pad-section">
+                    <h3><i class="fas fa-pen-nib"></i> Draw Your Signature</h3>
+                    <p class="signature-instructions">Use your mouse, finger, or stylus to sign below. This signature will appear on the contract above.</p>
 
-                    <form id="signing-form">
-                        <!-- Effective Date -->
-                        <div class="form-group">
-                            <label for="effective-date">Effective Date</label>
-                            <input type="date" id="effective-date" required>
-                            <small>The date this agreement takes effect</small>
-                        </div>
+                    <div class="signature-pad-container">
+                        <canvas id="signature-pad"></canvas>
+                        <button type="button" id="clear-signature" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-eraser"></i> Clear
+                        </button>
+                    </div>
 
-                        <!-- Name -->
-                        <div class="form-group">
-                            <label for="client-name">Full Name *</label>
-                            <input type="text" id="client-name" required placeholder="Your full legal name">
-                        </div>
-
-                        <!-- Title -->
-                        <div class="form-group">
-                            <label for="client-title">Title *</label>
-                            <input type="text" id="client-title" required placeholder="e.g., CEO, Owner, Manager">
-                        </div>
-
-                        <!-- Signature Pad -->
-                        <div class="form-group signature-pad-group">
-                            <label>Signature *</label>
-                            <div class="signature-pad-container">
-                                <canvas id="signature-pad"></canvas>
-                                <button type="button" id="clear-signature" class="btn btn-sm btn-secondary">
-                                    <i class="fas fa-eraser"></i> Clear
-                                </button>
-                            </div>
-                            <small>Draw your signature using mouse, touch, or stylus</small>
-                        </div>
-
-                        <!-- Portfolio Permission -->
-                        <div class="form-group portfolio-permission">
-                            <label>Portfolio Permission (Section 16)</label>
-                            <div class="radio-group">
-                                <label class="radio-option">
-                                    <input type="radio" name="portfolio" value="true" required>
-                                    <span>I agree to allow portfolio use after launch, subject to prior written approval</span>
-                                </label>
-                                <label class="radio-option">
-                                    <input type="radio" name="portfolio" value="false">
-                                    <span>I do not wish to be featured in Provider's portfolio</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Agreement Checkbox -->
-                        <div class="form-group agreement-checkbox">
-                            <label class="checkbox-option">
-                                <input type="checkbox" id="agree-terms" required>
-                                <span>I have read and agree to the terms of this Agreement *</span>
+                    <!-- Portfolio Permission -->
+                    <div class="form-group portfolio-permission">
+                        <label><strong>Portfolio Permission</strong> (Section 16)</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="portfolio" value="true" required>
+                                <span>I agree to allow portfolio use after launch, subject to prior written approval</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="portfolio" value="false">
+                                <span>I do not wish to be featured in Provider's portfolio</span>
                             </label>
                         </div>
+                    </div>
 
-                        <!-- Submit Button -->
-                        <button type="submit" id="submit-btn" class="btn btn-primary btn-full">
-                            <i class="fas fa-signature"></i> Sign &amp; Submit
-                        </button>
-                    </form>
+                    <!-- Agreement Checkbox -->
+                    <div class="form-group agreement-checkbox">
+                        <label class="checkbox-option">
+                            <input type="checkbox" id="agree-terms" required>
+                            <span><strong>I have read and agree to all terms of this Agreement</strong></span>
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="submit-btn" class="btn btn-primary btn-full">
+                        <i class="fas fa-file-signature"></i> Sign &amp; Submit Contract
+                    </button>
                 </div>
-            </div>
+            </form>
         </main>
 
         <footer class="sign-footer">
