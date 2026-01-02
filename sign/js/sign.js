@@ -87,9 +87,11 @@ function getContractIdFromUrl() {
 
 function initSignaturePad() {
     const canvas = document.getElementById('signature-pad');
+    const container = canvas.parentElement;
 
-    // Set canvas size
-    resizeCanvas(canvas);
+    // Set initial canvas size
+    canvas.width = container.offsetWidth;
+    canvas.height = 200;
 
     // Initialize SignaturePad
     signaturePad = new SignaturePad(canvas, {
@@ -99,8 +101,12 @@ function initSignaturePad() {
         maxWidth: 3
     });
 
-    // Handle window resize
-    window.addEventListener('resize', () => resizeCanvas(canvas));
+    // Handle window resize with debounce
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => resizeCanvas(canvas), 100);
+    });
 
     // Clear button
     clearSignatureBtn.addEventListener('click', () => {
@@ -109,19 +115,16 @@ function initSignaturePad() {
 }
 
 function resizeCanvas(canvas) {
-    const ratio = Math.max(window.devicePixelRatio || 1, 1);
     const container = canvas.parentElement;
+    const data = signaturePad.toData(); // Save current signature data
 
-    canvas.width = container.offsetWidth * ratio;
-    canvas.height = 200 * ratio;
-    canvas.style.width = container.offsetWidth + 'px';
-    canvas.style.height = '200px';
+    canvas.width = container.offsetWidth;
+    canvas.height = 200;
 
-    canvas.getContext('2d').scale(ratio, ratio);
+    signaturePad.clear(); // Clear and reset
 
-    // Clear and restore if there was a signature
-    if (signaturePad) {
-        signaturePad.clear();
+    if (data && data.length > 0) {
+        signaturePad.fromData(data); // Restore signature
     }
 }
 
