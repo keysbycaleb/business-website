@@ -1,4 +1,6 @@
 const { onDocumentCreated, onDocumentUpdated } = require("firebase-functions/v2/firestore");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
@@ -8,6 +10,8 @@ admin.initializeApp();
 // Define secrets
 const gmailEmail = defineSecret("GMAIL_EMAIL");
 const gmailPassword = defineSecret("GMAIL_PASSWORD");
+const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
+const stripeWebhookSecret = defineSecret("STRIPE_WEBHOOK_SECRET");
 
 /**
  * Cloud Function triggered when a new document is created in the
@@ -292,7 +296,10 @@ exports.sendContractSignedEmail = onDocumentUpdated(
 
 /**
  * Cloud Function triggered when a new message is created.
- * Sends email notification to the appropriate party.
+ * Only notifies admin when:
+ * 1. It's the first message from a client, OR
+ * 2. Admin has responded since the last client message
+ * Never notifies client (no email when admin responds).
  */
 exports.sendMessageNotification = onDocumentCreated(
   {
@@ -310,93 +317,82 @@ exports.sendMessageNotification = onDocumentCreated(
     const message = snapshot.data();
     const db = admin.firestore();
 
-    // Create transporter
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: gmailEmail.value(),
-        pass: gmailPassword.value(),
-      },
-    });
-
-    const providerEmail = "caleb@lantingdigital.com";
-    const messagePreview = message.content?.length > 100
-      ? message.content.substring(0, 100) + "..."
-      : message.content;
-
-    const timestamp = new Date().toLocaleString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-      timeZone: "America/Los_Angeles",
-    });
-
+    // If admin sent the message, mark conversation as responded and don't notify client
     if (message.fromAdmin) {
-      // Admin sent message to client - notify client
-      if (!message.clientEmail) {
-        console.log("No client email, skipping notification");
-        return null;
+      console.log("Admin message - no notification to client");
+      // Update the client's lastAdminResponse timestamp
+      if (message.clientEmail) {
+        try {
+          const clientQuery = await db.collection("clients")
+            .where("email", "==", message.clientEmail)
+            .limit(1)
+            .get();
+
+          if (!clientQuery.empty) {
+            await clientQuery.docs[0].ref.update({
+              lastAdminResponse: admin.firestore.FieldValue.serverTimestamp(),
+              pendingNotification: false,
+            });
+          }
+        } catch (error) {
+          console.error("Error updating client lastAdminResponse:", error);
+        }
+      }
+      return null;
+    }
+
+    // Client sent message - check if we should notify admin
+    const providerEmail = "caleb@lantingdigital.com";
+
+    try {
+      // Check if there's a pending notification already (admin hasn't responded)
+      const clientQuery = await db.collection("clients")
+        .where("email", "==", message.clientEmail)
+        .limit(1)
+        .get();
+
+      let shouldNotify = true;
+      let clientDoc = null;
+
+      if (!clientQuery.empty) {
+        clientDoc = clientQuery.docs[0];
+        const clientData = clientDoc.data();
+
+        // If there's already a pending notification, don't send another
+        if (clientData.pendingNotification === true) {
+          console.log("Pending notification exists, skipping immediate email");
+          shouldNotify = false;
+
+          // Update the reminder time (5 minutes from now)
+          await clientDoc.ref.update({
+            reminderDue: admin.firestore.Timestamp.fromDate(
+              new Date(Date.now() + 5 * 60 * 1000)
+            ),
+          });
+        }
       }
 
-      const clientEmailBody = `
-<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: #1a1a1a; color: white; padding: 24px; text-align: center; }
-    .header h1 { margin: 0; font-size: 20px; }
-    .content { background: #ffffff; padding: 24px; border: 1px solid #e5e7eb; }
-    .message-box { background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 16px 0; border-left: 4px solid #b45309; }
-    .message-box p { margin: 0; }
-    .cta { text-align: center; margin-top: 24px; }
-    .button { display: inline-block; background: #b45309; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; }
-    .footer { text-align: center; padding: 20px; font-size: 12px; color: #888; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>New Message from Lanting Digital</h1>
-    </div>
-    <div class="content">
-      <p>Hi ${message.clientName || "there"},</p>
-      <p>You have a new message from Caleb at Lanting Digital:</p>
-      <div class="message-box">
-        <p>${message.content || ""}</p>
-      </div>
-      <p style="font-size: 12px; color: #666;">Sent: ${timestamp}</p>
-      <div class="cta">
-        <a href="https://lantingdigital.com/sign/portal.html#messages" class="button">View in Portal</a>
-      </div>
-    </div>
-    <div class="footer">
-      <p>Lanting Digital LLC | <a href="https://lantingdigital.com">lantingdigital.com</a></p>
-    </div>
-  </div>
-</body>
-</html>
-      `;
-
-      try {
-        await transporter.sendMail({
-          from: `"Lanting Digital" <${gmailEmail.value()}>`,
-          to: message.clientEmail,
-          subject: "New Message from Lanting Digital",
-          html: clientEmailBody,
+      if (shouldNotify) {
+        // Create transporter
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: gmailEmail.value(),
+            pass: gmailPassword.value(),
+          },
         });
-        console.log("Message notification sent to client:", message.clientEmail);
-      } catch (error) {
-        console.error("Error sending message notification to client:", error);
-      }
 
-    } else {
-      // Client sent message to admin - notify Caleb
-      const providerEmailBody = `
+        const timestamp = new Date().toLocaleString("en-US", {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true,
+          timeZone: "America/Los_Angeles",
+        });
+
+        const providerEmailBody = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -440,9 +436,8 @@ exports.sendMessageNotification = onDocumentCreated(
   </div>
 </body>
 </html>
-      `;
+        `;
 
-      try {
         await transporter.sendMail({
           from: `"Lanting Digital" <${gmailEmail.value()}>`,
           to: providerEmail,
@@ -450,11 +445,446 @@ exports.sendMessageNotification = onDocumentCreated(
           html: providerEmailBody,
         });
         console.log("Message notification sent to provider");
-      } catch (error) {
-        console.error("Error sending message notification to provider:", error);
+
+        // Mark that there's a pending notification and set reminder time
+        if (clientDoc) {
+          await clientDoc.ref.update({
+            pendingNotification: true,
+            lastClientMessage: admin.firestore.FieldValue.serverTimestamp(),
+            reminderDue: admin.firestore.Timestamp.fromDate(
+              new Date(Date.now() + 5 * 60 * 1000)
+            ),
+          });
+        }
       }
+
+    } catch (error) {
+      console.error("Error in message notification:", error);
     }
 
     return null;
+  }
+);
+
+/**
+ * Cloud Function triggered when a new contract is created.
+ * Auto-creates a client record if one doesn't exist.
+ */
+exports.autoCreateClientFromContract = onDocumentCreated(
+  {
+    document: "contracts/{contractId}",
+    region: "us-central1",
+  },
+  async (event) => {
+    const snapshot = event.data;
+    if (!snapshot) {
+      console.log("No data associated with the event");
+      return null;
+    }
+
+    const contract = snapshot.data();
+    const db = admin.firestore();
+
+    // Check if we have a client email
+    if (!contract.clientEmail) {
+      console.log("No client email in contract, skipping client creation");
+      return null;
+    }
+
+    try {
+      // Check if client already exists
+      const existingClient = await db.collection("clients")
+        .where("email", "==", contract.clientEmail)
+        .limit(1)
+        .get();
+
+      if (!existingClient.empty) {
+        console.log("Client already exists for:", contract.clientEmail);
+        return null;
+      }
+
+      // Create new client record
+      const newClient = {
+        email: contract.clientEmail,
+        name: contract.clientName || "Client",
+        company: contract.clientCompany || "",
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdFromContract: event.params.contractId,
+      };
+
+      await db.collection("clients").add(newClient);
+      console.log("Auto-created client for:", contract.clientEmail);
+
+      return null;
+    } catch (error) {
+      console.error("Error auto-creating client:", error);
+      return null;
+    }
+  }
+);
+
+/**
+ * Scheduled function that runs every 5 minutes to check for
+ * unanswered client messages and send reminder emails.
+ * Only sends reminders when admin status is "available".
+ */
+exports.checkMessageReminders = onSchedule(
+  {
+    schedule: "every 5 minutes",
+    region: "us-central1",
+    secrets: [gmailEmail, gmailPassword],
+  },
+  async (event) => {
+    const db = admin.firestore();
+    const now = admin.firestore.Timestamp.now();
+
+    try {
+      // Check admin status first
+      const settingsDoc = await db.collection("settings").doc("admin").get();
+      const adminStatus = settingsDoc.exists ? settingsDoc.data().status : "available";
+
+      // Only send reminders when admin is "available"
+      if (adminStatus !== "available") {
+        console.log(`Admin status is "${adminStatus}" - skipping reminders`);
+        return null;
+      }
+
+      // Find clients with pending notifications where reminder is due
+      const clientsQuery = await db.collection("clients")
+        .where("pendingNotification", "==", true)
+        .where("reminderDue", "<=", now)
+        .get();
+
+      if (clientsQuery.empty) {
+        console.log("No pending reminders due");
+        return null;
+      }
+
+      // Create transporter
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: gmailEmail.value(),
+          pass: gmailPassword.value(),
+        },
+      });
+
+      const providerEmail = "caleb@lantingdigital.com";
+
+      for (const clientDoc of clientsQuery.docs) {
+        const clientData = clientDoc.data();
+
+        // Get the most recent unread message from this client
+        const messagesQuery = await db.collection("messages")
+          .where("clientEmail", "==", clientData.email)
+          .where("fromAdmin", "==", false)
+          .orderBy("createdAt", "desc")
+          .limit(1)
+          .get();
+
+        if (messagesQuery.empty) {
+          // No messages, clear the pending flag
+          await clientDoc.ref.update({
+            pendingNotification: false,
+            reminderDue: admin.firestore.FieldValue.delete(),
+          });
+          continue;
+        }
+
+        const lastMessage = messagesQuery.docs[0].data();
+
+        const reminderEmailBody = `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: #d97706; color: white; padding: 20px; text-align: center; }
+    .content { background: #f9f9f9; padding: 20px; border: 1px solid #ddd; }
+    .message-box { background: white; padding: 16px; border-radius: 8px; margin: 16px 0; border: 1px solid #e5e7eb; }
+    .field { margin-bottom: 12px; }
+    .label { font-weight: bold; color: #555; font-size: 12px; text-transform: uppercase; }
+    .value { margin-top: 4px; }
+    .footer { text-align: center; padding: 20px; font-size: 12px; color: #888; }
+    a.button { display: inline-block; background: #1b1f22; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>⏰ Reminder: Unanswered Message</h1>
+    </div>
+    <div class="content">
+      <p>You have an unanswered message from <strong>${clientData.name || "a client"}</strong>.</p>
+      <div class="field">
+        <div class="label">From:</div>
+        <div class="value">${clientData.name || "Client"} (${clientData.email})</div>
+      </div>
+      <div class="field">
+        <div class="label">Last Message:</div>
+        <div class="message-box">
+          <p>${lastMessage.content || ""}</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <p><a href="https://admin.lantingdigital.com/#messages" class="button">Reply Now</a></p>
+    </div>
+  </div>
+</body>
+</html>
+        `;
+
+        try {
+          await transporter.sendMail({
+            from: `"Lanting Digital" <${gmailEmail.value()}>`,
+            to: providerEmail,
+            subject: `⏰ Reminder: Message from ${clientData.name || "Client"} awaiting reply`,
+            html: reminderEmailBody,
+          });
+          console.log("Reminder sent for client:", clientData.email);
+
+          // Clear the pending notification (no more reminders until admin responds and client messages again)
+          await clientDoc.ref.update({
+            pendingNotification: false,
+            reminderDue: admin.firestore.FieldValue.delete(),
+            reminderSentAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+
+        } catch (error) {
+          console.error("Error sending reminder for client:", clientData.email, error);
+        }
+      }
+
+    } catch (error) {
+      console.error("Error in checkMessageReminders:", error);
+    }
+
+    return null;
+  }
+);
+
+/**
+ * Helper function to create Stripe payment link for an invoice
+ */
+async function createPaymentLinkForInvoice(invoiceId, invoiceData) {
+  const stripe = require("stripe")(stripeSecretKey.value());
+  const db = admin.firestore();
+
+  console.log(`Creating payment link for invoice ${invoiceId}`);
+
+  try {
+    // Get or create Stripe customer
+    let stripeCustomerId = invoiceData.stripeCustomerId;
+
+    if (!stripeCustomerId && invoiceData.clientEmail) {
+      // Search for existing customer
+      const customers = await stripe.customers.list({
+        email: invoiceData.clientEmail,
+        limit: 1,
+      });
+
+      if (customers.data.length > 0) {
+        stripeCustomerId = customers.data[0].id;
+      } else {
+        // Create new customer
+        const customer = await stripe.customers.create({
+          email: invoiceData.clientEmail,
+          name: invoiceData.clientName || undefined,
+          metadata: {
+            clientId: invoiceData.clientId || "",
+            source: "lanting-digital-portal",
+          },
+        });
+        stripeCustomerId = customer.id;
+      }
+    }
+
+    // Create a product for this invoice
+    const product = await stripe.products.create({
+      name: `Invoice ${invoiceData.invoiceNumber}`,
+      description: invoiceData.lineItems?.map((item) => item.description).join(", ") || "Services",
+      metadata: {
+        invoiceId: invoiceId,
+        invoiceNumber: invoiceData.invoiceNumber || "",
+      },
+    });
+
+    // Create a price for the total amount
+    const price = await stripe.prices.create({
+      product: product.id,
+      unit_amount: Math.round((invoiceData.total || 0) * 100), // Convert to cents
+      currency: "usd",
+    });
+
+    // Create payment link
+    const paymentLink = await stripe.paymentLinks.create({
+      line_items: [
+        {
+          price: price.id,
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        invoiceId: invoiceId,
+        invoiceNumber: invoiceData.invoiceNumber || "",
+        clientEmail: invoiceData.clientEmail || "",
+      },
+      after_completion: {
+        type: "redirect",
+        redirect: {
+          url: `https://portal.lantingdigital.com/#invoices?success=true&invoice=${invoiceId}`,
+        },
+      },
+      payment_method_types: ["card", "us_bank_account"],
+      allow_promotion_codes: false,
+      billing_address_collection: "auto",
+    });
+
+    // Update invoice with Stripe info
+    await db.collection("invoices").doc(invoiceId).update({
+      stripeCustomerId: stripeCustomerId,
+      stripeProductId: product.id,
+      stripePriceId: price.id,
+      stripePaymentLinkId: paymentLink.id,
+      stripePaymentLink: paymentLink.url,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    console.log(`Payment link created for invoice ${invoiceId}: ${paymentLink.url}`);
+    return true;
+  } catch (error) {
+    console.error("Error creating payment link:", error);
+
+    // Update invoice with error
+    await db.collection("invoices").doc(invoiceId).update({
+      stripeError: error.message,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return false;
+  }
+}
+
+/**
+ * Cloud Function triggered when a NEW invoice is created with status 'pending'.
+ * Creates a Stripe payment link immediately.
+ */
+exports.createStripePaymentLinkOnCreate = onDocumentCreated(
+  {
+    document: "invoices/{invoiceId}",
+    region: "us-central1",
+    secrets: [stripeSecretKey],
+  },
+  async (event) => {
+    const snapshot = event.data;
+    if (!snapshot) {
+      console.log("No data associated with the event");
+      return null;
+    }
+
+    const invoiceData = snapshot.data();
+    const invoiceId = event.params.invoiceId;
+
+    // Only process if status is 'pending' and no payment link exists
+    if (invoiceData.status !== "pending" || invoiceData.stripePaymentLink) {
+      return null;
+    }
+
+    await createPaymentLinkForInvoice(invoiceId, invoiceData);
+    return null;
+  }
+);
+
+/**
+ * Cloud Function triggered when an invoice is updated.
+ * Creates a Stripe payment link when status changes to 'pending'.
+ */
+exports.createStripePaymentLink = onDocumentUpdated(
+  {
+    document: "invoices/{invoiceId}",
+    region: "us-central1",
+    secrets: [stripeSecretKey],
+  },
+  async (event) => {
+    const beforeData = event.data.before.data();
+    const afterData = event.data.after.data();
+    const invoiceId = event.params.invoiceId;
+
+    // Only process when status changes to 'pending' and no payment link exists
+    if (beforeData.status === afterData.status) {
+      return null;
+    }
+
+    if (afterData.status !== "pending" || afterData.stripePaymentLink) {
+      return null;
+    }
+
+    await createPaymentLinkForInvoice(invoiceId, afterData);
+    return null;
+  }
+);
+
+/**
+ * Stripe webhook handler for payment events.
+ * Updates invoice status when payment is completed.
+ */
+exports.stripeWebhook = onRequest(
+  {
+    region: "us-central1",
+    secrets: [stripeSecretKey, stripeWebhookSecret],
+    invoker: "public", // Allow Stripe to call this endpoint
+  },
+  async (req, res) => {
+    if (req.method !== "POST") {
+      res.status(405).send("Method Not Allowed");
+      return;
+    }
+
+    const stripe = require("stripe")(stripeSecretKey.value());
+    const sig = req.headers["stripe-signature"];
+    const db = admin.firestore();
+
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        req.rawBody,
+        sig,
+        stripeWebhookSecret.value()
+      );
+    } catch (err) {
+      console.error("Webhook signature verification failed:", err.message);
+      res.status(400).send(`Webhook Error: ${err.message}`);
+      return;
+    }
+
+    console.log(`Received Stripe event: ${event.type}`);
+
+    // Handle checkout.session.completed event
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
+
+      // Get invoice ID from metadata
+      const invoiceId = session.metadata?.invoiceId;
+
+      if (invoiceId) {
+        try {
+          await db.collection("invoices").doc(invoiceId).update({
+            status: "paid",
+            paidAt: admin.firestore.FieldValue.serverTimestamp(),
+            stripePaymentIntentId: session.payment_intent,
+            stripeSessionId: session.id,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+          console.log(`Invoice ${invoiceId} marked as paid`);
+        } catch (error) {
+          console.error("Error updating invoice:", error);
+        }
+      }
+    }
+
+    res.status(200).json({ received: true });
   }
 );

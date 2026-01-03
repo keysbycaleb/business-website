@@ -1,6 +1,11 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == 'caleb@lantingdigital.com';
+    }
+
     // Existing contacts collection (keep for backwards compatibility)
     match /contacts/{contactId} {
       allow create: if true;
@@ -32,6 +37,44 @@ service cloud.firestore {
       allow update: if true;
       // Only authenticated users can create or delete
       allow create, delete: if request.auth != null;
+    }
+
+    // Clients collection
+    match /clients/{clientId} {
+      // Admin can do everything
+      allow read, create, update, delete: if isAdmin();
+      // Clients can read their own record (matched by email)
+      allow read: if request.auth != null && resource.data.email == request.auth.token.email;
+      // Clients can update their own record (limited fields)
+      allow update: if request.auth != null && resource.data.email == request.auth.token.email;
+    }
+
+    // Messages collection
+    match /messages/{messageId} {
+      // Admin can do everything
+      allow read, create, update, delete: if isAdmin();
+      // Clients can read their own messages
+      allow read: if request.auth != null && resource.data.clientEmail == request.auth.token.email;
+      // Clients can create messages (to admin)
+      allow create: if request.auth != null && request.resource.data.clientEmail == request.auth.token.email;
+      // Clients can update read status on their messages
+      allow update: if request.auth != null && resource.data.clientEmail == request.auth.token.email;
+    }
+
+    // Invoices collection
+    match /invoices/{invoiceId} {
+      // Admin can do everything
+      allow read, create, update, delete: if isAdmin();
+      // Clients can read their own invoices
+      allow read: if request.auth != null && resource.data.clientEmail == request.auth.token.email;
+    }
+
+    // Settings collection (admin status, etc.)
+    match /settings/{settingId} {
+      // Anyone authenticated can read settings (for admin status display)
+      allow read: if request.auth != null;
+      // Only admin can write settings
+      allow write: if isAdmin();
     }
   }
 }

@@ -10,7 +10,8 @@
         "functions/**",
         "admin/**",
         "sign/**",
-        "auth/**"
+        "auth/**",
+        "portal/**"
       ]
     },
     {
@@ -48,6 +49,25 @@
         "firebase.json",
         "**/.*",
         "**/node_modules/**"
+      ]
+    },
+    {
+      "target": "portal",
+      "public": "portal",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "headers": [
+        {
+          "source": "**/*.js",
+          "headers": [{"key": "Cache-Control", "value": "no-cache, no-store, must-revalidate"}]
+        },
+        {
+          "source": "**/*.css",
+          "headers": [{"key": "Cache-Control", "value": "no-cache, no-store, must-revalidate"}]
+        }
       ]
     }
   ],

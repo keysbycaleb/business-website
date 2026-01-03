@@ -33,6 +33,8 @@ function initDashboard() {
     setupEventListeners();
     setupSidebarNavigation();
     updateHeaderDate();
+    loadAdminStatus();
+    setupStatusToggle();
 }
 
 // Setup Event Listeners
@@ -109,7 +111,8 @@ function setupSidebarNavigation() {
                     'leads': 'Leads & Inquiries',
                     'contracts': 'Contracts & Proposals',
                     'clients': 'Clients',
-                    'messages': 'Messages'
+                    'messages': 'Messages',
+                    'invoices': 'Invoices'
                 };
                 pageHeaderTitle.textContent = titles[tab.dataset.section] || 'Dashboard';
             }
@@ -125,6 +128,8 @@ function setupSidebarNavigation() {
                 loadClients();
             } else if (section === 'messages' && typeof loadConversations === 'function') {
                 loadConversations();
+            } else if (section === 'invoices' && typeof loadInvoices === 'function') {
+                loadInvoices();
             }
         });
     });
@@ -538,4 +543,129 @@ function debounce(func, wait) {
 function truncateMessage(message, maxLength = 80) {
     if (!message || message.length <= maxLength) return message;
     return message.substring(0, maxLength).trim() + '...';
+}
+
+// =============================================
+// ADMIN STATUS MANAGEMENT
+// =============================================
+
+let currentAdminStatus = 'available';
+
+// Load admin status from Firestore
+async function loadAdminStatus() {
+    try {
+        const settingsDoc = await db.collection('settings').doc('admin').get();
+
+        if (settingsDoc.exists) {
+            const data = settingsDoc.data();
+            currentAdminStatus = data.status || 'available';
+        } else {
+            // Create default settings if they don't exist
+            await db.collection('settings').doc('admin').set({
+                status: 'available',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            currentAdminStatus = 'available';
+        }
+
+        updateStatusDisplay(currentAdminStatus);
+    } catch (error) {
+        console.error('Error loading admin status:', error);
+        // Default to available on error
+        currentAdminStatus = 'available';
+        updateStatusDisplay(currentAdminStatus);
+    }
+}
+
+// Setup status toggle event listeners
+function setupStatusToggle() {
+    const toggleWrapper = document.getElementById('status-toggle-wrapper');
+    const toggle = document.getElementById('status-toggle');
+    const dropdown = document.getElementById('status-dropdown');
+
+    if (!toggle || !dropdown) return;
+
+    // Toggle dropdown
+    toggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleWrapper.classList.toggle('open');
+    });
+
+    // Handle status selection
+    dropdown.querySelectorAll('.status-option').forEach(option => {
+        option.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const newStatus = option.dataset.status;
+
+            if (newStatus !== currentAdminStatus) {
+                await updateAdminStatus(newStatus);
+            }
+
+            toggleWrapper.classList.remove('open');
+        });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!toggleWrapper.contains(e.target)) {
+            toggleWrapper.classList.remove('open');
+        }
+    });
+
+    // Close on escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            toggleWrapper.classList.remove('open');
+        }
+    });
+}
+
+// Update admin status in Firestore
+async function updateAdminStatus(newStatus) {
+    try {
+        await db.collection('settings').doc('admin').set({
+            status: newStatus,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        currentAdminStatus = newStatus;
+        updateStatusDisplay(newStatus);
+
+        const statusLabels = {
+            available: 'Available',
+            busy: 'Busy',
+            away: 'Away'
+        };
+
+        showToast(`Status changed to ${statusLabels[newStatus]}`, 'success');
+    } catch (error) {
+        console.error('Error updating status:', error);
+        showToast('Failed to update status', 'error');
+    }
+}
+
+// Update the status display in the UI
+function updateStatusDisplay(status) {
+    const toggle = document.getElementById('status-toggle');
+    const statusText = document.getElementById('status-text');
+    const dropdown = document.getElementById('status-dropdown');
+
+    if (!toggle || !statusText) return;
+
+    const statusLabels = {
+        available: 'Available',
+        busy: 'Busy',
+        away: 'Away'
+    };
+
+    // Update toggle button
+    toggle.setAttribute('data-status', status);
+    statusText.textContent = statusLabels[status] || 'Available';
+
+    // Update active state in dropdown
+    if (dropdown) {
+        dropdown.querySelectorAll('.status-option').forEach(option => {
+            option.classList.toggle('active', option.dataset.status === status);
+        });
+    }
 }

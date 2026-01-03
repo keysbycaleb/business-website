@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="css/admin.css?v=20260102g">
+    <link rel="stylesheet" href="css/admin.css?v=20260103a">
 </head>
 <body>
     <!-- LOGIN SCREEN -->
@@ -80,6 +80,10 @@
                 <button class="nav-tab" data-section="messages">
                     <i class="fas fa-comments"></i>
                     Messages
+                </button>
+                <button class="nav-tab" data-section="invoices">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    Invoices
                     <span class="nav-badge" id="unread-messages-badge" style="display: none;"></span>
                 </button>
             </nav>
@@ -110,6 +114,38 @@
                 </div>
 
                 <div class="action-bar">
+                    <!-- Admin Status Toggle -->
+                    <div class="status-toggle-wrapper" id="status-toggle-wrapper">
+                        <button class="status-toggle" id="status-toggle" title="Click to change status">
+                            <span class="status-dot"></span>
+                            <span class="status-text" id="status-text">Available</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="status-dropdown" id="status-dropdown">
+                            <button class="status-option" data-status="available">
+                                <span class="status-dot available"></span>
+                                <div class="status-option-info">
+                                    <span class="status-option-label">Available</span>
+                                    <span class="status-option-desc">~5 min response time</span>
+                                </div>
+                            </button>
+                            <button class="status-option" data-status="busy">
+                                <span class="status-dot busy"></span>
+                                <div class="status-option-info">
+                                    <span class="status-option-label">Busy</span>
+                                    <span class="status-option-desc">30-60 min response time</span>
+                                </div>
+                            </button>
+                            <button class="status-option" data-status="away">
+                                <span class="status-dot away"></span>
+                                <div class="status-option-info">
+                                    <span class="status-option-label">Away</span>
+                                    <span class="status-option-desc">1-2 business days</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="search-wrapper">
                         <i class="fas fa-search"></i>
                         <input type="text" class="search-input" id="search-input" placeholder="Search records...">
@@ -359,6 +395,96 @@
                                 </button>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INVOICES SECTION -->
+            <div id="invoices-section" class="section-content">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h2>Invoices</h2>
+                        <p>Create and manage client invoices</p>
+                    </div>
+                    <button class="btn btn-primary" id="create-invoice-btn">
+                        <i class="fas fa-plus"></i> Create Invoice
+                    </button>
+                </div>
+
+                <!-- Invoice Stats -->
+                <div class="invoice-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-invoices">0</span>
+                            <span class="stat-label">Total Invoices</span>
+                        </div>
+                    </div>
+                    <div class="stat-card pending">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="pending-invoices">0</span>
+                            <span class="stat-label">Pending</span>
+                        </div>
+                    </div>
+                    <div class="stat-card paid">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="paid-invoices">0</span>
+                            <span class="stat-label">Paid</span>
+                        </div>
+                    </div>
+                    <div class="stat-card revenue">
+                        <div class="stat-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-revenue">$0</span>
+                            <span class="stat-label">Total Revenue</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoices Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="invoice-filters">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="draft">Draft</button>
+                            <button class="filter-btn" data-filter="pending">Pending</button>
+                            <button class="filter-btn" data-filter="paid">Paid</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="data-table" id="invoices-table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Client</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoices-body">
+                                <tr class="empty-row">
+                                    <td colspan="6">
+                                        <div class="empty-state">
+                                            <i class="fas fa-file-invoice"></i>
+                                            <p>No invoices yet</p>
+                                            <button class="btn btn-primary btn-sm" onclick="openCreateInvoiceModal()">Create Your First Invoice</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -655,6 +781,102 @@
         </div>
     </div>
 
+    <!-- CREATE INVOICE MODAL -->
+    <div id="invoice-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2 id="invoice-modal-title">Create Invoice</h2>
+                <button class="modal-close" onclick="closeInvoiceModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="invoice-form">
+                    <!-- Client Selection -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="invoice-client">Client <span class="required">*</span></label>
+                            <select id="invoice-client" required>
+                                <option value="">Select a client...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="invoice-due-date">Due Date</label>
+                            <select id="invoice-due-date">
+                                <option value="0">Due on Receipt</option>
+                                <option value="7">Net 7 (7 days)</option>
+                                <option value="15">Net 15 (15 days)</option>
+                                <option value="30">Net 30 (30 days)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Line Items -->
+                    <div class="form-group">
+                        <label>Line Items <span class="required">*</span></label>
+                        <div class="line-items-container" id="line-items-container">
+                            <div class="line-item" data-index="0">
+                                <input type="text" class="line-description" placeholder="Description (e.g., Web Development)" required>
+                                <input type="number" class="line-quantity" placeholder="Qty" value="1" min="1" required>
+                                <input type="number" class="line-price" placeholder="Price" step="0.01" min="0" required>
+                                <span class="line-total">$0.00</span>
+                                <button type="button" class="btn-remove-line" onclick="removeLineItem(this)" title="Remove">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm" id="add-line-item">
+                            <i class="fas fa-plus"></i> Add Line Item
+                        </button>
+                    </div>
+
+                    <!-- Totals -->
+                    <div class="invoice-totals">
+                        <div class="total-row">
+                            <span>Subtotal:</span>
+                            <span id="invoice-subtotal">$0.00</span>
+                        </div>
+                        <div class="total-row grand-total">
+                            <span>Total:</span>
+                            <span id="invoice-total">$0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div class="form-group">
+                        <label for="invoice-notes">Notes / Terms (optional)</label>
+                        <textarea id="invoice-notes" rows="3" placeholder="Payment terms, late fees, or other notes..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeInvoiceModal()">Cancel</button>
+                <button type="button" class="btn btn-secondary" id="save-draft-btn" onclick="saveInvoiceDraft()">
+                    <i class="fas fa-save"></i> Save as Draft
+                </button>
+                <button type="button" class="btn btn-primary" id="send-invoice-btn" onclick="sendInvoice()">
+                    <i class="fas fa-paper-plane"></i> Send Invoice
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW INVOICE MODAL -->
+    <div id="view-invoice-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>Invoice <span id="view-invoice-number"></span></h2>
+                <button class="modal-close" onclick="closeViewInvoiceModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div id="view-invoice-content">
+                    <!-- Invoice details loaded by JS -->
+                </div>
+            </div>
+            <div class="modal-footer" id="view-invoice-actions">
+                <!-- Actions loaded by JS based on status -->
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
@@ -663,9 +885,10 @@
     <!-- Admin Scripts -->
     <script src="js/config.js?v=20260102g"></script>
     <script src="js/auth.js?v=20260102g"></script>
-    <script src="js/dashboard.js?v=20260102a"></script>
+    <script src="js/dashboard.js?v=20260103a"></script>
     <script src="js/contracts.js?v=20260102f"></script>
     <script src="js/clients.js?v=20260102a"></script>
     <script src="js/messages.js?v=20260102a"></script>
+    <script src="js/invoices.js?v=20260103a"></script>
 </body>
 </html>

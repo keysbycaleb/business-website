@@ -77,7 +77,10 @@ if (googleSigninBtn) {
         loginError.textContent = '';
 
         try {
-            await auth.signInWithPopup(googleProvider);
+            // Force account selection every time
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
+            await auth.signInWithPopup(provider);
             // Auth state observer will handle the redirect and admin check
         } catch (error) {
             console.error('Google sign-in error:', error);

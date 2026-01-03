@@ -16,6 +16,9 @@
         ],
         "auth": [
           "lanting-digital-auth"
+        ],
+        "portal": [
+          "lanting-digital-portal"
         ]
       }
     }
