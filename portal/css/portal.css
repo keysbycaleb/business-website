@@ -170,6 +170,27 @@ body {
     border-top: 1px solid var(--border);
 }
 
+.legal-links {
+    text-align: center;
+    padding-top: 12px;
+    font-size: 0.75rem;
+}
+
+.legal-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.legal-links a:hover {
+    color: var(--accent-gold);
+}
+
+.legal-links .separator {
+    color: var(--text-muted);
+    margin: 0 6px;
+}
+
 .user-card {
     display: flex;
     align-items: center;

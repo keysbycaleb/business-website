@@ -208,7 +208,7 @@
 				// Add state?
 					if (typeof addState != 'undefined'
 					&&	addState === true)
-						history.pushState(null, null, '#');
+						history.pushState(null, null, '/');
 
 				// Handle lock.
 
@@ -295,7 +295,7 @@
 					$('<div class="close">Close</div>')
 						.appendTo($this)
 						.on('click', function() {
-							location.hash = '';
+							$main._hide(true);
 						});
 
 				// Prevent clicks from inside article from bubbling.
@@ -333,57 +333,61 @@
 
 			});
 
-			$window.on('hashchange', function(event) {
+		// Clean URL Navigation (using History API instead of hash)
+			// Valid article IDs for clean URLs
+			var validArticles = ['intro', 'work', 'portfolio', 'process', 'about', 'faq', 'contact', 'privacy', 'terms'];
 
-				// Empty hash?
-					if (location.hash == ''
-					||	location.hash == '#') {
+			// Get article ID from pathname
+			function getArticleFromPath() {
+				var path = location.pathname.replace(/^\//, '').replace(/\/$/, '');
+				if (validArticles.indexOf(path) !== -1) {
+					return path;
+				}
+				return null;
+			}
 
-						// Prevent default.
-							event.preventDefault();
-							event.stopPropagation();
+			// Handle nav link clicks - use clean URLs
+			$(document).on('click', 'a[href^="/"]', function(event) {
+				var href = $(this).attr('href');
+				var articleId = href.replace(/^\//, '');
 
-						// Hide.
-							$main._hide();
+				// Only handle internal article links
+				if (validArticles.indexOf(articleId) !== -1) {
+					event.preventDefault();
+					history.pushState({ article: articleId }, '', '/' + articleId);
+					$main._show(articleId);
+				}
+			});
 
-					}
+			// Also handle legacy hash links (for backwards compatibility)
+			$(document).on('click', 'a[href^="#"]', function(event) {
+				var href = $(this).attr('href');
+				if (href === '#' || href === '') {
+					event.preventDefault();
+					$main._hide(true);
+					return;
+				}
+				var articleId = href.substr(1);
+				if (validArticles.indexOf(articleId) !== -1) {
+					event.preventDefault();
+					history.pushState({ article: articleId }, '', '/' + articleId);
+					$main._show(articleId);
+				}
+			});
 
-				// Otherwise, check for a matching article.
-					else if ($main_articles.filter(location.hash).length > 0) {
-
-						// Prevent default.
-							event.preventDefault();
-							event.stopPropagation();
-
-						// Show article.
-							$main._show(location.hash.substr(1));
-
-					}
-
+			// Handle browser back/forward
+			$window.on('popstate', function(event) {
+				var articleId = getArticleFromPath();
+				if (articleId) {
+					$main._show(articleId);
+				} else {
+					$main._hide();
+				}
 			});
 
 		// Scroll restoration.
-		// This prevents the page from scrolling back to the top on a hashchange.
 			if ('scrollRestoration' in history)
 				history.scrollRestoration = 'manual';
-			else {
-
-				var	oldScrollPos = 0,
-					scrollPos = 0,
-					$htmlbody = $('html,body');
-
-				$window
-					.on('scroll', function() {
-
-						oldScrollPos = scrollPos;
-						scrollPos = $htmlbody.scrollTop();
-
-					})
-					.on('hashchange', function() {
-						$window.scrollTop(oldScrollPos);
-					});
-
-			}
 
 		// Initialize.
 
@@ -391,12 +395,13 @@
 				$main.hide();
 				$main_articles.hide();
 
-			// Initial article.
-				if (location.hash != ''
-				&&	location.hash != '#')
+			// Initial article from clean URL path.
+				var initialArticle = getArticleFromPath();
+				if (initialArticle) {
 					$window.on('load', function() {
-						$main._show(location.hash.substr(1), true);
+						$main._show(initialArticle, true);
 					});
+				}
 
 	// START: Lanting Digital Firebase Form Handler
     

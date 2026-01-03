@@ -3,6 +3,7 @@
     {
       "target": "main",
       "public": ".",
+      "cleanUrls": true,
       "ignore": [
         "firebase.json",
         "**/.*",
@@ -12,6 +13,17 @@
         "sign/**",
         "auth/**",
         "portal/**"
+      ],
+      "rewrites": [
+        { "source": "/intro", "destination": "/index.html" },
+        { "source": "/work", "destination": "/index.html" },
+        { "source": "/portfolio", "destination": "/index.html" },
+        { "source": "/process", "destination": "/index.html" },
+        { "source": "/about", "destination": "/index.html" },
+        { "source": "/faq", "destination": "/index.html" },
+        { "source": "/contact", "destination": "/index.html" },
+        { "source": "/privacy", "destination": "/index.html" },
+        { "source": "/terms", "destination": "/index.html" }
       ]
     },
     {

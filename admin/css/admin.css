@@ -322,6 +322,27 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--danger);
 }
 
+.legal-links {
+    text-align: center;
+    padding: 12px 24px 24px;
+    font-size: 0.75rem;
+}
+
+.legal-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.legal-links a:hover {
+    color: var(--accent-gold);
+}
+
+.legal-links .separator {
+    color: var(--text-muted);
+    margin: 0 6px;
+}
+
 /* =============================================
    MAIN CONTENT
    ============================================= */
