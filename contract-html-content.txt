@@ -1,0 +1,180 @@
+<h1>Service Agreement</h1>
+<p style="text-align: center; color: #666; margin-bottom: 32px;">Custom Software Development Services</p>
+
+<div class="parties">
+  <p><strong>Provider:</strong><br>
+  Lanting Digital LLC, a California Limited Liability Company<br>
+  Riverside, California<br>
+  caleb@lantingdigital.com | (951) 460-8140<br>
+  ("Provider" or "Caleb")</p>
+
+  <p><strong>Client:</strong><br>
+  iAttend, LLC<br>
+  921 N. Milliken Ave #1134, Ontario, CA 91764<br>
+  micah@iattendenrichment.com | (310) 428-2814<br>
+  ("Client" or "iAttend")</p>
+</div>
+
+<p>This Service Agreement ("Agreement") sets forth the terms under which Provider will perform custom software development services for Client. By signing below or providing written acceptance (including email), both parties agree to be bound by these terms.</p>
+
+<h2>1. Project Overview</h2>
+<p><strong>Project Name:</strong> iAttend Enrichment Dashboard</p>
+<p><strong>Project Description:</strong> Provider will design and develop a custom web-based dashboard for Client's after-school enrichment program operations, serving the Lynwood Unified School District (12 school sites). The dashboard will enable attendance tracking, student roster and waitlist management, SEL (Social-Emotional Learning) growth tracking, and reporting capabilities for district partners.</p>
+<p><strong>Engagement Model:</strong> Project Build with Payment Plan (Client owns intellectual property)</p>
+
+<h2>2. Scope of Work &amp; Deliverables</h2>
+<p>Provider agrees to deliver the following ("Deliverables"):</p>
+<ul>
+  <li>Dropdown selection for all 12 school sites</li>
+  <li>Student roster management per site</li>
+  <li>Waitlist tracking with easy student swap functionality</li>
+  <li>Attendance logging with percentage tracking</li>
+  <li>SEL growth input with percentage tracking</li>
+  <li>Calendar view with historical data filtering (by week, month, school year)</li>
+  <li>Visual dashboard with charts and at-a-glance metrics</li>
+  <li>Secure login for 3 authorized users</li>
+  <li>Clean, polished interface suitable for district partner viewing</li>
+  <li>Comprehensive technical documentation at handoff (approximately 5 hours of documentation work included)</li>
+</ul>
+<p><strong>Specifically Excluded from Scope:</strong></p>
+<ul>
+  <li>"Streak" feature (highlighting attendance milestones)</li>
+  <li>Premium animated analytics with advanced visualizations</li>
+  <li>Native mobile app development (iOS/Android apps)</li>
+  <li>Content creation or data entry</li>
+</ul>
+
+<h2>3. Project Timeline &amp; Milestones</h2>
+<p>Provider will complete the project in approximately 5-6 weeks, organized into the following milestones:</p>
+<table>
+  <tr><th>Milestone</th><th>Deliverables</th><th>Target</th></tr>
+  <tr><td><strong>Milestone 1</strong></td><td>Core attendance logging, student roster and waitlist management, secure login for 3 users</td><td>~2 weeks from kickoff</td></tr>
+  <tr><td><strong>Milestone 2</strong></td><td>Dashboard with historical filtering, calendar view, visual charts and analytics</td><td>~4 weeks from kickoff</td></tr>
+  <tr><td><strong>Milestone 3</strong></td><td>Final polish, testing, QA, documentation, and launch</td><td>~5-6 weeks from kickoff</td></tr>
+</table>
+<p>Target completion: End of January 2026, subject to timely Client feedback and materials.</p>
+<p><strong>Revisions:</strong> Each milestone includes up to two (2) rounds of revisions within the agreed scope. Additional revision rounds or revisions that expand the scope will be handled as Change Requests (see Section 6).</p>
+
+<h2>4. Fees &amp; Payment Schedule</h2>
+<p><strong>Total Project Fee:</strong> $9,500.00 USD</p>
+<p><strong>Payment Structure:</strong> Payment Plan (0% interest)</p>
+<table>
+  <tr><th>Payment</th><th>Amount</th><th>Due Date</th></tr>
+  <tr><td>Down Payment + First Monthly Payment</td><td>$3,167.00</td><td>Due before kickoff</td></tr>
+  <tr><td>Payment 2</td><td>$1,267.00</td><td>30 days after kickoff</td></tr>
+  <tr><td>Payment 3</td><td>$1,267.00</td><td>60 days after kickoff</td></tr>
+  <tr><td>Payment 4</td><td>$1,267.00</td><td>90 days after kickoff</td></tr>
+  <tr><td>Payment 5</td><td>$1,267.00</td><td>120 days after kickoff</td></tr>
+  <tr><td>Payment 6</td><td>$1,265.00</td><td>150 days after kickoff</td></tr>
+  <tr><td><strong>Total</strong></td><td><strong>$9,500.00</strong></td><td></td></tr>
+</table>
+<p><strong>Payment Method:</strong> Invoices will be sent via Stripe. Client may pay by credit card or bank transfer.</p>
+<p><strong>Late Payments:</strong> If any payment is more than fifteen (15) days past due, Provider may pause all work until the balance is paid in full. No interest or late fees will be charged, but work will not resume until payment is received.</p>
+
+<h2>5. Intellectual Property &amp; Ownership</h2>
+<p><strong>Ownership Transfer:</strong> Upon Provider's receipt of the initial payment ($3,167.00 — down payment plus first monthly payment), Provider will transfer ownership of the Firebase project and code repository to Client. From that point forward, Client owns all custom code, designs, and Deliverables created for this project. Provider will remain as a collaborator with access to complete the build and provide any ongoing maintenance services.</p>
+<p><strong>What Client Owns:</strong> All custom-developed code, database structure, user interface designs, and documentation created specifically for this project.</p>
+<p><strong>What Provider Retains:</strong> Provider retains the right to use general knowledge, techniques, and non-proprietary code patterns learned during this project in future work. Provider also retains ownership of any pre-existing tools, libraries, or frameworks used in the project, but grants Client a perpetual, royalty-free license to use them as part of the Deliverables.</p>
+<p><strong>If Payments Stop:</strong> If Client fails to make payments and the Agreement is terminated, Client retains ownership of whatever has been built and transferred up to that point. Provider will cease all work and remove collaborator access upon termination.</p>
+
+<h2>6. Change Requests &amp; Additional Work</h2>
+<p>Any work beyond the scope defined in Section 2 will be considered a "Change Request."</p>
+<p><strong>Minor Changes</strong> (estimated at 8 hours or less): Will be billed at Provider's hourly rate of $75.00/hour. Provider will provide an estimate before beginning work and obtain Client's written approval (email is sufficient).</p>
+<p><strong>Major Changes</strong> (estimated at more than 8 hours or representing significant new features): Will require a separate written agreement or amendment to this Agreement with its own scope and pricing.</p>
+<p>Provider will not perform any Change Request work without Client's prior written approval.</p>
+
+<h2>7. Client Responsibilities</h2>
+<p>Client agrees to:</p>
+<ul>
+  <li>Provide timely feedback and approvals within five (5) business days of any request</li>
+  <li>Designate a primary point of contact authorized to make decisions (Micah Langston or Becca Allen)</li>
+  <li>Provide any necessary content, branding materials, or access credentials needed for the project</li>
+  <li>Communicate any specific compliance or regulatory requirements applicable to the project</li>
+</ul>
+<p><strong>Project Delays:</strong> If Provider is unable to proceed for fifteen (15) consecutive business days due to Client's failure to provide feedback, materials, or approvals, Provider may pause the project and invoice for all work completed to date. To resume, the parties will agree on a new timeline based on Provider's availability.</p>
+
+<h2>8. Data &amp; Compliance</h2>
+<p><strong>Client's Responsibility:</strong> Client is solely responsible for determining the legal and regulatory requirements applicable to its business, including but not limited to FERPA (Family Educational Rights and Privacy Act) compliance for student data. Client will communicate any specific compliance requirements to Provider.</p>
+<p><strong>Provider's Responsibility:</strong> Provider will implement reasonable security measures and industry-standard practices in building the software, including secure authentication, encrypted data transmission, and role-based access controls. Provider will make good-faith efforts to accommodate compliance requirements communicated by Client.</p>
+<p><strong>Provider is not a compliance auditor</strong> and does not warrant that the Deliverables will meet any specific legal standard unless explicitly agreed in writing. If compliance-related changes are needed after delivery, they will be handled as Change Requests.</p>
+
+<h2>9. Warranty</h2>
+<p><strong>Warranty Period:</strong> Provider warrants that for sixty (60) days following project launch ("Warranty Period"), the Deliverables will function substantially as described in Section 2. During this period, Provider will fix any bugs or defects at no additional charge.</p>
+<p><strong>What's Covered:</strong> Bugs or defects in the custom code developed by Provider that prevent the software from functioning as specified.</p>
+<p><strong>What's NOT Covered:</strong></p>
+<ul>
+  <li>Issues caused by Client modifications to the code</li>
+  <li>Issues caused by third-party services, APIs, or hosting providers</li>
+  <li>New feature requests or scope expansions</li>
+  <li>Issues arising from Client's misuse of the system</li>
+  <li>Content errors or data entry mistakes</li>
+</ul>
+<p><strong>After Warranty:</strong> Following the Warranty Period, ongoing support and bug fixes are available through a Maintenance Retainer agreement (see Section 11) or billed at Provider's hourly rate.</p>
+
+<h2>10. Infrastructure &amp; Hosting (Firebase)</h2>
+<p>This project will be built on Google Firebase, a cloud platform that provides database, authentication, and hosting services. Per Section 5, Client will own the Firebase project and be responsible for the associated Google Cloud billing account.</p>
+<p><strong>How Firebase Billing Works:</strong> Firebase uses consumption-based pricing, meaning costs scale with usage (database reads/writes, bandwidth, etc.) rather than a fixed monthly fee. For an internal tool with 3 users and ~12 school sites, costs are expected to remain within Firebase's free tier or minimal paid tier (typically $0–$25/month).</p>
+<p><strong>Cost Scaling:</strong> If iAttend expands significantly (e.g., adding many more districts, hundreds of concurrent users, or high-frequency data operations), Firebase costs may increase. Provider will architect the system with cost efficiency in mind, but Client is responsible for monitoring their Firebase billing dashboard and any costs incurred.</p>
+<p><strong>Provider's Responsibility:</strong> Provider will implement cost-conscious architecture (efficient queries, appropriate caching, optimized data structures) and set up billing alerts in the Google Cloud Console to notify Client if costs exceed expected thresholds.</p>
+<p><strong>Client's Responsibility:</strong> Client owns the Firebase billing account and is responsible for all infrastructure costs after ownership transfer. Provider is not liable for Firebase costs, including unexpected spikes due to usage growth, inefficient third-party integrations added after handoff, or external factors.</p>
+
+<h2>11. Ongoing Maintenance (Optional)</h2>
+<p>After project launch and the Warranty Period, Client may choose to engage Provider for ongoing maintenance services. Maintenance retainer options will be presented at launch and may include:</p>
+<ul>
+  <li>Hosting oversight and optimization</li>
+  <li>Regular backups</li>
+  <li>Security updates and monitoring</li>
+  <li>Minor content updates and bug fixes</li>
+  <li>Priority support response</li>
+</ul>
+<p>The specific tier, pricing, and terms will be agreed upon separately if Client chooses to proceed with a maintenance retainer.</p>
+<p><strong>Backups:</strong> During the build phase, Provider will maintain working backups of the project. After launch, if Client does not engage a maintenance retainer, Client is responsible for maintaining their own backups. Firebase provides automatic daily backups for Firestore data, but Provider recommends Client implement an additional backup strategy for critical data.</p>
+
+<h2>12. Documentation</h2>
+<p>At project completion, Provider will deliver comprehensive technical documentation including:</p>
+<ul>
+  <li>Architecture overview (how the system is structured, what connects to what)</li>
+  <li>Deployment and environment setup instructions</li>
+  <li>Key technical decisions and rationale</li>
+  <li>Admin user guide for day-to-day operations</li>
+</ul>
+<p>This documentation is intended to enable another qualified developer to understand, maintain, and extend the system if needed in the future. Approximately five (5) hours of documentation work is included in the project fee.</p>
+
+<h2>13. Limitation of Liability</h2>
+<p><strong>Cap on Liability:</strong> Provider's total liability for any claims arising from this Agreement shall not exceed two times (2x) the total fees paid by Client under this Agreement ($19,000.00 maximum).</p>
+<p><strong>No Consequential Damages:</strong> In no event shall Provider be liable for any indirect, incidental, special, or consequential damages, including but not limited to lost profits, lost data, or business interruption, even if advised of the possibility of such damages.</p>
+<p><strong>Exceptions:</strong> These limitations do not apply to Provider's gross negligence or willful misconduct.</p>
+
+<h2>14. Termination</h2>
+<p><strong>Termination by Either Party:</strong> Either party may terminate this Agreement with thirty (30) days written notice.</p>
+<p><strong>Termination for Cause:</strong> Either party may terminate immediately if the other party materially breaches this Agreement and fails to cure the breach within fifteen (15) days of written notice.</p>
+<p><strong>Effect of Termination:</strong></p>
+<ul>
+  <li>Client shall pay Provider for all work completed up to the termination date, prorated for any milestone in progress</li>
+  <li>Provider shall transfer all completed work and work-in-progress to Client</li>
+  <li>Provider shall remove collaborator access from Client's systems</li>
+  <li>Sections 5 (Intellectual Property), 8 (Data &amp; Compliance), 13 (Limitation of Liability), and 15 (Confidentiality) shall survive termination</li>
+</ul>
+
+<h2>15. Confidentiality</h2>
+<p>Both parties agree to keep confidential any non-public information shared during this engagement, including but not limited to business strategies, pricing, technical approaches, and student data. Neither party will disclose the other's confidential information to third parties without written consent, except as required by law.</p>
+<p>This obligation survives for two (2) years after termination of this Agreement.</p>
+
+<h2>16. Portfolio &amp; Marketing Rights</h2>
+<p>Provider would like to feature this project in its portfolio and marketing materials (website, social media, case studies) after launch. Provider will obtain Client's written permission before any public use of the project, Client's name, or Client's logo.</p>
+<p><em>(Your selection will be recorded when you sign below)</em></p>
+
+<h2>17. Dispute Resolution</h2>
+<p>The parties agree to attempt to resolve any dispute arising from this Agreement through good-faith negotiation. If the dispute cannot be resolved within thirty (30) days, either party may pursue legal remedies in the state courts of Riverside County, California.</p>
+<p><strong>Governing Law:</strong> This Agreement shall be governed by the laws of the State of California.</p>
+
+<h2>18. General Terms</h2>
+<p><strong>Entire Agreement:</strong> This Agreement constitutes the entire agreement between the parties and supersedes all prior discussions and agreements.</p>
+<p><strong>Amendments:</strong> Any changes to this Agreement must be in writing and signed by both parties.</p>
+<p><strong>Severability:</strong> If any provision of this Agreement is found unenforceable, the remaining provisions shall remain in full force.</p>
+<p><strong>Independent Contractor:</strong> Provider is an independent contractor, not an employee of Client.</p>
+<p><strong>Electronic Signatures:</strong> This Agreement may be signed electronically or by email acceptance, which shall be equally binding as a handwritten signature.</p>
+<p><strong>Notices:</strong> All notices shall be sent to the email addresses listed at the beginning of this Agreement.</p>
+
+<h2>19. Acceptance</h2>
+<p>By signing below, both parties agree to be bound by these terms.</p>

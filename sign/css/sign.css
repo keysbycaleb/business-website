@@ -904,7 +904,7 @@ table.doc-table td {
 }
 
 /* =============================================
-   RESPONSIVE (MOBILE)
+   RESPONSIVE (TABLET - 768px to 900px)
    ============================================= */
 @media (max-width: 900px) {
     body {
@@ -919,25 +919,30 @@ table.doc-table td {
     }
 
     .main-container {
-        display: block;
+        display: flex;
+        flex-direction: column;
         height: auto;
+        min-height: calc(100vh - 60px);
     }
 
     .doc-viewer {
         height: auto;
-        max-height: 500px;
+        max-height: none;
         padding: 20px;
+        flex: 1;
     }
 
     .action-panel {
         width: 100%;
         border-left: none;
         border-top: 1px solid var(--border);
+        flex-shrink: 0;
     }
 
     .paper-document {
         padding: 30px;
         min-height: auto;
+        max-width: 100%;
     }
 
     .signature-area-preview {
@@ -955,6 +960,337 @@ table.doc-table td {
 
     .brand-badge {
         display: none;
+    }
+
+    /* State cards on tablet */
+    .state-card {
+        padding: 48px 36px;
+        max-width: 380px;
+    }
+
+    /* Modal on tablet */
+    .modal-content {
+        max-width: 90%;
+    }
+}
+
+/* =============================================
+   RESPONSIVE (SMALL TABLET / HALF SCREEN - 768px)
+   ============================================= */
+@media (max-width: 768px) {
+    .navbar {
+        height: 56px;
+        padding: 0 12px;
+    }
+
+    .brand {
+        font-size: 1.1rem;
+    }
+
+    .secure-badge {
+        font-size: 0.75rem;
+    }
+
+    .secure-badge span {
+        display: none;
+    }
+
+    .doc-viewer {
+        padding: 16px;
+    }
+
+    .paper-document {
+        padding: 24px;
+        font-size: 10pt;
+    }
+
+    .action-header {
+        padding: 20px;
+    }
+
+    .action-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .action-body {
+        padding: 20px;
+    }
+
+    .action-footer {
+        padding: 16px 20px;
+    }
+
+    /* State cards */
+    .state-card {
+        padding: 40px 28px;
+        max-width: 360px;
+    }
+
+    .state-card h1 {
+        font-size: 1.4rem;
+    }
+
+    .state-icon {
+        width: 64px;
+        height: 64px;
+        font-size: 1.5rem;
+    }
+
+    /* Login */
+    .login-container {
+        padding: 36px 28px;
+    }
+
+    .login-header h1 {
+        font-size: 1.75rem;
+    }
+}
+
+/* =============================================
+   RESPONSIVE (MOBILE - 480px and below)
+   ============================================= */
+@media (max-width: 480px) {
+    .navbar {
+        height: 52px;
+        padding: 0 12px;
+    }
+
+    .brand {
+        font-size: 1rem;
+    }
+
+    .secure-badge {
+        font-size: 0.7rem;
+        gap: 4px;
+    }
+
+    .doc-viewer {
+        padding: 12px;
+        background: #e5e7eb;
+    }
+
+    .paper-document {
+        padding: 20px;
+        font-size: 9pt;
+        line-height: 1.5;
+        border-radius: 8px;
+    }
+
+    .paper-document h1.doc-title {
+        font-size: 16pt;
+    }
+
+    .paper-document h2 {
+        font-size: 11pt;
+    }
+
+    .sig-line {
+        font-size: 16pt;
+        height: 36px;
+    }
+
+    /* Action Panel Mobile */
+    .action-header {
+        padding: 16px;
+    }
+
+    .action-header h2 {
+        font-size: 1.2rem;
+    }
+
+    .action-header p {
+        font-size: 0.85rem;
+    }
+
+    .action-body {
+        padding: 16px;
+    }
+
+    .action-footer {
+        padding: 12px 16px;
+    }
+
+    .form-step {
+        margin-bottom: 24px;
+    }
+
+    .step-label {
+        font-size: 0.7rem;
+    }
+
+    .input-group {
+        margin-bottom: 14px;
+    }
+
+    .input-group label {
+        font-size: 0.85rem;
+    }
+
+    .form-input {
+        padding: 10px 12px;
+        font-size: 16px; /* Prevents iOS zoom on focus */
+    }
+
+    .signature-input {
+        font-size: 1.3rem !important;
+    }
+
+    .radio-option {
+        padding: 10px 12px;
+    }
+
+    .radio-option span {
+        font-size: 0.85rem;
+    }
+
+    .btn-sign {
+        padding: 14px;
+        font-size: 0.95rem;
+    }
+
+    /* State cards mobile */
+    .state-card {
+        padding: 32px 20px;
+        max-width: 100%;
+        width: 95%;
+        border-radius: 12px;
+    }
+
+    .state-card h1 {
+        font-size: 1.25rem;
+    }
+
+    .state-card p {
+        font-size: 0.9rem;
+    }
+
+    .state-icon {
+        width: 56px;
+        height: 56px;
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+    }
+
+    .state-actions {
+        margin-top: 20px;
+    }
+
+    .btn-elegant {
+        padding: 12px 20px;
+        font-size: 0.85rem;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .state-footer {
+        margin-top: 24px !important;
+        padding-top: 20px;
+    }
+
+    .success-details {
+        padding: 16px;
+    }
+
+    .success-details .detail-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    /* Login mobile */
+    .login-container {
+        padding: 28px 20px;
+        width: 95%;
+    }
+
+    .login-header {
+        margin-bottom: 24px;
+    }
+
+    .login-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .login-header p {
+        font-size: 0.9rem;
+    }
+
+    .btn-google {
+        padding: 12px 16px;
+        font-size: 0.95rem;
+    }
+
+    .login-note {
+        font-size: 0.8rem;
+        margin-top: 20px;
+    }
+
+    /* Modal full screen on mobile - centered, not bottom sheet */
+    .modal {
+        padding: 16px;
+        align-items: flex-start;
+        padding-top: 10vh;
+    }
+
+    .modal-content {
+        max-width: 100%;
+        width: 100%;
+        border-radius: 12px;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        padding: 16px 20px;
+        position: sticky;
+        top: 0;
+        background: #fff;
+        z-index: 1;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .modal-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .modal-description {
+        font-size: 0.9rem;
+    }
+
+    .signature-preview-box {
+        padding: 16px;
+    }
+
+    .signature-preview {
+        font-size: 1.5rem;
+    }
+
+    .modal-footer {
+        padding: 12px 20px;
+        position: sticky;
+        bottom: 0;
+        background: var(--bg-app);
+        border-radius: 0 0 12px 12px;
+    }
+
+    .modal-terms {
+        padding: 12px;
+    }
+
+    .modal-terms span {
+        font-size: 0.8rem;
+    }
+
+    /* Toast mobile */
+    .toast {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        width: auto;
     }
 }
 
@@ -988,7 +1324,8 @@ table.doc-table td {
 /* =============================================
    LOGIN SCREEN
    ============================================= */
-#login-screen {
+#login-screen.active {
+    display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;

@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Contract | Lanting Digital - DESIGN MOCKUP</title>
+
+    <!-- Google Fonts - Dancing Script for signature -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+/* =============================================
+   LANTING DIGITAL - CONTRACT SIGNING PAGE
+   This is a static mockup for design purposes.
+   Edit this CSS to modify the design.
+   ============================================= */
+
+:root {
+    --bg-primary: #1b1f22;
+    --bg-secondary: #252a2e;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --accent: #4a9eff;
+    --accent-hover: #6bb3ff;
+    --success: #4caf50;
+    --danger: #f44336;
+    --border: #3d444a;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+}
+
+/* =============================================
+   SCREEN STATES
+   (Only signing screen is shown in mockup)
+   ============================================= */
+.screen {
+    display: none;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* Loading/Error/Success Screens */
+.loading-container,
+.error-container,
+.signed-container,
+.success-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    padding: 40px;
+}
+
+.loading-container i,
+.error-container i,
+.signed-container i,
+.success-container i {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.loading-container i { color: var(--accent); }
+.error-container i { color: var(--danger); }
+.signed-container i,
+.success-container i { color: var(--success); }
+
+.loading-container p,
+.error-container p,
+.signed-container p,
+.success-container p {
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.error-container h1,
+.signed-container h1,
+.success-container h1 {
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+}
+
+.success-details {
+    background: var(--bg-secondary);
+    padding: 20px 30px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+/* =============================================
+   HEADER
+   ============================================= */
+.sign-header {
+    background: var(--bg-secondary);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+}
+
+.header-content h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.header-content p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* =============================================
+   MAIN CONTENT AREA
+   ============================================= */
+.sign-main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+/* =============================================
+   CONTRACT DOCUMENT
+   This is styled to look like a paper document
+   ============================================= */
+.contract-document {
+    background: #fff;
+    color: #333;
+    border-radius: 4px;
+    padding: 0.75in;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-height: none;
+    overflow: visible;
+}
+
+#contract-content {
+    font-family: 'Georgia', serif;
+    font-size: 12pt;
+    line-height: 1.6;
+}
+
+/* Contract headings */
+#contract-content h1 {
+    text-align: center;
+    font-size: 18pt;
+    margin-bottom: 8px;
+    color: #1a1a1a;
+}
+
+#contract-content .subtitle {
+    text-align: center;
+    font-size: 11pt;
+    color: #666;
+    margin-bottom: 32px;
+}
+
+#contract-content h2 {
+    font-size: 12pt;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    color: #1a1a1a;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 4px;
+}
+
+#contract-content p {
+    margin-bottom: 12px;
+    text-align: justify;
+}
+
+/* Parties section */
+#contract-content .parties {
+    margin: 24px 0;
+}
+
+#contract-content .parties p {
+    margin-bottom: 8px;
+}
+
+/* =============================================
+   TABLES (Milestones, Payment, etc.)
+   ============================================= */
+#contract-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+}
+
+#contract-content th,
+#contract-content td {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 11pt;
+}
+
+#contract-content th {
+    background-color: #f5f5f5;
+}
+
+/* Lists */
+#contract-content ul,
+#contract-content ol {
+    margin: 12px 0;
+    padding-left: 24px;
+}
+
+#contract-content li {
+    margin-bottom: 8px;
+}
+
+/* =============================================
+   SIGNATURE SECTION (inside contract)
+   ============================================= */
+#contract-content .signature-section {
+    margin-top: 48px;
+    page-break-inside: avoid;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4%;
+}
+
+#contract-content .signature-block {
+    flex: 0 0 46%;
+    margin-bottom: 20px;
+}
+
+#contract-content .signature-block p {
+    margin: 4px 0;
+    text-align: left;
+}
+
+/* Signature lines */
+#contract-content .signature-line {
+    border-bottom: 1px solid #333;
+    height: 30px;
+    margin: 8px 0;
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 2px;
+}
+
+/* Provider signature - cursive font, no box */
+#contract-content .provider-signature-text {
+    font-family: 'Dancing Script', cursive;
+    font-size: 24pt;
+    color: #000;
+}
+
+/* Client editable fields inside contract */
+#contract-content .client-input {
+    border: none;
+    border-bottom: 1px solid #333;
+    background: transparent;
+    font-family: 'Georgia', serif;
+    font-size: 12pt;
+    padding: 4px 0;
+    width: 200px;
+    color: #333;
+}
+
+#contract-content .client-input:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+    background: #f0f7ff;
+}
+
+#contract-content .client-input::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+/* Date input styling */
+#contract-content .date-input {
+    border: none;
+    border-bottom: 1px solid #333;
+    background: transparent;
+    font-family: 'Georgia', serif;
+    font-size: 12pt;
+    padding: 4px 0;
+    color: #333;
+}
+
+#contract-content .date-input:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+    background: #f0f7ff;
+}
+
+/* =============================================
+   SIGNATURE PAD SECTION (outside contract)
+   ============================================= */
+.signature-pad-section {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 30px;
+    border: 1px solid var(--border);
+}
+
+.signature-pad-section h3 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+    color: var(--text-primary);
+}
+
+.signature-pad-section h3 i {
+    margin-right: 8px;
+    color: var(--accent);
+}
+
+.signature-instructions {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+/* Signature Pad Canvas */
+.signature-pad-container {
+    position: relative;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid var(--border);
+    margin-bottom: 25px;
+}
+
+#signature-pad {
+    display: block;
+    width: 100%;
+    height: 200px;
+    cursor: crosshair;
+    touch-action: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background: white;
+}
+
+#clear-signature {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+/* Form elements */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+/* Radio Groups (Portfolio Permission) */
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 15px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.radio-option:hover {
+    border-color: var(--accent);
+}
+
+.radio-option input[type="radio"] {
+    margin-top: 3px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+}
+
+.radio-option span {
+    flex: 1;
+    line-height: 1.4;
+    color: var(--text-secondary);
+}
+
+/* Checkbox (Agreement) */
+.checkbox-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.checkbox-option input[type="checkbox"] {
+    margin-top: 3px;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+}
+
+.checkbox-option span {
+    color: var(--text-primary);
+}
+
+/* =============================================
+   BUTTONS
+   ============================================= */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.btn i {
+    font-size: 0.9rem;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
+}
+
+.btn-primary:disabled {
+    background: var(--text-secondary);
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background: var(--border);
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+}
+
+.btn-full {
+    width: 100%;
+    padding: 16px;
+    font-size: 1.1rem;
+}
+
+/* =============================================
+   FOOTER
+   ============================================= */
+.sign-footer {
+    text-align: center;
+    padding: 30px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.sign-footer a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+.sign-footer a:hover {
+    text-decoration: underline;
+}
+
+/* =============================================
+   RESPONSIVE DESIGN
+   ============================================= */
+@media (max-width: 768px) {
+    .sign-main {
+        padding: 15px 10px;
+    }
+
+    .contract-document {
+        padding: 20px 15px;
+    }
+
+    #contract-content {
+        font-size: 10pt;
+    }
+
+    #contract-content h1 {
+        font-size: 14pt;
+    }
+
+    #contract-content h2 {
+        font-size: 11pt;
+    }
+
+    #contract-content th,
+    #contract-content td {
+        padding: 6px 8px;
+        font-size: 9pt;
+    }
+
+    #contract-content .signature-block {
+        flex: 0 0 100%;
+    }
+
+    .signature-pad-section {
+        padding: 20px 15px;
+    }
+
+    #signature-pad {
+        height: 150px;
+    }
+
+    #contract-content .client-input {
+        width: 150px;
+    }
+}
+
+/* =============================================
+   TOAST NOTIFICATIONS
+   ============================================= */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    padding: 15px 25px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 2000;
+    animation: slideIn 0.3s ease;
+}
+
+.toast.error {
+    border-color: var(--danger);
+}
+
+.toast.error i {
+    color: var(--danger);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* =============================================
+   PRINT STYLES
+   ============================================= */
+@media print {
+    body {
+        background: white;
+    }
+
+    .sign-header,
+    .signature-pad-section,
+    .sign-footer {
+        display: none;
+    }
+
+    .contract-document {
+        box-shadow: none;
+        padding: 0;
+        margin: 0;
+    }
+}
+    </style>
+</head>
+<body>
+    <!--
+    =============================================
+    DESIGN MOCKUP NOTICE
+    This is a static HTML file for design purposes.
+    No Firebase connection - all data is hardcoded.
+    Edit the CSS above to modify the design.
+    =============================================
+    -->
+
+    <!-- LOADING STATE (hidden) -->
+    <div id="loading-screen" class="screen">
+        <div class="loading-container">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading contract...</p>
+        </div>
+    </div>
+
+    <!-- ERROR STATE (hidden) -->
+    <div id="error-screen" class="screen">
+        <div class="error-container">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h1>Contract Not Found</h1>
+            <p id="error-message">This contract link is invalid or has expired.</p>
+            <a href="#" class="btn btn-primary">Visit Lanting Digital</a>
+        </div>
+    </div>
+
+    <!-- ALREADY SIGNED STATE (hidden) -->
+    <div id="signed-screen" class="screen">
+        <div class="signed-container">
+            <i class="fas fa-check-circle"></i>
+            <h1>Contract Already Signed</h1>
+            <p>This contract was signed on <span id="signed-date">December 18, 2025</span>.</p>
+            <p>If you need a copy, please contact <a href="mailto:caleb@lantingdigital.com">caleb@lantingdigital.com</a>.</p>
+        </div>
+    </div>
+
+    <!-- MAIN SIGNING PAGE (shown by default) -->
+    <div id="signing-screen" class="screen active">
+        <header class="sign-header">
+            <div class="header-content">
+                <h1>Lanting Digital</h1>
+                <p>Contract Review &amp; Signing</p>
+            </div>
+        </header>
+
+        <main class="sign-main">
+            <form id="signing-form">
+                <!-- CONTRACT DOCUMENT -->
+                <div class="contract-document">
+                    <div id="contract-content">
+                        <!-- ============================================
+                             MOCK CONTRACT CONTENT
+                             This is sample contract HTML for design purposes
+                             ============================================ -->
+
+                        <h1>SOFTWARE DEVELOPMENT AGREEMENT</h1>
+                        <p class="subtitle">Mobile Application Development Services</p>
+
+                        <div class="parties">
+                            <p><strong>This Software Development Agreement</strong> ("Agreement") is entered into as of the Effective Date by and between:</p>
+                            <p><strong>Provider:</strong> Lanting Digital LLC, a California limited liability company ("Provider")</p>
+                            <p><strong>Client:</strong> iAttend LLC ("Client")</p>
+                        </div>
+
+                        <h2>1. SCOPE OF WORK</h2>
+                        <p>Provider agrees to develop a mobile application ("App") for Client according to the specifications outlined in this Agreement. The App will be a cross-platform React Native application providing event check-in and attendance tracking functionality.</p>
+
+                        <h2>2. DELIVERABLES</h2>
+                        <p>The following deliverables are included in this Agreement:</p>
+                        <ul>
+                            <li>iOS and Android mobile application</li>
+                            <li>Admin dashboard web interface</li>
+                            <li>Backend API and database setup</li>
+                            <li>User documentation</li>
+                            <li>30 days of post-launch support</li>
+                        </ul>
+
+                        <h2>3. PROJECT TIMELINE</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Milestone</th>
+                                    <th>Deliverable</th>
+                                    <th>Target Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>UI/UX Design Approval</td>
+                                    <td>January 15, 2026</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>Core Features Development</td>
+                                    <td>February 15, 2026</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>Beta Testing</td>
+                                    <td>March 1, 2026</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>Final Delivery & Launch</td>
+                                    <td>March 15, 2026</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h2>4. PAYMENT TERMS</h2>
+                        <p>Total project cost: <strong>$8,500.00</strong></p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Payment</th>
+                                    <th>Amount</th>
+                                    <th>Due</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Deposit (upon signing)</td>
+                                    <td>$2,550.00 (30%)</td>
+                                    <td>Upon Signing</td>
+                                </tr>
+                                <tr>
+                                    <td>Milestone 2 Payment</td>
+                                    <td>$2,975.00 (35%)</td>
+                                    <td>Feb 15, 2026</td>
+                                </tr>
+                                <tr>
+                                    <td>Final Payment</td>
+                                    <td>$2,975.00 (35%)</td>
+                                    <td>Upon Delivery</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h2>5. INTELLECTUAL PROPERTY</h2>
+                        <p>Upon full payment, all intellectual property rights in the deliverables shall transfer to Client, except for any pre-existing Provider IP which shall be licensed to Client on a non-exclusive, perpetual basis.</p>
+
+                        <h2>6. CONFIDENTIALITY</h2>
+                        <p>Both parties agree to keep confidential any proprietary information disclosed during the course of this Agreement and shall not disclose such information to third parties without prior written consent.</p>
+
+                        <h2>7. LIMITATION OF LIABILITY</h2>
+                        <p>Provider's total liability under this Agreement shall not exceed the total fees paid by Client. Neither party shall be liable for indirect, incidental, or consequential damages.</p>
+
+                        <h2>8. TERMINATION</h2>
+                        <p>Either party may terminate this Agreement with 14 days written notice. Upon termination, Client shall pay for all work completed to date and Provider shall deliver all completed work product.</p>
+
+                        <!-- SIGNATURE SECTION -->
+                        <div class="signature-section">
+                            <div class="signature-block">
+                                <p><strong>PROVIDER: Lanting Digital LLC</strong></p>
+                                <p>Signature:</p>
+                                <div class="signature-line">
+                                    <span class="provider-signature-text">Caleb Lanting</span>
+                                </div>
+                                <p>Name: Caleb Lanting</p>
+                                <p>Title: Owner / Member</p>
+                                <p>Date: January 2, 2026</p>
+                            </div>
+                            <div class="signature-block">
+                                <p><strong>CLIENT: iAttend LLC</strong></p>
+                                <p>Signature: <em style="color: #666; font-size: 10pt;">(Draw below)</em></p>
+                                <div class="signature-line" id="client-signature-display">
+                                    <!-- Client signature image will appear here after signing -->
+                                </div>
+                                <p>Name: <input type="text" class="client-input" id="client-name" required placeholder="Your full name"></p>
+                                <p>Title: <input type="text" class="client-input" id="client-title" required placeholder="Your title"></p>
+                                <p>Date: <input type="date" class="date-input" id="effective-date" value="2026-01-02" required></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SIGNATURE PAD SECTION (outside contract) -->
+                <div class="signature-pad-section">
+                    <h3><i class="fas fa-pen-nib"></i> Draw Your Signature</h3>
+                    <p class="signature-instructions">Use your mouse, finger, or stylus to sign below. This signature will appear on the contract above.</p>
+
+                    <div class="signature-pad-container">
+                        <!-- Canvas is just for visual - no actual signature capture in mockup -->
+                        <div id="signature-pad" style="background: white; display: flex; align-items: center; justify-content: center; color: #ccc; font-style: italic;">
+                            Sign here...
+                        </div>
+                        <button type="button" id="clear-signature" class="btn btn-sm btn-secondary">
+                            <i class="fas fa-eraser"></i> Clear
+                        </button>
+                    </div>
+
+                    <!-- Portfolio Permission -->
+                    <div class="form-group portfolio-permission">
+                        <label><strong>Portfolio Permission</strong> (Section 16)</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="portfolio" value="true" required>
+                                <span>I agree to allow portfolio use after launch, subject to prior written approval</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="portfolio" value="false">
+                                <span>I do not wish to be featured in Provider's portfolio</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Agreement Checkbox -->
+                    <div class="form-group agreement-checkbox">
+                        <label class="checkbox-option">
+                            <input type="checkbox" id="agree-terms" required>
+                            <span><strong>I have read and agree to all terms of this Agreement</strong></span>
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="submit-btn" class="btn btn-primary btn-full">
+                        <i class="fas fa-file-signature"></i> Sign &amp; Submit Contract
+                    </button>
+                </div>
+            </form>
+        </main>
+
+        <footer class="sign-footer">
+            <p>&copy; Lanting Digital LLC | <a href="#">lantingdigital.com</a></p>
+        </footer>
+    </div>
+
+    <!-- SUCCESS STATE (hidden) -->
+    <div id="success-screen" class="screen">
+        <div class="success-container">
+            <i class="fas fa-check-circle"></i>
+            <h1>Contract Signed Successfully!</h1>
+            <p>Thank you for signing. A confirmation email will be sent to <span id="success-email">pete@iattend.com</span>.</p>
+            <div class="success-details">
+                <p><strong>Contract:</strong> <span id="success-contract-name">iAttend Mobile App Development</span></p>
+                <p><strong>Signed:</strong> <span id="success-timestamp">Thursday, January 2, 2026 at 2:45 PM PST</span></p>
+            </div>
+            <a href="#" class="btn btn-primary">Visit Lanting Digital</a>
+        </div>
+    </div>
+
+    <!-- Simple JS for screen switching in mockup -->
+    <script>
+        // Prevent form submission in mockup
+        document.getElementById('signing-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Show success screen
+            document.getElementById('signing-screen').classList.remove('active');
+            document.getElementById('success-screen').classList.add('active');
+        });
+
+        // Function to switch screens for testing different states
+        // Uncomment the desired screen to view it:
+
+        // Show loading screen:
+        // document.getElementById('signing-screen').classList.remove('active');
+        // document.getElementById('loading-screen').classList.add('active');
+
+        // Show error screen:
+        // document.getElementById('signing-screen').classList.remove('active');
+        // document.getElementById('error-screen').classList.add('active');
+
+        // Show already signed screen:
+        // document.getElementById('signing-screen').classList.remove('active');
+        // document.getElementById('signed-screen').classList.add('active');
+
+        // Show success screen:
+        // document.getElementById('signing-screen').classList.remove('active');
+        // document.getElementById('success-screen').classList.add('active');
+    </script>
+</body>
+</html>

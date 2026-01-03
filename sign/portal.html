@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Client Portal | Lanting Digital</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="https://lantingdigital.com/images/favicon.ico">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/portal.css?v=20260102a">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="portal-login">
+        <div class="login-card">
+            <div class="login-logo">
+                <span class="logo-text">Lanting Digital</span>
+                <span class="logo-tagline">Client Portal</span>
+            </div>
+            <div class="login-content">
+                <h1>Welcome Back</h1>
+                <p>Sign in to access your contracts, messages, and invoices.</p>
+                <button type="button" class="btn-google" id="google-login-btn">
+                    <i class="fab fa-google"></i> Sign in with Google
+                </button>
+                <p class="login-note">
+                    <i class="fas fa-lock"></i> Your information is secure and encrypted
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="portal-loading active">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Loading your portal...</p>
+        </div>
+    </div>
+
+    <!-- Access Denied Screen -->
+    <div id="access-denied-screen" class="portal-access-denied">
+        <div class="access-denied-card">
+            <div class="access-denied-icon">
+                <i class="fas fa-user-lock"></i>
+            </div>
+            <h1>No Active Projects</h1>
+            <p>Your account doesn't have any active projects or contracts yet.</p>
+            <p class="access-denied-note">If you believe this is an error, please contact us.</p>
+            <div class="access-denied-actions">
+                <a href="mailto:caleb@lantingdigital.com" class="btn btn-primary">
+                    <i class="fas fa-envelope"></i> Contact Support
+                </a>
+                <button type="button" class="btn btn-secondary" id="try-different-account">
+                    <i class="fas fa-user"></i> Try Different Account
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Portal -->
+    <div id="portal-app" class="portal-container hidden">
+        <!-- Mobile Overlay -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <!-- Sidebar -->
+        <aside class="portal-sidebar" id="portal-sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="sidebar-brand">Lanting Digital</a>
+                <span class="sidebar-tagline">Client Portal</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <span class="nav-section-title">Overview</span>
+                    <a href="#dashboard" class="nav-item active" data-view="dashboard">
+                        <i class="fas fa-home"></i>
+                        Dashboard
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <span class="nav-section-title">Documents</span>
+                    <a href="#contracts" class="nav-item" data-view="contracts">
+                        <i class="fas fa-file-contract"></i>
+                        Contracts
+                        <span class="nav-badge" id="contracts-badge" style="display: none;">0</span>
+                    </a>
+                    <a href="#invoices" class="nav-item" data-view="invoices">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                        Invoices
+                        <span class="nav-badge warning" id="invoices-badge" style="display: none;">0</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <span class="nav-section-title">Communication</span>
+                    <a href="#messages" class="nav-item" data-view="messages">
+                        <i class="fas fa-comments"></i>
+                        Messages
+                        <span class="nav-badge" id="messages-badge" style="display: none;">0</span>
+                    </a>
+                </div>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-card">
+                    <div class="user-avatar" id="user-avatar">
+                        <!-- Will show initials or photo -->
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name" id="user-name">Loading...</div>
+                        <div class="user-email" id="user-email">...</div>
+                    </div>
+                    <button class="btn-logout" id="logout-btn" title="Sign Out">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="portal-main">
+            <header class="portal-header">
+                <button class="mobile-menu-btn" id="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="header-title">
+                    <h1 class="page-title" id="page-title">Dashboard</h1>
+                    <p class="page-subtitle" id="page-subtitle">Welcome back! Here's your overview.</p>
+                </div>
+                <div class="header-actions" id="header-actions">
+                    <!-- Dynamic actions will be added here -->
+                </div>
+            </header>
+
+            <div class="portal-content">
+                <!-- Dashboard View -->
+                <div id="view-dashboard" class="portal-view active">
+                    <!-- Stats Grid -->
+                    <div class="dashboard-grid">
+                        <div class="stat-card clickable" data-navigate="contracts">
+                            <div class="stat-icon gold">
+                                <i class="fas fa-file-contract"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="stat-contracts">-</div>
+                                <div class="stat-label">Active Contracts</div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card clickable" data-navigate="invoices">
+                            <div class="stat-icon orange">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="stat-pending-invoices">-</div>
+                                <div class="stat-label">Pending Invoices</div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card clickable" data-navigate="messages">
+                            <div class="stat-icon blue">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="stat-unread-messages">-</div>
+                                <div class="stat-label">Unread Messages</div>
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="stat-completed">-</div>
+                                <div class="stat-label">Projects Completed</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-clock"></i>
+                                Recent Activity
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <ul class="activity-feed" id="activity-feed">
+                                <li class="loading-spinner">
+                                    <div class="spinner"></div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions Card -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-bolt"></i>
+                                Quick Actions
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="quick-actions-grid">
+                                <a href="#contracts" class="quick-action-btn" data-view="contracts">
+                                    <i class="fas fa-file-signature"></i>
+                                    <span>View Contracts</span>
+                                </a>
+                                <a href="#messages" class="quick-action-btn" data-view="messages">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span>Send Message</span>
+                                </a>
+                                <a href="#invoices" class="quick-action-btn" data-view="invoices">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>Pay Invoice</span>
+                                </a>
+                                <a href="mailto:caleb@lantingdigital.com" class="quick-action-btn">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>Contact Support</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contracts View -->
+                <div id="view-contracts" class="portal-view">
+                    <div class="contracts-list" id="contracts-list">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contract Detail View -->
+                <div id="view-contract-detail" class="portal-view">
+                    <div class="contract-detail">
+                        <div class="contract-detail-header">
+                            <button class="btn btn-ghost" id="back-to-contracts">
+                                <i class="fas fa-arrow-left"></i> Back to Contracts
+                            </button>
+                            <div class="contract-detail-actions" id="contract-detail-actions">
+                                <!-- Sign button will appear here if needed -->
+                            </div>
+                        </div>
+                        <div class="contract-document" id="contract-document">
+                            <!-- Contract HTML will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoices View -->
+                <div id="view-invoices" class="portal-view">
+                    <div class="invoices-list" id="invoices-list">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Detail View -->
+                <div id="view-invoice-detail" class="portal-view">
+                    <div class="invoice-detail" id="invoice-detail">
+                        <!-- Invoice details will be loaded here -->
+                    </div>
+                </div>
+
+                <!-- Messages View -->
+                <div id="view-messages" class="portal-view">
+                    <div class="messages-container" id="messages-container">
+                        <div class="messages-header">
+                            <div class="messages-recipient">
+                                <div class="recipient-avatar">CL</div>
+                                <div class="recipient-info">
+                                    <h3>Caleb Lanting</h3>
+                                    <p>Lanting Digital</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="messages-list" id="messages-list">
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                        <div class="messages-input">
+                            <input type="text" id="message-input" placeholder="Type your message..." autocomplete="off">
+                            <button type="button" id="send-message-btn">
+                                <i class="fas fa-paper-plane"></i>
+                                <span class="btn-text">Send</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+
+    <!-- Stripe -->
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <!-- App Scripts -->
+    <script src="js/config.js?v=20260102b"></script>
+    <script src="js/portal.js?v=20260102a"></script>
+</body>
+</html>

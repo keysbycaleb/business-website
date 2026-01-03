@@ -105,19 +105,26 @@ function setupSidebarNavigation() {
 
             // Update page title
             if (pageHeaderTitle) {
-                if (tab.dataset.section === 'leads') {
-                    pageHeaderTitle.textContent = 'Leads & Inquiries';
-                } else if (tab.dataset.section === 'contracts') {
-                    pageHeaderTitle.textContent = 'Contracts & Proposals';
-                }
+                const titles = {
+                    'leads': 'Leads & Inquiries',
+                    'contracts': 'Contracts & Proposals',
+                    'clients': 'Clients',
+                    'messages': 'Messages'
+                };
+                pageHeaderTitle.textContent = titles[tab.dataset.section] || 'Dashboard';
             }
 
             // Close mobile sidebar
             if (sidebar) sidebar.classList.remove('mobile-open');
 
-            // Load contracts if switching to that section
-            if (tab.dataset.section === 'contracts' && typeof loadContracts === 'function') {
+            // Load section-specific data
+            const section = tab.dataset.section;
+            if (section === 'contracts' && typeof loadContracts === 'function') {
                 loadContracts();
+            } else if (section === 'clients' && typeof loadClients === 'function') {
+                loadClients();
+            } else if (section === 'messages' && typeof loadConversations === 'function') {
+                loadConversations();
             }
         });
     });

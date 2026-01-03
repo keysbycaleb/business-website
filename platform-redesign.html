@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal | Lanting Digital</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+/* =============================================
+   LANTING DIGITAL - PREMIUM LIGHT THEME
+   Theme: Porcelain & Gold
+   ============================================= */
+
+:root {
+    /* Luxury Light Palette */
+    --bg-app: #f8f9fa;          /* Softest Gray/White */
+    --bg-panel: #ffffff;        /* Pure White */
+    --bg-card: #ffffff;         /* Pure White */
+    --bg-input: #f3f4f6;        /* Light Gray Input */
+    
+    /* Typography & Accents */
+    --text-primary: #1a1f2c;    /* Deep Obsidian */
+    --text-secondary: #64748b;  /* Slate */
+    --text-muted: #94a3b8;      /* Light Slate */
+    
+    /* The Gold Standard */
+    --accent-gold: #c5a059;     /* Muted Metallic Gold */
+    --accent-gold-dark: #a38240;
+    --accent-gold-light: #f4efe6; /* Very light gold wash */
+    
+    /* Functional Colors */
+    --success: #059669;
+    --success-bg: #ecfdf5;
+    --warning: #d97706;
+    --warning-bg: #fffbeb;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    
+    --border: #e2e8f0;
+    --border-subtle: #f1f5f9;
+    
+    /* Sophisticated Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+    --shadow-float: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    min-height: 100vh;
+    line-height: 1.6;
+    display: flex;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text-primary);
+}
+
+/* =============================================
+   SIDEBAR
+   ============================================= */
+.sidebar {
+    width: 280px;
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border);
+    height: 100vh;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    padding: 32px 0;
+    transition: transform 0.3s ease;
+    z-index: 100;
+}
+
+.brand {
+    padding: 0 32px 32px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.brand i {
+    color: var(--text-primary);
+    font-size: 1.4rem;
+}
+
+.brand span {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+}
+
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 16px;
+    flex: 1;
+}
+
+.nav-tab {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.95rem;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.2s ease;
+}
+
+.nav-tab i {
+    width: 20px;
+    text-align: center;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+    color: var(--text-muted);
+}
+
+.nav-tab:hover {
+    background: var(--bg-input);
+    color: var(--text-primary);
+}
+
+.nav-tab:hover i {
+    color: var(--text-primary);
+}
+
+.nav-tab.active {
+    background: var(--accent-gold-light);
+    color: var(--accent-gold-dark);
+}
+
+.nav-tab.active i {
+    color: var(--accent-gold);
+}
+
+.user-profile {
+    padding: 24px 32px;
+    border-top: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.user-info-mini {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.user-role {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+.logout-icon {
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s;
+    font-size: 1.1rem;
+}
+
+.logout-icon:hover {
+    color: var(--danger);
+}
+
+/* =============================================
+   MAIN CONTENT
+   ============================================= */
+.main-content {
+    flex: 1;
+    margin-left: 280px; 
+    padding: 48px;
+    min-height: 100vh;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 48px;
+}
+
+.page-title h1 {
+    font-size: 2.25rem;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.page-title p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.action-bar {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+/* =============================================
+   BUTTONS & INPUTS
+   ============================================= */
+.btn {
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.01em;
+}
+
+.btn-primary {
+    background: var(--text-primary);
+    color: #fff;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.btn-primary:hover {
+    background: #000;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.btn-secondary {
+    background: #fff;
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-app);
+    border-color: var(--text-secondary);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+}
+
+.btn-outline:hover {
+    border-color: var(--accent-gold);
+    color: var(--accent-gold-dark);
+    background: #fff;
+}
+
+.btn-danger {
+    background: #fff;
+    color: var(--danger);
+    border: 1px solid var(--danger-bg);
+}
+
+.btn-danger:hover {
+    background: var(--danger-bg);
+    border-color: var(--danger);
+}
+
+.search-wrapper {
+    position: relative;
+}
+
+.search-wrapper i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.search-input {
+    background: #fff;
+    border: 1px solid var(--border);
+    padding: 12px 16px 12px 42px;
+    border-radius: 6px;
+    color: var(--text-primary);
+    width: 320px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    box-shadow: var(--shadow-sm);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 0 3px var(--accent-gold-light);
+}
+
+/* =============================================
+   STATS CARDS
+   ============================================= */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 30px;
+    margin-bottom: 48px;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 28px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    box-shadow: var(--shadow-card);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-float);
+    border-color: var(--accent-gold-light);
+}
+
+.stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--bg-app);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    font-size: 1.4rem;
+    border: 1px solid var(--border);
+}
+
+.stat-card:hover .stat-icon {
+    background: var(--accent-gold);
+    color: #fff;
+    border-color: var(--accent-gold);
+    transition: all 0.3s ease;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+}
+
+/* =============================================
+   TABLES & PANELS
+   ============================================= */
+.content-panel {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+    animation: fadeIn 0.4s ease-out;
+}
+
+.panel-header {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+}
+
+.panel-header h3 {
+    font-size: 1.25rem;
+}
+
+.filter-group {
+    display: flex;
+    background: var(--bg-input);
+    padding: 4px;
+    border-radius: 6px;
+}
+
+.filter-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 4px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.filter-btn.active {
+    background: #fff;
+    color: var(--text-primary);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: var(--bg-app);
+    border-bottom: 1px solid var(--border);
+}
+
+th {
+    text-align: left;
+    padding: 18px 32px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-secondary);
+    font-weight: 700;
+}
+
+td {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    vertical-align: middle;
+}
+
+tr {
+    transition: background 0.2s;
+}
+
+tr:hover {
+    background: var(--bg-app);
+}
+
+tr:last-child td {
+    border-bottom: none;
+}
+
+.cell-primary {
+    font-weight: 600;
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.cell-sub {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.status-badge {
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status-sent { background: var(--warning-bg); color: var(--warning); border: 1px solid rgba(217, 119, 6, 0.2); }
+.status-signed { background: var(--success-bg); color: var(--success); border: 1px solid rgba(5, 150, 105, 0.2); }
+.status-draft { background: var(--bg-input); color: var(--text-secondary); border: 1px solid var(--border); }
+
+/* =============================================
+   MODALS
+   ============================================= */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 31, 44, 0.6); /* Darker overlay */
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: #fff;
+    width: 90%;
+    max-width: 700px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-float);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-app);
+}
+
+.modal-header h2 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: var(--danger);
+}
+
+.modal-body {
+    padding: 32px;
+}
+
+.detail-group {
+    margin-bottom: 28px;
+}
+
+.detail-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    display: block;
+    font-weight: 600;
+}
+
+.detail-value {
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+.detail-value.highlight {
+    color: var(--text-primary);
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.message-box {
+    background: var(--bg-app);
+    padding: 24px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+
+.signature-preview {
+    margin-top: 24px;
+    padding: 30px;
+    background: #fff;
+    border: 1px dashed var(--border); /* Dashed border for signature area */
+    border-radius: 8px;
+    text-align: center;
+}
+
+.signature-preview img {
+    max-height: 80px;
+    opacity: 0.9;
+}
+
+.modal-footer {
+    padding: 24px 32px;
+    border-top: 1px solid var(--border);
+    background: #fff;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    border-radius: 0 0 12px 12px;
+}
+
+/* Sections */
+.section-content { display: none; }
+.section-content.active { display: block; animation: fadeIn 0.4s; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .sidebar { transform: translateX(-100%); width: 0; padding: 0; }
+    .main-content { margin-left: 0; padding: 24px; }
+    .mobile-menu-btn { display: block; margin-right: 15px; font-size: 1.5rem; color: var(--text-primary); cursor: pointer; }
+    
+    /* Show sidebar when toggled */
+    .sidebar.mobile-open { transform: translateX(0); width: 280px; padding: 32px 0; box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
+}
+
+.mobile-menu-btn { display: none; }
+
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <i class="fas fa-layer-group" style="color: var(--accent-gold);"></i>
+            <span>Lanting Digital</span>
+        </div>
+        
+        <nav class="nav-links">
+            <button class="nav-tab active" data-section="leads">
+                <i class="fas fa-envelope-open-text"></i>
+                Leads & Inquiries
+            </button>
+            <button class="nav-tab" data-section="contracts">
+                <i class="fas fa-file-signature"></i>
+                Contracts & Proposals
+            </button>
+            <button class="nav-tab" style="opacity: 0.5; cursor: not-allowed;">
+                <i class="fas fa-users"></i>
+                Clients (Coming Soon)
+            </button>
+        </nav>
+
+        <div class="user-profile">
+            <div class="user-info-mini">
+                <span class="user-name">Caleb Lanting</span>
+                <span class="user-role">Administrator</span>
+            </div>
+            <i class="fas fa-sign-out-alt logout-icon" title="Logout"></i>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- Top Bar for Search/Mobile Toggle -->
+        <div class="top-bar">
+            <div style="display: flex; align-items: center;">
+                <i class="fas fa-bars mobile-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('mobile-open')"></i>
+                <div class="page-title">
+                    <h1 id="page-header-title">Dashboard</h1>
+                    <p id="page-header-date">Friday, January 2, 2026</p>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <div class="search-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" placeholder="Search records...">
+                </div>
+                <button class="btn btn-primary">
+                    <i class="fas fa-plus"></i> New Proposal
+                </button>
+            </div>
+        </div>
+
+        <!-- LEADS SECTION -->
+        <div id="leads-section" class="section-content active">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-inbox"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value">12</span>
+                        <span class="stat-label">Active Leads</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-bolt"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value">3</span>
+                        <span class="stat-label">New Today</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="color: var(--text-muted); border-color: var(--border);"><i class="fas fa-archive"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" style="color: var(--text-secondary);">145</span>
+                        <span class="stat-label">Archived</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Panel -->
+            <div class="content-panel">
+                <div class="panel-header">
+                    <h3>Recent Submissions</h3>
+                    <div class="filter-group">
+                        <button class="filter-btn active">All</button>
+                        <button class="filter-btn">Unread</button>
+                        <button class="filter-btn">Starred</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="submissions-table">
+                        <thead>
+                            <tr>
+                                <th>Client Name</th>
+                                <th>Subject/Message</th>
+                                <th>Date Received</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="clickable-row">
+                                <td>
+                                    <span class="cell-primary">John Smith</span>
+                                    <span class="cell-sub">john.smith@example.com</span>
+                                </td>
+                                <td>
+                                    <span class="cell-primary">Restaurant Mobile App</span>
+                                    <span class="cell-sub">Looking for menu browsing and pickup orders...</span>
+                                </td>
+                                <td>Jan 2, 2026</td>
+                                <td>
+                                    <button class="btn btn-outline" style="padding: 8px 12px;"><i class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                            <tr class="clickable-row">
+                                <td>
+                                    <span class="cell-primary">Sarah Johnson</span>
+                                    <span class="cell-sub">sarah@techstartup.io</span>
+                                </td>
+                                <td>
+                                    <span class="cell-primary">SaaS Dashboard UI</span>
+                                    <span class="cell-sub">Need React expertise for our admin panel...</span>
+                                </td>
+                                <td>Jan 1, 2026</td>
+                                <td>
+                                    <button class="btn btn-outline" style="padding: 8px 12px;"><i class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                            <tr class="clickable-row">
+                                <td>
+                                    <span class="cell-primary">Michael Chen</span>
+                                    <span class="cell-sub">m.chen@enterprise.com</span>
+                                </td>
+                                <td>
+                                    <span class="cell-primary">Figma to React Native</span>
+                                    <span class="cell-sub">Enterprise conversion project...</span>
+                                </td>
+                                <td>Dec 30, 2025</td>
+                                <td>
+                                    <button class="btn btn-outline" style="padding: 8px 12px;"><i class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTRACTS SECTION -->
+        <div id="contracts-section" class="section-content">
+             <!-- Stats -->
+             <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-file-contract"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value">4</span>
+                        <span class="stat-label">Active Contracts</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="color: var(--warning); border-color: rgba(217, 119, 6, 0.2);"><i class="fas fa-hourglass-half"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" style="color: var(--warning);">2</span>
+                        <span class="stat-label">Pending Sign</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="color: var(--success); border-color: rgba(5, 150, 105, 0.2);"><i class="fas fa-check-double"></i></div>
+                    <div class="stat-info">
+                        <span class="stat-value" style="color: var(--success);">2</span>
+                        <span class="stat-label">Completed</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table Panel -->
+            <div class="content-panel">
+                <div class="panel-header">
+                    <h3>Contract Management</h3>
+                    <div class="filter-group">
+                        <button class="filter-btn active">Active</button>
+                        <button class="filter-btn">Pending</button>
+                        <button class="filter-btn">Signed</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="contracts-table">
+                        <thead>
+                            <tr>
+                                <th>Client Entity</th>
+                                <th>Project Scope</th>
+                                <th>Status</th>
+                                <th>Timeline</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="clickable-row">
+                                <td>
+                                    <span class="cell-primary">iAttend LLC</span>
+                                    <span class="cell-sub">Pete Anderson</span>
+                                </td>
+                                <td>Mobile App Development</td>
+                                <td><span class="status-badge status-signed">Signed</span></td>
+                                <td>
+                                    <span class="cell-primary">Dec 18, 2025</span>
+                                    <span class="cell-sub">Effective Date</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-outline" style="padding: 8px 12px;"><i class="fas fa-file-pdf"></i></button>
+                                </td>
+                            </tr>
+                            <tr class="clickable-row">
+                                <td>
+                                    <span class="cell-primary">Pete's Holiday Lighting</span>
+                                    <span class="cell-sub">pete@peteslighting.com</span>
+                                </td>
+                                <td>Website Development</td>
+                                <td><span class="status-badge status-sent">Pending</span></td>
+                                <td>
+                                    <span class="cell-primary">Dec 28, 2025</span>
+                                    <span class="cell-sub">Sent Date</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-outline" style="padding: 8px 12px;"><i class="fas fa-paper-plane"></i></button>
+                                </td>
+                            </tr>
+                            <tr class="clickable-row">
+                                <td>
+                                    <span class="cell-primary">Riverside Fitness</span>
+                                    <span class="cell-sub">owner@riverside.com</span>
+                                </td>
+                                <td>Gym Management App</td>
+                                <td><span class="status-badge status-signed">Signed</span></td>
+                                <td>
+                                    <span class="cell-primary">Nov 22, 2025</span>
+                                    <span class="cell-sub">Effective Date</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-outline" style="padding: 8px 12px;"><i class="fas fa-file-pdf"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- LEAD MODAL -->
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Lead Details</h2>
+                <button class="modal-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                    <div>
+                        <span class="detail-label">Client Name</span>
+                        <div class="detail-value highlight">John Smith</div>
+                    </div>
+                    <div>
+                        <span class="detail-label">Email Address</span>
+                        <div class="detail-value">john.smith@example.com</div>
+                    </div>
+                </div>
+                <div class="detail-group">
+                    <span class="detail-label">Submission Date</span>
+                    <div class="detail-value">January 2, 2026 &bull; 10:30 AM</div>
+                </div>
+                <div class="detail-group">
+                    <span class="detail-label">Project Inquiry</span>
+                    <div class="message-box">
+                        Hi, I'm interested in building a mobile app for my restaurant business. We're looking for something that lets customers browse our menu, place orders for pickup, and maybe a loyalty points system. Our budget is around $5,000-$8,000. Would love to set up a call to discuss!
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="modal-archive">Archive Record</button>
+                <button class="btn btn-primary" href="mailto:john@example.com">Reply via Email</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTRACT MODAL (Generic for mockup) -->
+    <div id="contract-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Contract Status</h2>
+                <button class="modal-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                    <div>
+                        <span class="detail-label">Contract Name</span>
+                        <div class="detail-value highlight">iAttend Mobile App</div>
+                        <br>
+                        <span class="detail-label">Client Entity</span>
+                        <div class="detail-value">iAttend LLC</div>
+                    </div>
+                    <div>
+                        <span class="detail-label">Current Status</span>
+                        <div class="status-badge status-signed">Signed & Valid</div>
+                        <br><br>
+                        <span class="detail-label">Signed Date</span>
+                        <div class="detail-value">Dec 18, 2025</div>
+                    </div>
+                </div>
+                
+                <hr style="border: 0; border-top: 1px solid var(--border); margin: 30px 0;">
+                
+                <span class="detail-label">Signature Capture</span>
+                <div class="signature-preview">
+                    <div style="font-family: 'Brush Script MT', cursive; font-size: 2.5rem; color: #1a1f2c;">Pete Anderson</div>
+                    <div style="font-size: 0.8rem; color: #64748b; margin-top: 12px; font-family: 'Inter', sans-serif;">IP: 192.168.1.100 &bull; Verified</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="contract-delete-btn">Delete Contract</button>
+                <button class="btn btn-secondary">Download PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple Logic to switch tabs and modals
+        
+        // Navigation Tabs
+        const tabs = document.querySelectorAll('.nav-tab');
+        const sections = document.querySelectorAll('.section-content');
+        const pageTitle = document.getElementById('page-header-title');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                if(tab.style.cursor === 'not-allowed') return;
+                
+                // Remove active
+                tabs.forEach(t => t.classList.remove('active'));
+                sections.forEach(s => s.classList.remove('active'));
+                
+                // Add active
+                tab.classList.add('active');
+                const sectionId = tab.getAttribute('data-section') + '-section';
+                document.getElementById(sectionId).classList.add('active');
+                
+                // Update Title
+                if(tab.getAttribute('data-section') === 'leads') pageTitle.textContent = 'Leads & Inquiries';
+                if(tab.getAttribute('data-section') === 'contracts') pageTitle.textContent = 'Contracts & Proposals';
+            });
+        });
+
+        // Modals
+        const modals = document.querySelectorAll('.modal');
+        const closeBtns = document.querySelectorAll('.modal-close');
+        
+        // Open Lead Modal
+        document.querySelectorAll('#submissions-table .clickable-row').forEach(row => {
+            row.addEventListener('click', () => {
+                document.getElementById('detail-modal').classList.add('active');
+            });
+        });
+
+        // Open Contract Modal
+        document.querySelectorAll('#contracts-table .clickable-row').forEach(row => {
+            row.addEventListener('click', () => {
+                document.getElementById('contract-modal').classList.add('active');
+            });
+        });
+
+        // Close Modals
+        closeBtns.forEach(btn => btn.addEventListener('click', () => {
+            modals.forEach(m => m.classList.remove('active'));
+        }));
+
+        modals.forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>

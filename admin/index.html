@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <!-- Styles -->
-    <link rel="stylesheet" href="css/admin.css?v=20260102f">
+    <link rel="stylesheet" href="css/admin.css?v=20260102g">
 </head>
 <body>
     <!-- LOGIN SCREEN -->
@@ -73,9 +73,14 @@
                     <i class="fas fa-file-signature"></i>
                     Contracts & Proposals
                 </button>
-                <button class="nav-tab disabled">
+                <button class="nav-tab" data-section="clients">
                     <i class="fas fa-users"></i>
-                    Clients (Coming Soon)
+                    Clients
+                </button>
+                <button class="nav-tab" data-section="messages">
+                    <i class="fas fa-comments"></i>
+                    Messages
+                    <span class="nav-badge" id="unread-messages-badge" style="display: none;"></span>
                 </button>
             </nav>
 
@@ -243,6 +248,117 @@
                     <div id="contracts-empty-state" class="empty-state hidden">
                         <i class="fas fa-file-signature"></i>
                         <p>No contracts found</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CLIENTS SECTION -->
+            <div id="clients-section" class="section-content">
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-clients">0</span>
+                            <span class="stat-label">Total Clients</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success"><i class="fas fa-user-check"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value success" id="active-clients">0</span>
+                            <span class="stat-label">Active Projects</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-file-invoice-dollar"></i></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="clients-pending-invoices">0</span>
+                            <span class="stat-label">Pending Invoices</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Panel -->
+                <div class="content-panel">
+                    <div class="panel-header">
+                        <h3>Client Directory</h3>
+                        <div class="panel-header-actions">
+                            <button class="btn btn-primary btn-sm" id="add-client-btn">
+                                <i class="fas fa-plus"></i> Add Client
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="clients-table">
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th>Company</th>
+                                    <th>Email</th>
+                                    <th>Contracts</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="clients-body">
+                                <!-- Data loaded by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="clients-loading-state" class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading clients...</p>
+                    </div>
+                    <div id="clients-empty-state" class="empty-state hidden">
+                        <i class="fas fa-users"></i>
+                        <p>No clients found</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MESSAGES SECTION -->
+            <div id="messages-section" class="section-content">
+                <div class="messages-layout">
+                    <!-- Conversations List -->
+                    <div class="conversations-panel">
+                        <div class="conversations-header">
+                            <h3>Conversations</h3>
+                        </div>
+                        <div class="conversations-list" id="conversations-list">
+                            <div class="loading-state">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <p>Loading...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Panel -->
+                    <div class="chat-panel" id="chat-panel">
+                        <div class="chat-empty-state" id="chat-empty">
+                            <i class="fas fa-comments"></i>
+                            <h3>Select a Conversation</h3>
+                            <p>Choose a client from the list to view and send messages.</p>
+                        </div>
+                        <div class="chat-container hidden" id="chat-container">
+                            <div class="chat-header">
+                                <div class="chat-recipient">
+                                    <div class="recipient-avatar" id="chat-recipient-avatar">--</div>
+                                    <div class="recipient-info">
+                                        <h4 id="chat-recipient-name">Client Name</h4>
+                                        <p id="chat-recipient-email">client@email.com</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-messages" id="chat-messages">
+                                <!-- Messages loaded by JS -->
+                            </div>
+                            <div class="chat-input">
+                                <input type="text" id="admin-message-input" placeholder="Type your message..." autocomplete="off">
+                                <button class="btn btn-primary" id="send-admin-message">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -440,6 +556,105 @@
         </div>
     </div>
 
+    <!-- ADD/EDIT CLIENT MODAL -->
+    <div id="client-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="client-modal-title">Add Client</h2>
+                <button class="modal-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="client-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="client-name">Client Name <span class="required">*</span></label>
+                            <input type="text" id="client-name" placeholder="Full Name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="client-email">Email <span class="required">*</span></label>
+                            <input type="email" id="client-email" placeholder="email@company.com" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="client-company">Company</label>
+                            <input type="text" id="client-company" placeholder="Company Name">
+                        </div>
+                        <div class="form-group">
+                            <label for="client-phone">Phone</label>
+                            <input type="tel" id="client-phone" placeholder="(555) 123-4567">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="client-notes">Notes</label>
+                        <textarea id="client-notes" rows="3" placeholder="Any additional notes about this client..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary modal-cancel">Cancel</button>
+                <button class="btn btn-primary" id="save-client-btn">
+                    <i class="fas fa-save"></i> Save Client
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLIENT DETAIL MODAL -->
+    <div id="client-detail-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>Client Details</h2>
+                <button class="modal-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="detail-grid">
+                    <div>
+                        <span class="detail-label">Client Name</span>
+                        <div class="detail-value highlight" id="client-detail-name"></div>
+                    </div>
+                    <div>
+                        <span class="detail-label">Company</span>
+                        <div class="detail-value" id="client-detail-company"></div>
+                    </div>
+                </div>
+                <div class="detail-grid">
+                    <div>
+                        <span class="detail-label">Email</span>
+                        <div class="detail-value" id="client-detail-email"></div>
+                    </div>
+                    <div>
+                        <span class="detail-label">Phone</span>
+                        <div class="detail-value" id="client-detail-phone"></div>
+                    </div>
+                </div>
+                <div class="detail-group">
+                    <span class="detail-label">Notes</span>
+                    <div class="message-box" id="client-detail-notes"></div>
+                </div>
+
+                <!-- Client Contracts -->
+                <div class="detail-group">
+                    <span class="detail-label">Contracts</span>
+                    <div id="client-contracts-list" class="client-contracts-list">
+                        <!-- Loaded by JS -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="edit-client-btn">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn btn-danger" id="delete-client-btn">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+                <button class="btn btn-primary" id="message-client-btn">
+                    <i class="fas fa-comment"></i> Message
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
@@ -448,7 +663,9 @@
     <!-- Admin Scripts -->
     <script src="js/config.js?v=20260102g"></script>
     <script src="js/auth.js?v=20260102g"></script>
-    <script src="js/dashboard.js"></script>
+    <script src="js/dashboard.js?v=20260102a"></script>
     <script src="js/contracts.js?v=20260102f"></script>
+    <script src="js/clients.js?v=20260102a"></script>
+    <script src="js/messages.js?v=20260102a"></script>
 </body>
 </html>
