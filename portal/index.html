@@ -1,13 +1,13 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <title>Client Login | Lanting Digital</title>
+    <title>Client Portal | Lanting Digital</title>
 
     <!-- Primary Meta Tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
     <meta name="robots" content="noindex, nofollow" />
-    <meta name="description" content="Secure client portal login for Lanting Digital projects." />
+    <meta name="description" content="Secure client portal for Lanting Digital projects." />
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="https://lantingdigital.com/images/logo.png" />
@@ -21,184 +21,474 @@
 </head>
 <body class="is-preload">
 
-    <!-- Wrapper -->
-    <div id="wrapper">
-
-        <!-- Header -->
-        <header id="header">
-            <div class="logo">
-                <span class="fas fa-lock"></span>
-            </div>
-            <div class="content">
-                <div class="inner">
-                    <!-- Login Section -->
-                    <div id="login-section">
-                        <div class="login-layout">
-                            <!-- Left: Branding -->
-                            <div class="login-branding">
-                                <h1>Client Login</h1>
-                                <p>Secure access to your projects</p>
-                                <p class="branding-sub">brought to you by Lanting Digital</p>
-                                <ul class="feature-list">
-                                    <li><i class="fas fa-file-contract"></i> View Contracts</li>
-                                    <li><i class="fas fa-tasks"></i> Track Projects</li>
-                                    <li><i class="fas fa-comments"></i> Message Your Team</li>
-                                    <li><i class="fas fa-file-invoice-dollar"></i> Manage Invoices</li>
-                                </ul>
-                            </div>
-                            <!-- Right: Login Form -->
-                            <div class="login-form-container">
-                                <form id="login-form" class="login-form">
-                                    <div class="form-group">
-                                        <input type="email" id="login-email" required placeholder="Email">
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="password" id="login-password" required placeholder="Password">
-                                    </div>
-                                    <button type="submit" class="btn-submit">
-                                        <i class="fas fa-sign-in-alt"></i> Sign In
+    <!-- ==================== LOGIN VIEW ==================== -->
+    <div id="login-view">
+        <div id="wrapper">
+            <header id="header">
+                <div class="logo">
+                    <span class="fas fa-lock"></span>
+                </div>
+                <div class="content">
+                    <div class="inner">
+                        <div id="login-section">
+                            <div class="login-layout">
+                                <div class="login-branding">
+                                    <h1>Client Portal</h1>
+                                    <p>Secure access to your projects</p>
+                                    <p class="branding-sub">brought to you by Lanting Digital</p>
+                                    <ul class="feature-list">
+                                        <li><i class="fas fa-file-contract"></i> View Contracts</li>
+                                        <li><i class="fas fa-tasks"></i> Track Projects</li>
+                                        <li><i class="fas fa-comments"></i> Message Your Team</li>
+                                        <li><i class="fas fa-file-invoice-dollar"></i> Manage Invoices</li>
+                                    </ul>
+                                </div>
+                                <div class="login-form-container">
+                                    <form id="login-form" class="login-form">
+                                        <div class="form-group">
+                                            <input type="email" id="login-email" required placeholder="Email">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="password" id="login-password" required placeholder="Password">
+                                        </div>
+                                        <button type="submit" class="btn-submit">
+                                            <i class="fas fa-sign-in-alt"></i> Sign In
+                                        </button>
+                                        <p id="login-error" class="error-message"></p>
+                                    </form>
+                                    <button type="button" class="btn-google" id="google-signin-btn">
+                                        <i class="fab fa-google"></i> Sign in with Google
                                     </button>
-                                    <p id="login-error" class="error-message"></p>
-                                    <a href="#" id="forgot-password-link" class="forgot-password-link">Forgot Password?</a>
-                                </form>
-                                <button type="button" class="btn-google" id="google-signin-btn">
-                                    <i class="fab fa-google"></i> Sign in with Google
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Forgot Password Section (hidden by default) -->
-                    <div id="forgot-password-section" style="display: none;">
-                        <div class="auth-centered">
-                            <h1>Reset Password</h1>
-                            <p class="auth-subtitle">Enter your email and we'll send you a reset link</p>
-
-                            <form id="forgot-password-form" class="auth-form">
-                                <div class="form-group">
-                                    <input type="email" id="forgot-email" required placeholder="Email Address">
-                                </div>
-                                <button type="submit" class="btn-submit">
-                                    <i class="fas fa-paper-plane"></i> Send Reset Link
-                                </button>
-                                <p id="forgot-error" class="error-message"></p>
-                                <p id="forgot-success" class="success-message"></p>
-                            </form>
-
-                            <a href="#" id="back-to-login" class="back-link">
-                                <i class="fas fa-arrow-left"></i> Back to Login
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Reset Password Section (hidden by default) -->
-                    <div id="reset-password-section" style="display: none;">
-                        <div class="auth-centered">
-                            <h1>Set New Password</h1>
-                            <p class="auth-subtitle">Hi <span id="reset-user-name">there</span>, create your new password</p>
-
-                            <form id="reset-password-form" class="auth-form">
-                                <div class="form-group">
-                                    <input type="password" id="reset-password" required placeholder="New Password" minlength="8">
-                                </div>
-                                <div class="form-group">
-                                    <input type="password" id="reset-password-confirm" required placeholder="Confirm Password" minlength="8">
-                                </div>
-                                <div class="password-requirements">
-                                    <p><i class="fas fa-info-circle"></i> Password must be at least 8 characters</p>
-                                </div>
-                                <button type="submit" class="btn-submit">
-                                    <i class="fas fa-check"></i> Set Password
-                                </button>
-                                <p id="reset-error" class="error-message"></p>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Account Setup Section (for invitations, hidden by default) -->
-                    <div id="setup-section" style="display: none;">
-                        <div class="auth-centered">
-                            <h1>Welcome to Lanting Digital</h1>
-                            <p class="auth-subtitle">Hi <span id="setup-user-name">there</span>, set up your account</p>
-
-                            <form id="setup-form" class="auth-form">
-                                <div class="form-group">
-                                    <input type="password" id="setup-password" required placeholder="Create Password" minlength="8">
-                                </div>
-                                <div class="form-group">
-                                    <input type="password" id="setup-password-confirm" required placeholder="Confirm Password" minlength="8">
-                                </div>
-                                <div class="password-requirements">
-                                    <p><i class="fas fa-info-circle"></i> Password must be at least 8 characters</p>
-                                </div>
-                                <button type="submit" class="btn-submit">
-                                    <i class="fas fa-rocket"></i> Complete Setup
-                                </button>
-                                <p id="setup-error" class="error-message"></p>
-                            </form>
-                        </div>
-                    </div>
-
-                    <!-- Token Error Section (for invalid/expired links) -->
-                    <div id="token-error-section" style="display: none;">
-                        <div class="auth-centered">
-                            <div class="error-icon">
-                                <i class="fas fa-exclamation-circle"></i>
-                            </div>
-                            <h1>Link Invalid</h1>
-                            <p class="auth-subtitle" id="token-error-message">This link is invalid or has expired.</p>
-
-                            <a href="#" id="token-error-login" class="btn-submit" style="text-decoration: none; display: inline-block; text-align: center;">
-                                <i class="fas fa-sign-in-alt"></i> Go to Login
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- Welcome Section (hidden by default) -->
-                    <div id="welcome-section" style="display: none;">
-                        <div class="welcome-centered">
-                            <h1>Welcome, <span id="user-name">Client</span></h1>
-                            <p class="welcome-subtitle">Your client portal is coming soon</p>
-
-                            <div class="coming-soon-features">
-                                <div class="feature-card">
-                                    <i class="fas fa-file-contract"></i>
-                                    <span>Contracts</span>
-                                </div>
-                                <div class="feature-card">
-                                    <i class="fas fa-tasks"></i>
-                                    <span>Projects</span>
-                                </div>
-                                <div class="feature-card">
-                                    <i class="fas fa-comments"></i>
-                                    <span>Messages</span>
-                                </div>
-                                <div class="feature-card">
-                                    <i class="fas fa-file-invoice-dollar"></i>
-                                    <span>Invoices</span>
                                 </div>
                             </div>
+                        </div>
 
-                            <p class="welcome-note">We'll notify you when your portal is ready.</p>
+                        <!-- Account Setup Section (for invited users) -->
+                        <div id="setup-section" style="display: none;">
+                            <div class="login-layout">
+                                <div class="login-branding">
+                                    <h1>Welcome!</h1>
+                                    <p>Set up your account</p>
+                                    <p class="branding-sub">brought to you by Lanting Digital</p>
+                                    <ul class="feature-list">
+                                        <li><i class="fas fa-check-circle"></i> Create your password</li>
+                                        <li><i class="fas fa-lock"></i> Secure access to your projects</li>
+                                        <li><i class="fas fa-envelope"></i> You'll sign in with <span id="setup-email-display">your email</span></li>
+                                    </ul>
+                                </div>
+                                <div class="login-form-container">
+                                    <form id="setup-form" class="login-form">
+                                        <div class="form-group">
+                                            <input type="password" id="setup-password" required placeholder="Create Password" minlength="8">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="password" id="setup-password-confirm" required placeholder="Confirm Password" minlength="8">
+                                        </div>
+                                        <p class="password-hint">Password must be at least 8 characters</p>
+                                        <button type="submit" class="btn-submit">
+                                            <i class="fas fa-user-plus"></i> Create Account
+                                        </button>
+                                        <p id="setup-error" class="error-message"></p>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
 
-                            <button type="button" class="btn-signout" id="signout-btn">
-                                <i class="fas fa-sign-out-alt"></i> Sign Out
-                            </button>
+                        <!-- Already Set Up Section (for used invitation links) -->
+                        <div id="already-setup-section" style="display: none;">
+                            <div class="login-layout">
+                                <div class="login-branding" style="text-align: center;">
+                                    <h1 id="already-setup-welcome">Welcome back!</h1>
+                                    <p>Your account is already set up</p>
+                                    <p class="branding-sub">brought to you by Lanting Digital</p>
+                                    <ul class="feature-list">
+                                        <li><i class="fas fa-check-circle"></i> Account created</li>
+                                        <li><i class="fas fa-lock"></i> Ready to access your portal</li>
+                                    </ul>
+                                </div>
+                                <div class="login-form-container">
+                                    <button type="button" class="btn-submit" id="proceed-to-portal-btn">
+                                        <i class="fas fa-arrow-right"></i> Proceed to Portal
+                                    </button>
+                                    <p class="password-hint" style="margin-top: 1rem;">You can sign in with your email and password</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </header>
-
+            </header>
+        </div>
+        <footer id="login-footer">
+            <p class="copyright">&copy; Lanting Digital LLC | <a href="https://lantingdigital.com">Back to Main Site</a></p>
+        </footer>
+        <div id="bg"></div>
     </div>
 
-    <!-- Footer -->
-    <footer id="footer">
-        <p class="copyright">&copy; Lanting Digital LLC | <a href="https://lantingdigital.com">Back to Main Site</a></p>
-    </footer>
+    <!-- ==================== PORTAL VIEW ==================== -->
+    <div id="portal-view" style="display: none;">
 
-    <!-- Background -->
-    <div id="bg"></div>
+        <!-- Mobile Top Navigation -->
+        <nav id="mobile-nav">
+            <div class="mobile-nav-header">
+                <div class="mobile-logo">
+                    <img src="https://lantingdigital.com/images/logo.png" alt="Lanting Digital">
+                    <span>Client Portal</span>
+                </div>
+                <button id="mobile-menu-btn" class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <div id="mobile-menu" class="mobile-menu">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="#" class="nav-item" data-section="contracts">
+                    <i class="fas fa-file-contract"></i> Contracts
+                </a>
+                <a href="#" class="nav-item" data-section="messages">
+                    <i class="fas fa-comments"></i> Messages
+                    <span class="badge" id="mobile-msg-badge" style="display: none;">0</span>
+                </a>
+                <a href="#" class="nav-item" data-section="invoices">
+                    <i class="fas fa-file-invoice-dollar"></i> Invoices
+                </a>
+                <a href="#" class="nav-item" data-section="payments">
+                    <i class="fas fa-credit-card"></i> Payment Plans
+                </a>
+                <div class="mobile-menu-divider"></div>
+                <a href="#" class="nav-item" id="mobile-signout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </a>
+            </div>
+        </nav>
+
+        <!-- Desktop Sidebar -->
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <img src="https://lantingdigital.com/images/logo.png" alt="Lanting Digital" class="sidebar-logo">
+                <h2>Client Portal</h2>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-section="contracts">
+                    <i class="fas fa-file-contract"></i>
+                    <span>Contracts</span>
+                </a>
+                <a href="#" class="nav-item" data-section="messages">
+                    <i class="fas fa-comments"></i>
+                    <span>Messages</span>
+                    <span class="badge" id="sidebar-msg-badge" style="display: none;">0</span>
+                </a>
+                <a href="#" class="nav-item" data-section="invoices">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>Invoices</span>
+                </a>
+                <a href="#" class="nav-item" data-section="payments">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Payment Plans</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name" id="sidebar-user-name">Client</span>
+                        <span class="user-email" id="sidebar-user-email">client@example.com</span>
+                    </div>
+                </div>
+                <button id="sidebar-signout-btn" class="signout-btn" title="Sign Out">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main id="main-content">
+
+            <!-- Dashboard Section -->
+            <section id="section-dashboard" class="content-section active">
+                <div class="section-header">
+                    <h1>Welcome back, <span id="welcome-name">Client</span></h1>
+                    <p class="section-subtitle">Here's an overview of your account</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card" data-section="contracts">
+                        <div class="card-icon">
+                            <i class="fas fa-file-contract"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Contracts</h3>
+                            <p class="card-stat" id="stat-contracts">0</p>
+                            <p class="card-label">Active contracts</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card" data-section="messages">
+                        <div class="card-icon">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Messages</h3>
+                            <p class="card-stat" id="stat-messages">0</p>
+                            <p class="card-label">Unread messages</p>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card" data-section="invoices">
+                        <div class="card-icon">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                        <div class="card-content">
+                            <h3>Invoices</h3>
+                            <p class="card-stat" id="stat-invoices">$0</p>
+                            <p class="card-label">Amount due</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recent-activity">
+                    <h2>Recent Activity</h2>
+                    <div class="activity-list" id="activity-list">
+                        <div class="activity-empty">
+                            <i class="fas fa-clock"></i>
+                            <p>No recent activity</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contracts Section -->
+            <section id="section-contracts" class="content-section">
+                <div class="section-header">
+                    <h1>Contracts</h1>
+                    <p class="section-subtitle">View and manage your contracts</p>
+                </div>
+
+                <div class="contracts-list" id="contracts-list">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading contracts...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Messages Section -->
+            <section id="section-messages" class="content-section">
+                <div class="section-header">
+                    <h1>Messages</h1>
+                    <p class="section-subtitle">Communicate with your team</p>
+                </div>
+
+                <div class="messages-container">
+                    <div class="messages-list" id="messages-list">
+                        <div class="loading-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading messages...</p>
+                        </div>
+                    </div>
+
+                    <div class="message-compose">
+                        <h3>Send a Message</h3>
+                        <form id="message-form">
+                            <textarea id="message-input" placeholder="Type your message..." rows="4"></textarea>
+                            <button type="submit" class="btn-send">
+                                <i class="fas fa-paper-plane"></i> Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Invoices Section -->
+            <section id="section-invoices" class="content-section">
+                <div class="section-header">
+                    <h1>Invoices</h1>
+                    <p class="section-subtitle">View your billing history and make payments</p>
+                </div>
+
+                <div class="invoices-summary">
+                    <div class="summary-card">
+                        <span class="summary-label">Amount Due</span>
+                        <span class="summary-value" id="total-due">$0.00</span>
+                    </div>
+                    <div class="summary-card">
+                        <span class="summary-label">Last Payment</span>
+                        <span class="summary-value" id="last-payment">--</span>
+                    </div>
+                </div>
+
+                <div class="invoices-list" id="invoices-list">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading invoices...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Payment Plans & Subscriptions Section -->
+            <section id="section-payments" class="content-section">
+                <div class="section-header">
+                    <h1>Payment Plans</h1>
+                    <p class="section-subtitle">Your active payment plans and subscriptions</p>
+                </div>
+
+                <div class="payments-summary">
+                    <div class="summary-card">
+                        <span class="summary-label">Active Plans</span>
+                        <span class="summary-value" id="active-plans-count">0</span>
+                    </div>
+                    <div class="summary-card">
+                        <span class="summary-label">Monthly Amount</span>
+                        <span class="summary-value" id="monthly-amount">$0.00</span>
+                    </div>
+                </div>
+
+                <h2 class="subsection-title">Payment Plans</h2>
+                <div class="payments-list" id="payment-plans-list">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading payment plans...</p>
+                    </div>
+                </div>
+
+                <h2 class="subsection-title" style="margin-top: 2rem;">Subscriptions</h2>
+                <div class="payments-list" id="subscriptions-list">
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading subscriptions...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contract Signing Section -->
+            <section id="section-contract-signing" class="content-section">
+                <div class="contract-signing-header">
+                    <button class="btn-back" id="back-to-contracts">
+                        <i class="fas fa-arrow-left"></i> Back to Contracts
+                    </button>
+                    <h1 id="signing-contract-title">Contract</h1>
+                </div>
+
+                <div class="contract-signing-layout">
+                    <!-- Left Panel: Contract Content -->
+                    <div class="contract-panel">
+                        <div class="contract-panel-header">
+                            <h2><i class="fas fa-file-contract"></i> Contract Agreement</h2>
+                        </div>
+                        <div class="contract-panel-content" id="signing-contract-content">
+                            <div class="loading-state">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                <p>Loading contract...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: Signature Form -->
+                    <div class="signature-panel">
+                        <div class="signature-panel-header">
+                            <h2><i class="fas fa-signature"></i> Sign Contract</h2>
+                        </div>
+                        <form id="signature-form" class="signature-form">
+                            <div class="form-section">
+                                <label class="form-label">Your Information</label>
+                                <div class="form-group">
+                                    <input type="text" id="signer-name" required placeholder="Full Legal Name">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" id="signer-title" placeholder="Title / Position (optional)">
+                                </div>
+                                <div class="form-group">
+                                    <input type="email" id="signer-email" required placeholder="Email" readonly>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <label class="form-label">Portfolio Permission</label>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="portfolio-permission">
+                                    <label for="portfolio-permission">
+                                        I allow Lanting Digital to showcase this project in their portfolio and marketing materials
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <label class="form-label">Your Signature</label>
+                                <div class="form-group">
+                                    <input type="text" id="signature-input" required placeholder="Type your full legal name" autocomplete="off">
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <div class="checkbox-group legal-checkbox">
+                                    <input type="checkbox" id="legal-acknowledgment" required>
+                                    <label for="legal-acknowledgment">
+                                        I acknowledge that my typed signature is legally binding and I have read and agree to all terms of this contract
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="signature-actions">
+                                <button type="submit" class="btn-sign-contract" id="sign-contract-btn" disabled>
+                                    <i class="fas fa-signature"></i> Sign Contract
+                                </button>
+                            </div>
+
+                            <p id="signature-error" class="error-message"></p>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Contract View Modal -->
+        <div id="contract-modal" class="modal">
+            <div class="modal-content modal-large">
+                <div class="modal-header">
+                    <h2 id="contract-modal-title">Contract</h2>
+                    <button class="modal-close" onclick="closeContractModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="contract-modal-meta" class="contract-modal-meta"></div>
+                    <div id="contract-modal-content" class="contract-content"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeContractModal()">Close</button>
+                    <a id="contract-sign-link" href="#" target="_blank" class="btn-primary" style="display: none;">
+                        <i class="fas fa-signature"></i> Sign Contract
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice View Modal -->
+        <div id="invoice-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 id="invoice-modal-title">Invoice</h2>
+                    <button class="modal-close" onclick="closeInvoiceModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="invoice-modal-content"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" onclick="closeInvoiceModal()">Close</button>
+                    <a id="invoice-pay-link" href="#" target="_blank" class="btn-primary" style="display: none;">
+                        <i class="fas fa-credit-card"></i> Pay Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
@@ -209,14 +499,5 @@
     <!-- App Scripts -->
     <script src="js/config.js"></script>
     <script src="js/portal.js"></script>
-
-    <!-- Page Load Animation -->
-    <script>
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                document.body.classList.remove('is-preload');
-            }, 100);
-        });
-    </script>
 </body>
 </html>

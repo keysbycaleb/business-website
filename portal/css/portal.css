@@ -1,11 +1,11 @@
 /*
-    Client Portal Landing - Lanting Digital
-    Based on Dimension theme animation
+    Client Portal - Lanting Digital
+    Responsive: Sidebar on desktop, top nav on mobile
 */
 
-/* Reset */
+/* ==================== RESET ==================== */
 html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, button,
-footer, header, nav, section {
+footer, header, nav, section, aside, main, form, textarea {
     margin: 0;
     padding: 0;
     border: 0;
@@ -14,7 +14,7 @@ footer, header, nav, section {
     vertical-align: baseline;
 }
 
-footer, header, nav, section {
+footer, header, nav, section, aside, main {
     display: block;
 }
 
@@ -26,22 +26,10 @@ body {
     box-sizing: border-box;
 }
 
-/* Base */
+/* ==================== BASE ==================== */
 html {
     box-sizing: border-box;
-    font-size: 16pt;
-}
-
-@media screen and (max-width: 1680px) {
-    html { font-size: 12pt; }
-}
-
-@media screen and (max-width: 736px) {
-    html { font-size: 11pt; }
-}
-
-@media screen and (max-width: 360px) {
-    html { font-size: 10pt; }
+    font-size: 16px;
 }
 
 body {
@@ -55,26 +43,19 @@ body {
 }
 
 body.is-preload *, body.is-preload *:before, body.is-preload *:after {
-    -moz-animation: none !important;
-    -webkit-animation: none !important;
     animation: none !important;
-    -moz-transition: none !important;
-    -webkit-transition: none !important;
     transition: none !important;
 }
 
-/* Typography */
+/* ==================== TYPOGRAPHY ==================== */
 a {
-    -moz-transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
-    -webkit-transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
-    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, border-bottom-color 0.2s ease-in-out;
-    border-bottom: dotted 1px rgba(255, 255, 255, 0.5);
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
     text-decoration: none;
     color: inherit;
 }
 
 a:hover {
-    border-bottom-color: transparent;
+    color: #ffffff;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -82,18 +63,33 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     line-height: 1.5;
     margin: 0 0 1rem 0;
-    text-transform: uppercase;
-    letter-spacing: 0.2rem;
+}
+
+h1 {
+    font-size: 1.75rem;
+    letter-spacing: 0.1rem;
+}
+
+h2 {
+    font-size: 1.25rem;
+    letter-spacing: 0.05rem;
+}
+
+h3 {
+    font-size: 1rem;
 }
 
 p {
-    margin: 0 0 2rem 0;
+    margin: 0 0 1rem 0;
+}
+
+/* ==================== LOGIN VIEW ==================== */
+#login-view {
+    min-height: 100vh;
 }
 
 /* Background */
 #bg {
-    -moz-transform: scale(1.0);
-    -webkit-transform: scale(1.0);
     transform: scale(1.0);
     -webkit-backface-visibility: hidden;
     position: fixed;
@@ -115,11 +111,7 @@ p {
 }
 
 #bg:before {
-    -moz-transition: background-color 2.5s ease-in-out;
-    -webkit-transition: background-color 2.5s ease-in-out;
     transition: background-color 2.5s ease-in-out;
-    -moz-transition-delay: 0.75s;
-    -webkit-transition-delay: 0.75s;
     transition-delay: 0.75s;
     background-image: linear-gradient(to top, rgba(19, 21, 25, 0.7), rgba(19, 21, 25, 0.6)), url("https://lantingdigital.com/images/overlay.png");
     background-size: auto, 256px 256px;
@@ -129,11 +121,7 @@ p {
 }
 
 #bg:after {
-    -moz-transform: scale(1.125);
-    -webkit-transform: scale(1.125);
     transform: scale(1.125);
-    -moz-transition: transform 0.325s ease-in-out, filter 0.325s ease-in-out;
-    -webkit-transition: transform 0.325s ease-in-out, filter 0.325s ease-in-out;
     transition: transform 0.325s ease-in-out, filter 0.325s ease-in-out;
     background-image: url("https://lantingdigital.com/images/bg2.jpg");
     background-position: center;
@@ -146,95 +134,24 @@ body.is-preload #bg:before {
     background-color: #000000;
 }
 
-/* Closing animation state */
-body.is-closing #header .content .inner {
-    max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    opacity: 0;
-}
-
-body.is-closing #header .content {
-    border-color: transparent;
-    -moz-transition: border-color 0.8s ease-in-out;
-    -webkit-transition: border-color 0.8s ease-in-out;
-    transition: border-color 0.8s ease-in-out;
-}
-
-body.is-closing #header .logo {
-    border-color: transparent;
-    opacity: 0;
-    -moz-transition: border-color 0.8s ease-in-out, opacity 0.8s ease-in-out;
-    -webkit-transition: border-color 0.8s ease-in-out, opacity 0.8s ease-in-out;
-    transition: border-color 0.8s ease-in-out, opacity 0.8s ease-in-out;
-}
-
-body.is-closing #header > *:before {
-    background: transparent;
-    -moz-transition: background 0.8s ease-in-out;
-    -webkit-transition: background 0.8s ease-in-out;
-    transition: background 0.8s ease-in-out;
-}
-
-body.is-closing #bg:before {
-    background-color: #000000;
-    -moz-transition: background-color 0.8s ease-in-out;
-    -webkit-transition: background-color 0.8s ease-in-out;
-    transition: background-color 0.8s ease-in-out;
-    -moz-transition-delay: 0s;
-    -webkit-transition-delay: 0s;
-    transition-delay: 0s;
-}
-
 /* Wrapper */
 #wrapper {
-    display: -moz-flex;
-    display: -webkit-flex;
     display: flex;
-    -moz-flex-direction: column;
-    -webkit-flex-direction: column;
     flex-direction: column;
-    -moz-align-items: center;
-    -webkit-align-items: center;
     align-items: center;
-    -moz-justify-content: center;
-    -webkit-justify-content: center;
     justify-content: center;
     position: relative;
     min-height: 100vh;
     width: 100%;
     padding: 2rem;
-    margin-top: -4vh;
     z-index: 3;
-}
-
-@media screen and (max-width: 736px) {
-    #wrapper {
-        padding: 1.5rem 1rem;
-        margin-top: -2vh;
-    }
-}
-
-@media screen and (max-width: 480px) {
-    #wrapper {
-        padding: 1rem;
-        margin-top: -1vh;
-    }
 }
 
 /* Header */
 #header {
-    display: -moz-flex;
-    display: -webkit-flex;
     display: flex;
-    -moz-flex-direction: column;
-    -webkit-flex-direction: column;
     flex-direction: column;
-    -moz-align-items: center;
-    -webkit-align-items: center;
     align-items: center;
-    -moz-transition: transform 0.325s ease-in-out, filter 0.325s ease-in-out, opacity 0.325s ease-in-out;
-    -webkit-transition: transform 0.325s ease-in-out, filter 0.325s ease-in-out, opacity 0.325s ease-in-out;
     transition: transform 0.325s ease-in-out, filter 0.325s ease-in-out, opacity 0.325s ease-in-out;
     background-image: radial-gradient(rgba(0, 0, 0, 0.25) 25%, rgba(0, 0, 0, 0) 55%);
     max-width: 100%;
@@ -242,8 +159,6 @@ body.is-closing #bg:before {
 }
 
 #header > * {
-    -moz-transition: opacity 0.325s ease-in-out;
-    -webkit-transition: opacity 0.325s ease-in-out;
     transition: opacity 0.325s ease-in-out;
     position: relative;
     margin-top: 3.5rem;
@@ -293,22 +208,34 @@ body.is-closing #bg:before {
 }
 
 #header .content .inner {
-    -moz-transition: max-height 0.75s ease, padding 0.75s ease, opacity 0.325s ease-in-out;
-    -webkit-transition: max-height 0.75s ease, padding 0.75s ease, opacity 0.325s ease-in-out;
     transition: max-height 0.75s ease, padding 0.75s ease, opacity 0.325s ease-in-out;
-    -moz-transition-delay: 0.25s;
-    -webkit-transition-delay: 0.25s;
     transition-delay: 0.25s;
-    padding: 3rem 3rem;
+    padding: 3rem;
     max-height: 40rem;
     overflow: hidden;
 }
 
-#header .content .inner > :last-child {
-    margin-bottom: 0;
+/* Preload States */
+body.is-preload #header {
+    filter: blur(0.125rem);
 }
 
-/* Horizontal Login Layout */
+body.is-preload #header > * {
+    opacity: 0;
+}
+
+body.is-preload #header .content .inner {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    opacity: 0;
+}
+
+body.is-preload #login-footer {
+    opacity: 0;
+}
+
+/* Login Layout */
 .login-layout {
     display: flex;
     align-items: center;
@@ -386,49 +313,12 @@ body.is-closing #bg:before {
     min-width: 280px;
 }
 
-/* Preload States */
-body.is-preload #header {
-    -moz-filter: blur(0.125rem);
-    -webkit-filter: blur(0.125rem);
-    filter: blur(0.125rem);
-}
-
-body.is-preload #header > * {
-    opacity: 0;
-}
-
-body.is-preload #header .content .inner {
-    max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    opacity: 0;
-}
-
-body.is-preload #footer {
-    opacity: 0;
-}
-
 /* Login Form */
 .login-form {
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 1rem;
-}
-
-.form-group {
-    margin-bottom: 0;
-}
-
-.form-group label {
-    display: block;
-    font-size: 0.65rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.12rem;
-    margin-bottom: 0.35rem;
-    color: rgba(255, 255, 255, 0.7);
-    text-align: left;
 }
 
 .form-group input {
@@ -442,8 +332,6 @@ body.is-preload #footer {
     font-family: "Source Sans Pro", sans-serif;
     font-size: 0.9rem;
     font-weight: 300;
-    -moz-transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    -webkit-transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
@@ -475,17 +363,11 @@ body.is-preload #footer {
     text-transform: uppercase;
     letter-spacing: 0.2rem;
     cursor: pointer;
-    -moz-transition: background-color 0.2s ease-in-out;
-    -webkit-transition: background-color 0.2s ease-in-out;
     transition: background-color 0.2s ease-in-out;
 }
 
 .btn-submit:hover {
     background-color: rgba(255, 255, 255, 0.85);
-}
-
-.btn-submit:active {
-    background-color: rgba(255, 255, 255, 0.75);
 }
 
 .error-message {
@@ -497,14 +379,34 @@ body.is-preload #footer {
     max-height: 0;
     opacity: 0;
     overflow: hidden;
-    -moz-transition: max-height 0.3s ease-out, opacity 0.3s ease-out, margin 0.3s ease-out;
-    -webkit-transition: max-height 0.3s ease-out, opacity 0.3s ease-out, margin 0.3s ease-out;
-    transition: max-height 0.3s ease-out, opacity 0.3s ease-out, margin 0.3s ease-out;
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
 }
 
 .error-message.show {
     max-height: 4rem;
     opacity: 1;
+}
+
+/* Password hint */
+.password-hint {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+    margin: -0.5rem 0 0 0;
+    text-align: center;
+}
+
+/* Setup section specific styles */
+#setup-section .login-form-container {
+    max-width: 320px;
+}
+
+#setup-section .login-form {
+    max-width: 320px;
+}
+
+/* Make email span inline so it doesn't create a separate flex item */
+#setup-email-display {
+    display: contents;
 }
 
 .btn-google {
@@ -525,8 +427,6 @@ body.is-preload #footer {
     text-transform: uppercase;
     letter-spacing: 0.2rem;
     cursor: pointer;
-    -moz-transition: background-color 0.2s ease-in-out;
-    -webkit-transition: background-color 0.2s ease-in-out;
     transition: background-color 0.2s ease-in-out;
 }
 
@@ -534,123 +434,8 @@ body.is-preload #footer {
     background-color: rgba(255, 255, 255, 0.075);
 }
 
-.btn-google:active {
-    background-color: rgba(255, 255, 255, 0.175);
-}
-
-.btn-google i {
-    font-size: 1rem;
-}
-
-/* Welcome Section (Post-Login) */
-.welcome-centered {
-    text-align: center;
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-.welcome-centered h1 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.3rem;
-    margin-bottom: 0.5rem;
-    line-height: 1.4;
-}
-
-.welcome-centered h1 span {
-    color: #ffffff;
-}
-
-.welcome-subtitle {
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.15rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 2rem;
-}
-
-.coming-soon-features {
-    display: flex;
-    justify-content: center;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-}
-
-.feature-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem 1.25rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    min-width: 90px;
-    -moz-transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
-    -webkit-transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
-    transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out;
-}
-
-.feature-card:hover {
-    border-color: rgba(255, 255, 255, 0.4);
-    background-color: rgba(255, 255, 255, 0.03);
-}
-
-.feature-card i {
-    font-size: 1.25rem;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.feature-card span {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1rem;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.welcome-note {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.5);
-    margin-bottom: 1.5rem;
-}
-
-.btn-signout {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0 2rem;
-    height: 2.5rem;
-    background: transparent;
-    border: solid 1px rgba(255, 255, 255, 0.4);
-    border-radius: 4px;
-    color: rgba(255, 255, 255, 0.6);
-    font-family: "Source Sans Pro", sans-serif;
-    font-weight: 300;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.15rem;
-    cursor: pointer;
-    -moz-transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
-    -webkit-transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
-    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out;
-}
-
-.btn-signout:hover {
-    background-color: rgba(255, 255, 255, 0.075);
-    border-color: rgba(255, 255, 255, 0.6);
-    color: #ffffff;
-}
-
-.btn-signout i {
-    font-size: 0.8rem;
-}
-
-/* Footer */
-#footer {
-    -moz-transition: opacity 0.325s ease-in-out;
-    -webkit-transition: opacity 0.325s ease-in-out;
+/* Login Footer */
+#login-footer {
     transition: opacity 0.325s ease-in-out;
     position: fixed;
     bottom: 2.5rem;
@@ -660,7 +445,7 @@ body.is-preload #footer {
     z-index: 3;
 }
 
-#footer .copyright {
+#login-footer .copyright {
     letter-spacing: 0.2rem;
     font-size: 0.6rem;
     opacity: 0.75;
@@ -668,8 +453,759 @@ body.is-preload #footer {
     text-transform: uppercase;
 }
 
-/* Responsive */
+#login-footer .copyright a {
+    border-bottom: dotted 1px rgba(255, 255, 255, 0.5);
+}
+
+/* ==================== PORTAL VIEW ==================== */
+#portal-view {
+    display: flex;
+    min-height: 100vh;
+    background: #0d1117;
+}
+
+/* ==================== SIDEBAR (Desktop) ==================== */
+#sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 260px;
+    background: #161b22;
+    border-right: 1px solid #30363d;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #30363d;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.sidebar-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+}
+
+.sidebar-header h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.05rem;
+    margin: 0;
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 1rem 0;
+    overflow-y: auto;
+}
+
+.sidebar-nav .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.5rem;
+    color: #8b949e;
+    font-size: 0.9rem;
+    font-weight: 400;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.sidebar-nav .nav-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+}
+
+.sidebar-nav .nav-item.active {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    border-left-color: #ffffff;
+}
+
+.sidebar-nav .nav-item i {
+    width: 20px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.sidebar-nav .badge {
+    margin-left: auto;
+    background: #f85149;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+    min-width: 20px;
+    text-align: center;
+}
+
+.sidebar-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #30363d;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.user-avatar {
+    width: 36px;
+    height: 36px;
+    background: #30363d;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.user-avatar i {
+    color: #8b949e;
+    font-size: 1rem;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.user-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-email {
+    font-size: 0.7rem;
+    color: #8b949e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.signout-btn {
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    color: #8b949e;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.signout-btn:hover {
+    background: rgba(248, 81, 73, 0.1);
+    border-color: #f85149;
+    color: #f85149;
+}
+
+/* ==================== MOBILE NAV ==================== */
+#mobile-nav {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #161b22;
+    border-bottom: 1px solid #30363d;
+    z-index: 100;
+}
+
+.mobile-nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+.mobile-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.mobile-logo img {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+}
+
+.mobile-logo span {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.mobile-menu-btn {
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.mobile-menu {
+    display: none;
+    padding: 0.5rem 0 1rem;
+    border-top: 1px solid #30363d;
+}
+
+.mobile-menu.open {
+    display: block;
+}
+
+.mobile-menu .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1rem;
+    color: #8b949e;
+    font-size: 0.9rem;
+}
+
+.mobile-menu .nav-item:hover,
+.mobile-menu .nav-item.active {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+}
+
+.mobile-menu .badge {
+    margin-left: auto;
+    background: #f85149;
+    color: #ffffff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 10px;
+}
+
+.mobile-menu-divider {
+    height: 1px;
+    background: #30363d;
+    margin: 0.5rem 1rem;
+}
+
+/* ==================== MAIN CONTENT ==================== */
+#main-content {
+    flex: 1;
+    margin-left: 260px;
+    padding: 2rem;
+    min-height: 100vh;
+}
+
+.content-section {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.content-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.section-header {
+    margin-bottom: 2rem;
+}
+
+.section-header h1 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+    color: #8b949e;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* ==================== DASHBOARD ==================== */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.dashboard-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dashboard-card:hover {
+    border-color: #8b949e;
+    transform: translateY(-2px);
+}
+
+.card-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.card-icon i {
+    font-size: 1.25rem;
+    color: #8b949e;
+}
+
+.card-content h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #8b949e;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+}
+
+.card-stat {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0 0 0.25rem 0;
+    line-height: 1.2;
+}
+
+.card-label {
+    font-size: 0.8rem;
+    color: #8b949e;
+    margin: 0;
+}
+
+.recent-activity {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.recent-activity h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.activity-list {
+    min-height: 100px;
+}
+
+.activity-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: #8b949e;
+}
+
+.activity-empty i {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+    opacity: 0.5;
+}
+
+.activity-empty p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid #30363d;
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.activity-icon i {
+    font-size: 0.85rem;
+    color: #8b949e;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-text {
+    font-size: 0.9rem;
+    color: #ffffff;
+    margin: 0 0 0.25rem 0;
+}
+
+.activity-time {
+    font-size: 0.75rem;
+    color: #8b949e;
+}
+
+/* ==================== CONTRACTS ==================== */
+.contracts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.contract-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: border-color 0.2s ease;
+}
+
+.contract-card:hover {
+    border-color: #8b949e;
+}
+
+.contract-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.contract-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.contract-status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.03rem;
+}
+
+.contract-status.signed {
+    background: rgba(46, 160, 67, 0.15);
+    color: #3fb950;
+}
+
+.contract-status.pending {
+    background: rgba(210, 153, 34, 0.15);
+    color: #d29922;
+}
+
+.contract-meta {
+    display: flex;
+    gap: 2rem;
+    color: #8b949e;
+    font-size: 0.85rem;
+}
+
+.contract-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #8b949e;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* ==================== MESSAGES ==================== */
+.messages-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.messages-list {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    min-height: 300px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.message-item {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #30363d;
+}
+
+.message-item:last-child {
+    border-bottom: none;
+}
+
+.message-item.unread {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.message-from {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.message-time {
+    font-size: 0.75rem;
+    color: #8b949e;
+}
+
+.message-body {
+    font-size: 0.9rem;
+    color: #8b949e;
+    line-height: 1.5;
+}
+
+.message-compose {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.message-compose h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+#message-input {
+    width: 100%;
+    padding: 1rem;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 0.9rem;
+    resize: vertical;
+    min-height: 100px;
+    margin-bottom: 1rem;
+}
+
+#message-input:focus {
+    outline: none;
+    border-color: #8b949e;
+}
+
+#message-input::placeholder {
+    color: #8b949e;
+}
+
+.btn-send {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: #ffffff;
+    border: none;
+    border-radius: 6px;
+    color: #0d1117;
+    font-family: "Source Sans Pro", sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-send:hover {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* ==================== INVOICES ==================== */
+.invoices-summary {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.summary-card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    flex: 1;
+}
+
+.summary-label {
+    display: block;
+    font-size: 0.8rem;
+    color: #8b949e;
+    margin-bottom: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03rem;
+}
+
+.summary-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.invoices-list {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.invoice-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #30363d;
+}
+
+.invoice-item:last-child {
+    border-bottom: none;
+}
+
+.invoice-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.invoice-number {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.invoice-date {
+    font-size: 0.8rem;
+    color: #8b949e;
+}
+
+.invoice-amount {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.invoice-status {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 10px;
+    text-transform: uppercase;
+    margin-left: 0.75rem;
+}
+
+.invoice-status.paid {
+    background: rgba(46, 160, 67, 0.15);
+    color: #3fb950;
+}
+
+.invoice-status.pending {
+    background: rgba(210, 153, 34, 0.15);
+    color: #d29922;
+}
+
+.invoice-status.overdue {
+    background: rgba(248, 81, 73, 0.15);
+    color: #f85149;
+}
+
+/* ==================== LOADING STATE ==================== */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: #8b949e;
+}
+
+.loading-state i {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+}
+
+.loading-state p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* ==================== RESPONSIVE ==================== */
 @media screen and (max-width: 900px) {
+    /* Login responsive */
     .login-layout {
         flex-direction: column;
         min-width: auto;
@@ -691,50 +1227,41 @@ body.is-preload #footer {
     .feature-list li {
         margin-bottom: 0;
     }
-
-    .coming-soon-features {
-        gap: 1rem;
-    }
-
-    .feature-card {
-        min-width: 80px;
-        padding: 0.75rem 1rem;
-    }
 }
 
-@media screen and (max-width: 736px) {
-    #header > * {
-        margin-top: 2rem;
+@media screen and (max-width: 768px) {
+    /* Hide sidebar, show mobile nav */
+    #sidebar {
+        display: none;
     }
 
-    #header > *:before {
-        top: calc(-2rem - 1px);
-        height: calc(2rem + 1px);
+    #mobile-nav {
+        display: block;
     }
 
-    #header .logo {
-        width: 4.75rem;
-        height: 4.75rem;
-        line-height: 4.75rem;
+    #main-content {
+        margin-left: 0;
+        padding: 1rem;
+        padding-top: calc(60px + 1rem); /* Account for fixed mobile nav */
     }
 
-    #header .logo .fas {
-        font-size: 1.75rem;
+    .dashboard-grid {
+        grid-template-columns: 1fr;
     }
 
-    #header .content .inner {
-        padding: 2.5rem 1.5rem;
+    .invoices-summary {
+        flex-direction: column;
     }
 
-    .login-branding h1 {
-        font-size: 1.75rem;
-        letter-spacing: 0.3rem;
+    .contract-meta {
+        flex-direction: column;
+        gap: 0.5rem;
     }
 }
 
 @media screen and (max-width: 480px) {
-    #header {
-        padding: 1.5rem 0;
+    #wrapper {
+        padding: 1rem;
     }
 
     #header .content .inner {
@@ -750,156 +1277,868 @@ body.is-preload #footer {
         min-width: 100%;
         max-width: 100%;
     }
+
+    #main-content {
+        padding: 0.75rem;
+        padding-top: calc(60px + 0.75rem);
+    }
+
+    .section-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .dashboard-card {
+        padding: 1rem;
+    }
+
+    .card-stat {
+        font-size: 1.5rem;
+    }
 }
 
-/* ========================================
-   AUTH FLOW SECTIONS
-   Forgot Password, Reset Password, Setup, Token Error
-   ======================================== */
-
-/* Forgot Password Link */
-.forgot-password-link {
-    display: block;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.6);
-    text-align: center;
-    margin-top: 0.5rem;
-    border-bottom: none;
-    -moz-transition: color 0.2s ease-in-out;
-    -webkit-transition: color 0.2s ease-in-out;
-    transition: color 0.2s ease-in-out;
-}
-
-.forgot-password-link:hover {
-    color: #ffffff;
-}
-
-/* Auth Centered Layout */
-.auth-centered {
-    text-align: center;
-    max-width: 380px;
-    margin: 0 auto;
-}
-
-.auth-centered h1 {
-    font-size: 1.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.3rem;
-    margin-bottom: 0.5rem;
-    line-height: 1.4;
-}
-
-.auth-subtitle {
-    font-size: 0.85rem;
-    text-transform: none;
-    letter-spacing: 0.05rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 2rem;
-    line-height: 1.5;
-}
-
-.auth-subtitle span {
-    color: #ffffff;
-    font-weight: 600;
-}
-
-/* Auth Form */
-.auth-form {
+/* ==================== MODALS ==================== */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 2rem;
+}
+
+.modal.active {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.modal-content {
+    background: #1b1f22;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 100%;
+    margin: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: modalSlideIn 0.3s ease;
+}
+
+.modal-content.modal-large {
+    max-width: 900px;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: #ffffff;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Contract Modal Specific */
+.contract-modal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contract-modal-meta .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.contract-modal-meta .meta-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.contract-modal-meta .meta-value {
+    font-weight: 600;
+}
+
+.contract-content {
+    background: #ffffff;
+    color: #333333;
+    padding: 2rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    line-height: 1.7;
+}
+
+.contract-content h1,
+.contract-content h2,
+.contract-content h3,
+.contract-content h4 {
+    color: #1a1a2e;
+}
+
+.contract-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+.contract-content th,
+.contract-content td {
+    border: 1px solid #ddd;
+    padding: 0.5rem;
+    text-align: left;
+}
+
+/* Invoice Modal Specific */
+.invoice-details {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-/* Success Message */
-.success-message {
-    color: #22c55e;
+.invoice-details .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.invoice-details .detail-row:last-child {
+    border-bottom: none;
+}
+
+.invoice-details .detail-label {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.invoice-details .detail-value {
+    font-weight: 600;
+}
+
+.invoice-details .line-items {
+    margin-top: 1rem;
+}
+
+.invoice-details .line-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.invoice-details .invoice-total {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* Modal Buttons */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #4CAF50;
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+    text-decoration: none;
+}
+
+.btn-primary:hover {
+    background: #45a049;
+    color: #ffffff;
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+/* Contract Card Actions */
+.contract-card {
+    cursor: default;
+}
+
+.contract-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contract-actions .btn-view,
+.contract-actions .btn-sign {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
     font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.contract-actions .btn-view {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.contract-actions .btn-view:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.contract-actions .btn-sign {
+    background: #4CAF50;
+    color: #ffffff;
+}
+
+.contract-actions .btn-sign:hover {
+    background: #45a049;
+}
+
+/* Invoice Item Actions */
+.invoice-item {
+    cursor: default;
+    position: relative;
+}
+
+.invoice-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.invoice-actions .btn-view,
+.invoice-actions .btn-pay {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.invoice-actions .btn-view {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+.invoice-actions .btn-view:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.invoice-actions .btn-pay {
+    background: #4CAF50;
+    color: #ffffff;
+}
+
+.invoice-actions .btn-pay:hover {
+    background: #45a049;
+}
+
+/* ==================== PAYMENT PLANS SECTION ==================== */
+.payments-summary {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.subsection-title {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Empty state hints */
+.empty-hint {
+    display: block;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 0.5rem;
+}
+
+.payments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.payment-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.payment-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.payment-card-title {
+    font-size: 1rem;
+    font-weight: 600;
     margin: 0;
+}
+
+.payment-card-type {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.payment-card-type.subscription {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+}
+
+.payment-card-type.payment-plan {
+    background: rgba(168, 85, 247, 0.2);
+    color: #c084fc;
+}
+
+.payment-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+}
+
+.payment-card-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.payment-card-meta span i {
+    width: 1rem;
     text-align: center;
-    line-height: 1.5;
-    max-height: 0;
-    opacity: 0;
+}
+
+.payment-progress {
+    margin-bottom: 1rem;
+}
+
+.progress-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
     overflow: hidden;
-    -moz-transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
-    -webkit-transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
-    transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
-}
-
-.success-message.show {
-    max-height: 4rem;
-    opacity: 1;
-}
-
-.success-message i {
-    margin-right: 0.3rem;
-}
-
-/* Password Requirements */
-.password-requirements {
-    text-align: left;
-    margin-top: -0.5rem;
     margin-bottom: 0.5rem;
 }
 
-.password-requirements p {
-    font-size: 0.7rem;
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #45a049);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 0.75rem;
     color: rgba(255, 255, 255, 0.5);
+}
+
+.payment-card-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.payment-card-status.active {
+    background: rgba(74, 222, 128, 0.2);
+    color: #4ade80;
+}
+
+.payment-card-status.pending {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
+
+.payment-card-status.completed {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+}
+
+.payment-card-status.cancelled {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.payment-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.payment-card-actions .btn-pay {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    text-decoration: none;
+    background: #4CAF50;
+    color: #ffffff;
+}
+
+.payment-card-actions .btn-pay:hover {
+    background: #45a049;
+}
+
+/* Mobile Modal Adjustments */
+@media (max-width: 768px) {
+    .modal {
+        padding: 1rem;
+    }
+
+    .modal-content {
+        margin: 0;
+    }
+
+    .modal-body {
+        max-height: 50vh;
+    }
+
+    .contract-content {
+        padding: 1rem;
+        font-size: 0.85rem;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+    }
+
+    .modal-footer .btn-primary,
+    .modal-footer .btn-secondary {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .payments-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-card-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+/* ==================== CONTRACT SIGNING SECTION ==================== */
+.contract-signing-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.contract-signing-header h1 {
     margin: 0;
+    font-size: 1.5rem;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Split-Screen Layout */
+.contract-signing-layout {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 1.5rem;
+    min-height: calc(100vh - 200px);
+}
+
+/* Contract Panel (Left) */
+.contract-panel {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.contract-panel-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #30363d;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.contract-panel-header h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-.password-requirements i {
-    font-size: 0.65rem;
+.contract-panel-header h2 i {
+    color: #8b949e;
 }
 
-/* Back Link */
-.back-link {
-    display: inline-flex;
+.contract-panel-content {
+    flex: 1;
+    overflow-y: auto;
+    background: #ffffff;
+    color: #333333;
+    padding: 2rem;
+    max-height: calc(100vh - 280px);
+}
+
+.contract-panel-content h1,
+.contract-panel-content h2,
+.contract-panel-content h3,
+.contract-panel-content h4 {
+    color: #1a1a2e;
+}
+
+.contract-panel-content p {
+    line-height: 1.7;
+    margin-bottom: 1rem;
+}
+
+.contract-panel-content ul,
+.contract-panel-content ol {
+    margin: 1rem 0;
+    padding-left: 2rem;
+}
+
+.contract-panel-content li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+.contract-panel-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+.contract-panel-content th,
+.contract-panel-content td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.contract-panel-content th {
+    background: #f5f5f5;
+    font-weight: 600;
+}
+
+/* Signature Panel (Right) */
+.signature-panel {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 2rem;
+    height: fit-content;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+}
+
+.signature-panel-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #30363d;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.signature-panel-header h2 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.6);
-    border-bottom: none;
-    margin-top: 1.5rem;
-    -moz-transition: color 0.2s ease-in-out;
-    -webkit-transition: color 0.2s ease-in-out;
-    transition: color 0.2s ease-in-out;
 }
 
-.back-link:hover {
-    color: #ffffff;
+.signature-panel-header h2 i {
+    color: #8b949e;
 }
 
-.back-link i {
-    font-size: 0.7rem;
+/* Signature Form */
+.signature-form {
+    padding: 1.5rem;
 }
 
-/* Error Icon (Token Error) */
-.error-icon {
+.form-section {
     margin-bottom: 1.5rem;
 }
 
-.error-icon i {
-    font-size: 3rem;
-    color: #f0b866;
+.form-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
 }
 
-/* Responsive adjustments for auth sections */
-@media screen and (max-width: 480px) {
-    .auth-centered {
-        max-width: 100%;
+.signature-form .form-group {
+    margin-bottom: 0.75rem;
+}
+
+.signature-form .form-group input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease;
+}
+
+.signature-form .form-group input:focus {
+    outline: none;
+    border-color: #8b949e;
+}
+
+.signature-form .form-group input::placeholder {
+    color: #6e7681;
+}
+
+.signature-form .form-group input[readonly] {
+    background: rgba(13, 17, 23, 0.5);
+    color: #8b949e;
+    cursor: not-allowed;
+}
+
+/* Checkbox Group */
+.checkbox-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    flex-shrink: 0;
+    accent-color: #4CAF50;
+    cursor: pointer;
+}
+
+.checkbox-group label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+/* Sign Button */
+.signature-actions {
+    margin-top: 1.5rem;
+}
+
+.btn-sign-contract {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: #4CAF50;
+    border: none;
+    border-radius: 6px;
+    color: #ffffff;
+    font-family: "Source Sans Pro", sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-sign-contract:hover {
+    background: #45a049;
+}
+
+.btn-sign-contract:disabled {
+    background: #30363d;
+    cursor: not-allowed;
+}
+
+/* ==================== INLINE SIGNATURE STYLING ==================== */
+.legal-checkbox label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Signature input styling */
+#signature-input {
+    font-style: italic;
+}
+
+/* ==================== CONTRACT SIGNING RESPONSIVE ==================== */
+@media screen and (max-width: 1024px) {
+    .contract-signing-layout {
+        grid-template-columns: 1fr;
     }
 
-    .auth-centered h1 {
-        font-size: 1.5rem;
-        letter-spacing: 0.2rem;
+    .signature-panel {
+        position: static;
+        max-height: none;
     }
 
-    .auth-subtitle {
-        font-size: 0.8rem;
+    .contract-panel-content {
+        max-height: 50vh;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .contract-signing-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .contract-signing-header h1 {
+        font-size: 1.25rem;
+    }
+
+    .contract-panel-content {
+        padding: 1rem;
+        max-height: 40vh;
+    }
+
+    .signature-form {
+        padding: 1rem;
+    }
+
+    .btn-sign-contract {
+        padding: 0.875rem 1.5rem;
+        font-size: 0.9rem;
     }
 }

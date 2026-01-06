@@ -2,6 +2,7 @@ const { onDocumentCreated, onDocumentUpdated } = require("firebase-functions/v2/
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { onRequest, onCall } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
+const functionsV1 = require("firebase-functions"); // v1 for CORS-friendly callable
 const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
 
@@ -1167,12 +1168,6 @@ exports.createSubscription = onCall(
   {
     region: "us-central1",
     secrets: [stripeSecretKey],
-    invoker: "public",
-    cors: [
-      "https://admin.lantingdigital.com",
-      "https://lanting-digital-admin.web.app",
-      "http://localhost:5000",
-    ],
   },
   async (request) => {
     // Verify admin is authenticated
@@ -1264,12 +1259,6 @@ exports.createPaymentPlan = onCall(
   {
     region: "us-central1",
     secrets: [stripeSecretKey],
-    invoker: "public",
-    cors: [
-      "https://admin.lantingdigital.com",
-      "https://lanting-digital-admin.web.app",
-      "http://localhost:5000",
-    ],
   },
   async (request) => {
     // Verify admin is authenticated
@@ -1415,12 +1404,6 @@ exports.cancelSubscription = onCall(
   {
     region: "us-central1",
     secrets: [stripeSecretKey],
-    invoker: "public",
-    cors: [
-      "https://admin.lantingdigital.com",
-      "https://lanting-digital-admin.web.app",
-      "http://localhost:5000",
-    ],
   },
   async (request) => {
     // Verify admin is authenticated
@@ -1491,12 +1474,6 @@ exports.getSubscriptionStatus = onCall(
   {
     region: "us-central1",
     secrets: [stripeSecretKey],
-    invoker: "public",
-    cors: [
-      "https://admin.lantingdigital.com",
-      "https://lanting-digital-admin.web.app",
-      "http://localhost:5000",
-    ],
   },
   async (request) => {
     if (!request.auth) {
@@ -1565,12 +1542,6 @@ exports.requestPasswordReset = onCall(
   {
     region: "us-central1",
     secrets: [gmailEmail, gmailPassword],
-    invoker: "public",
-    cors: [
-      "https://portal.lantingdigital.com",
-      "http://localhost:5000",
-      "http://127.0.0.1:5500",
-    ],
   },
   async (request) => {
     const { email } = request.data;
@@ -1721,54 +1692,35 @@ exports.requestPasswordReset = onCall(
 /**
  * Validate an auth token (password reset or invitation).
  * Returns token type and associated email if valid.
+ * Uses v1 format for CORS compatibility.
  */
-exports.validateAuthToken = onCall(
-  {
-    region: "us-central1",
-    invoker: "public",
-    cors: [
-      "https://portal.lantingdigital.com",
-      "http://localhost:5000",
-      "http://127.0.0.1:5500",
-    ],
-  },
-  async (request) => {
-    const { token } = request.data;
+exports.validateAuthToken = functionsV1.https.onCall(async (data, context) => {
+  const { token } = data;
 
-    if (!token) {
-      return { valid: false, error: "Token is required" };
+  if (!token) {
+    return { valid: false, error: "Token is required" };
+  }
+
+  const db = admin.firestore();
+  const hashedToken = hashToken(token);
+
+  try {
+    // Find token by hash
+    const tokenQuery = await db.collection("authTokens")
+      .where("tokenHash", "==", hashedToken)
+      .limit(1)
+      .get();
+
+    if (tokenQuery.empty) {
+      return { valid: false, error: "Invalid or expired link" };
     }
 
-    const db = admin.firestore();
-    const hashedToken = hashToken(token);
+    const tokenDoc = tokenQuery.docs[0];
+    const tokenData = tokenDoc.data();
 
-    try {
-      // Find token by hash
-      const tokenQuery = await db.collection("authTokens")
-        .where("tokenHash", "==", hashedToken)
-        .limit(1)
-        .get();
-
-      if (tokenQuery.empty) {
-        return { valid: false, error: "Invalid or expired link" };
-      }
-
-      const tokenDoc = tokenQuery.docs[0];
-      const tokenData = tokenDoc.data();
-
-      // Check if already used
-      if (tokenData.used) {
-        return { valid: false, error: "This link has already been used" };
-      }
-
-      // Check if expired
-      const now = new Date();
-      const expiresAt = tokenData.expiresAt.toDate();
-      if (now > expiresAt) {
-        return { valid: false, error: "This link has expired" };
-      }
-
-      // Get client name for personalization
+    // Check if already used
+    if (tokenData.used) {
+      // Still get client name for the "welcome back" screen
       let clientName = "";
       if (tokenData.clientId) {
         const clientDoc = await db.collection("clients").doc(tokenData.clientId).get();
@@ -1776,20 +1728,37 @@ exports.validateAuthToken = onCall(
           clientName = clientDoc.data().name || "";
         }
       }
-
-      return {
-        valid: true,
-        type: tokenData.type,
-        email: tokenData.email,
-        clientName: clientName,
-      };
-
-    } catch (error) {
-      console.error("Error validating token:", error);
-      return { valid: false, error: "Unable to validate link" };
+      return { valid: false, error: "This link has already been used", clientName: clientName };
     }
+
+    // Check if expired
+    const now = new Date();
+    const expiresAt = tokenData.expiresAt.toDate();
+    if (now > expiresAt) {
+      return { valid: false, error: "This link has expired" };
+    }
+
+    // Get client name for personalization
+    let clientName = "";
+    if (tokenData.clientId) {
+      const clientDoc = await db.collection("clients").doc(tokenData.clientId).get();
+      if (clientDoc.exists) {
+        clientName = clientDoc.data().name || "";
+      }
+    }
+
+    return {
+      valid: true,
+      type: tokenData.type,
+      email: tokenData.email,
+      clientName: clientName,
+    };
+
+  } catch (error) {
+    console.error("Error validating token:", error);
+    return { valid: false, error: "Unable to validate link" };
   }
-);
+});
 
 /**
  * Reset password using a valid token.
@@ -1798,12 +1767,6 @@ exports.validateAuthToken = onCall(
 exports.resetPassword = onCall(
   {
     region: "us-central1",
-    invoker: "public",
-    cors: [
-      "https://portal.lantingdigital.com",
-      "http://localhost:5000",
-      "http://127.0.0.1:5500",
-    ],
   },
   async (request) => {
     const { token, newPassword } = request.data;
@@ -1881,310 +1844,513 @@ exports.resetPassword = onCall(
  * Creates client record (if needed), generates invitation token, sends email.
  * Admin only.
  */
-exports.inviteClient = onCall(
-  {
-    region: "us-central1",
-    secrets: [gmailEmail, gmailPassword],
-    invoker: "public",
-    cors: [
-      "https://admin.lantingdigital.com",
-      "https://lanting-digital-admin.web.app",
-      "http://localhost:5000",
-    ],
-  },
-  async (request) => {
-    // Verify admin authentication
-    if (!request.auth) {
-      throw new Error("Authentication required");
-    }
+exports.inviteClient = functionsV1
+  .runWith({ secrets: ["GMAIL_EMAIL", "GMAIL_PASSWORD"] })
+  .https.onCall(async (data, context) => {
+  // Verify admin authentication
+  if (!context.auth) {
+    throw new functionsV1.https.HttpsError("unauthenticated", "Authentication required");
+  }
 
-    if (request.auth.token.email !== ADMIN_EMAIL) {
-      throw new Error("Admin access required");
-    }
+  if (context.auth.token.email !== ADMIN_EMAIL) {
+    throw new functionsV1.https.HttpsError("permission-denied", "Admin access required");
+  }
 
-    const { email, name, company } = request.data;
+  const { email, name, company } = data;
 
-    if (!email || !name) {
-      throw new Error("Email and name are required");
-    }
+  if (!email || !name) {
+    throw new functionsV1.https.HttpsError("invalid-argument", "Email and name are required");
+  }
 
-    const normalizedEmail = email.toLowerCase().trim();
-    const db = admin.firestore();
+  const normalizedEmail = email.toLowerCase().trim();
+  const db = admin.firestore();
 
-    try {
-      // Check if client already exists
-      let clientDoc;
-      const existingClient = await db.collection("clients")
-        .where("email", "==", normalizedEmail)
-        .limit(1)
-        .get();
+  try {
+    // Check if client already exists
+    let clientDoc;
+    const existingClient = await db.collection("clients")
+      .where("email", "==", normalizedEmail)
+      .limit(1)
+      .get();
 
-      if (!existingClient.empty) {
-        clientDoc = existingClient.docs[0];
-        const clientData = clientDoc.data();
+    if (!existingClient.empty) {
+      clientDoc = existingClient.docs[0];
+      const clientData = clientDoc.data();
 
-        // Check if they already have portal access
-        if (clientData.hasPortalAccess) {
-          throw new Error("Client already has portal access. Use password reset instead.");
-        }
-
-        // Update client info
-        await clientDoc.ref.update({
-          name: name,
-          company: company || "",
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-      } else {
-        // Create new client record
-        const newClient = await db.collection("clients").add({
-          email: normalizedEmail,
-          name: name,
-          company: company || "",
-          hasPortalAccess: false,
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-          createdBy: request.auth.uid,
-          invitedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-        clientDoc = await newClient.get();
+      // Check if they already have portal access
+      if (clientData.hasPortalAccess) {
+        throw new functionsV1.https.HttpsError("already-exists", "Client already has portal access. Use password reset instead.");
       }
 
-      // Invalidate any existing unused invitation tokens for this email
-      const existingTokens = await db.collection("authTokens")
-        .where("email", "==", normalizedEmail)
-        .where("type", "==", "invitation")
-        .where("used", "==", false)
-        .get();
-
-      const batch = db.batch();
-      existingTokens.forEach((doc) => {
-        batch.update(doc.ref, { used: true, usedAt: admin.firestore.FieldValue.serverTimestamp() });
+      // Update client info
+      await clientDoc.ref.update({
+        name: name,
+        company: company || "",
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
-      await batch.commit();
-
-      // Generate invitation token
-      const rawToken = generateSecureToken();
-      const hashedToken = hashToken(rawToken);
-
-      // Store token
-      const expiresAt = new Date(Date.now() + INVITATION_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
-      await db.collection("authTokens").add({
-        tokenHash: hashedToken,
-        type: "invitation",
+    } else {
+      // Create new client record
+      const newClient = await db.collection("clients").add({
         email: normalizedEmail,
-        clientId: clientDoc.id,
+        name: name,
+        company: company || "",
+        hasPortalAccess: false,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        expiresAt: admin.firestore.Timestamp.fromDate(expiresAt),
-        used: false,
-        usedAt: null,
-        invitedBy: request.auth.uid,
+        createdBy: context.auth.uid,
+        invitedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
+      clientDoc = await newClient.get();
+    }
 
-      // Create invitation link
-      const inviteLink = `${PORTAL_URL}?action=setup&token=${rawToken}`;
+    // Invalidate any existing unused invitation tokens for this email
+    const existingTokens = await db.collection("authTokens")
+      .where("email", "==", normalizedEmail)
+      .where("type", "==", "invitation")
+      .where("used", "==", false)
+      .get();
 
-      // Send invitation email
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: gmailEmail.value(),
-          pass: gmailPassword.value(),
-        },
-      });
+    const batch = db.batch();
+    existingTokens.forEach((doc) => {
+      batch.update(doc.ref, { used: true, usedAt: admin.firestore.FieldValue.serverTimestamp() });
+    });
+    await batch.commit();
 
-      const emailHtml = `
+    // Generate invitation token
+    const rawToken = generateSecureToken();
+    const hashedToken = hashToken(rawToken);
+
+    // Store token
+    const expiresAt = new Date(Date.now() + INVITATION_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
+    await db.collection("authTokens").add({
+      tokenHash: hashedToken,
+      type: "invitation",
+      email: normalizedEmail,
+      clientId: clientDoc.id,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      expiresAt: admin.firestore.Timestamp.fromDate(expiresAt),
+      used: false,
+      usedAt: null,
+      invitedBy: context.auth.uid,
+    });
+
+    // Create invitation link
+    const inviteLink = `${PORTAL_URL}?action=setup&token=${rawToken}`;
+
+    // Send invitation email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.GMAIL_EMAIL || gmailEmail.value(),
+        pass: process.env.GMAIL_PASSWORD || gmailPassword.value(),
+      },
+    });
+
+    const emailHtml = `
 <!DOCTYPE html>
 <html>
 <head>
-  <style>
-    body { font-family: Georgia, serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: #1a1a1a; color: white; padding: 30px; text-align: center; }
-    .header h1 { margin: 0; font-size: 24px; font-weight: normal; }
-    .content { background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; }
-    .button { display: inline-block; background: #1a1a1a; color: white !important; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: 500; margin: 20px 0; }
-    .features { background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .features ul { margin: 0; padding-left: 20px; }
-    .features li { margin: 8px 0; }
-    .footer { text-align: center; padding: 20px; font-size: 12px; color: #888; }
-    .note { font-size: 13px; color: #666; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
-  </style>
+<style>
+  body { font-family: Georgia, serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+  .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+  .header { background: #1a1a1a; color: white; padding: 30px; text-align: center; }
+  .header h1 { margin: 0; font-size: 24px; font-weight: normal; }
+  .content { background: #ffffff; padding: 30px; border: 1px solid #e5e7eb; }
+  .button { display: inline-block; background: #1a1a1a; color: white !important; padding: 14px 28px; text-decoration: none; border-radius: 4px; font-weight: 500; margin: 20px 0; }
+  .features { background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0; }
+  .features ul { margin: 0; padding-left: 20px; }
+  .features li { margin: 8px 0; }
+  .footer { text-align: center; padding: 20px; font-size: 12px; color: #888; }
+  .note { font-size: 13px; color: #666; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
+</style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>Welcome to Lanting Digital</h1>
-    </div>
-    <div class="content">
-      <p>Hi ${name},</p>
-      <p>You've been invited to access your client portal at Lanting Digital. Your portal gives you:</p>
-      <div class="features">
-        <ul>
-          <li><strong>Contracts</strong> - View and sign agreements</li>
-          <li><strong>Projects</strong> - Track project progress</li>
-          <li><strong>Messages</strong> - Direct communication with your team</li>
-          <li><strong>Invoices</strong> - View and pay invoices</li>
-        </ul>
-      </div>
-      <p>Click the button below to set up your account:</p>
-      <p style="text-align: center;">
-        <a href="${inviteLink}" class="button">Set Up Your Account</a>
-      </p>
-      <p class="note">
-        This invitation link expires in ${INVITATION_EXPIRY_DAYS} days.<br>
-        If you have any questions, reply to this email.
-      </p>
-      <p style="margin-top: 30px;">
-        Looking forward to working with you,<br>
-        <strong>Caleb Lanting</strong><br>
-        Lanting Digital
-      </p>
-    </div>
-    <div class="footer">
-      <p>Lanting Digital LLC | <a href="https://lantingdigital.com">lantingdigital.com</a></p>
-    </div>
+<div class="container">
+  <div class="header">
+    <h1>Welcome to Lanting Digital</h1>
   </div>
+  <div class="content">
+    <p>Hi ${name},</p>
+    <p>You've been invited to access your client portal at Lanting Digital. Your portal gives you:</p>
+    <div class="features">
+      <ul>
+        <li><strong>Contracts</strong> - View and sign agreements</li>
+        <li><strong>Projects</strong> - Track project progress</li>
+        <li><strong>Messages</strong> - Direct communication with your team</li>
+        <li><strong>Invoices</strong> - View and pay invoices</li>
+      </ul>
+    </div>
+    <p>Click the button below to set up your account:</p>
+    <p style="text-align: center;">
+      <a href="${inviteLink}" class="button">Set Up Your Account</a>
+    </p>
+    <p class="note">
+      This invitation link expires in ${INVITATION_EXPIRY_DAYS} days.<br>
+      If you have any questions, reply to this email.
+    </p>
+    <p style="margin-top: 30px;">
+      Looking forward to working with you,<br>
+      <strong>Caleb Lanting</strong><br>
+      Lanting Digital
+    </p>
+  </div>
+  <div class="footer">
+    <p>Lanting Digital LLC | <a href="https://lantingdigital.com">lantingdigital.com</a></p>
+  </div>
+</div>
 </body>
 </html>
-      `;
+    `;
 
-      await transporter.sendMail({
-        from: `"Lanting Digital" <${gmailEmail.value()}>`,
-        to: normalizedEmail,
-        subject: "You're Invited to Lanting Digital Client Portal",
-        html: emailHtml,
-      });
+    await transporter.sendMail({
+      from: `"Lanting Digital" <${process.env.GMAIL_EMAIL || gmailEmail.value()}>`,
+      to: normalizedEmail,
+      subject: "You're Invited to Lanting Digital Client Portal",
+      html: emailHtml,
+    });
 
-      console.log(`Invitation sent to ${normalizedEmail}`);
+    console.log(`Invitation sent to ${normalizedEmail}`);
 
-      return {
-        success: true,
-        clientId: clientDoc.id,
-        inviteLink: inviteLink,
-        message: `Invitation sent to ${normalizedEmail}`,
-      };
+    return {
+      success: true,
+      clientId: clientDoc.id,
+      inviteLink: inviteLink,
+      message: `Invitation sent to ${normalizedEmail}`,
+    };
 
-    } catch (error) {
-      console.error("Error inviting client:", error);
-      throw new Error(error.message || "Failed to invite client");
+  } catch (error) {
+    console.error("Error inviting client:", error);
+    if (error instanceof functionsV1.https.HttpsError) {
+      throw error;
     }
+    throw new functionsV1.https.HttpsError("internal", error.message || "Failed to invite client");
   }
-);
+});
 
 /**
  * Complete onboarding for an invited client.
  * Creates Firebase Auth account and sets password.
+ * Uses v1 format for CORS compatibility.
  */
-exports.completeOnboarding = onCall(
-  {
-    region: "us-central1",
-    invoker: "public",
-    cors: [
-      "https://portal.lantingdigital.com",
-      "http://localhost:5000",
-      "http://127.0.0.1:5500",
-    ],
-  },
-  async (request) => {
-    const { token, password } = request.data;
+exports.completeOnboarding = functionsV1.https.onCall(async (data, context) => {
+  const { token, password } = data;
 
-    if (!token || !password) {
-      throw new Error("Token and password are required");
+  if (!token || !password) {
+    throw new functionsV1.https.HttpsError("invalid-argument", "Token and password are required");
+  }
+
+  // Validate password strength
+  if (password.length < 8) {
+    throw new functionsV1.https.HttpsError("invalid-argument", "Password must be at least 8 characters long");
+  }
+
+  const db = admin.firestore();
+  const hashedToken = hashToken(token);
+
+  try {
+    // Find and validate token
+    const tokenQuery = await db.collection("authTokens")
+      .where("tokenHash", "==", hashedToken)
+      .where("type", "==", "invitation")
+      .limit(1)
+      .get();
+
+    if (tokenQuery.empty) {
+      throw new functionsV1.https.HttpsError("not-found", "Invalid or expired invitation link");
     }
 
-    // Validate password strength
-    if (password.length < 8) {
-      throw new Error("Password must be at least 8 characters long");
+    const tokenDoc = tokenQuery.docs[0];
+    const tokenData = tokenDoc.data();
+
+    if (tokenData.used) {
+      throw new functionsV1.https.HttpsError("already-exists", "This invitation has already been used");
     }
 
-    const db = admin.firestore();
-    const hashedToken = hashToken(token);
+    const now = new Date();
+    const expiresAt = tokenData.expiresAt.toDate();
+    if (now > expiresAt) {
+      throw new functionsV1.https.HttpsError("deadline-exceeded", "This invitation has expired");
+    }
 
+    // Get client info
+    const clientDoc = await db.collection("clients").doc(tokenData.clientId).get();
+    if (!clientDoc.exists) {
+      throw new functionsV1.https.HttpsError("not-found", "Client record not found");
+    }
+    const clientData = clientDoc.data();
+
+    // Check if Auth account already exists
+    let authUser;
     try {
-      // Find and validate token
-      const tokenQuery = await db.collection("authTokens")
-        .where("tokenHash", "==", hashedToken)
-        .where("type", "==", "invitation")
-        .limit(1)
-        .get();
-
-      if (tokenQuery.empty) {
-        throw new Error("Invalid or expired invitation link");
-      }
-
-      const tokenDoc = tokenQuery.docs[0];
-      const tokenData = tokenDoc.data();
-
-      if (tokenData.used) {
-        throw new Error("This invitation has already been used");
-      }
-
-      const now = new Date();
-      const expiresAt = tokenData.expiresAt.toDate();
-      if (now > expiresAt) {
-        throw new Error("This invitation has expired");
-      }
-
-      // Get client info
-      const clientDoc = await db.collection("clients").doc(tokenData.clientId).get();
-      if (!clientDoc.exists) {
-        throw new Error("Client record not found");
-      }
-      const clientData = clientDoc.data();
-
-      // Check if Auth account already exists
-      let authUser;
-      try {
-        authUser = await admin.auth().getUserByEmail(tokenData.email);
-        // User exists - update password
-        await admin.auth().updateUser(authUser.uid, {
+      authUser = await admin.auth().getUserByEmail(tokenData.email);
+      // User exists - update password
+      await admin.auth().updateUser(authUser.uid, {
+        password: password,
+      });
+    } catch (authError) {
+      if (authError.code === "auth/user-not-found") {
+        // Create new Auth user
+        authUser = await admin.auth().createUser({
+          email: tokenData.email,
           password: password,
+          displayName: clientData.name || tokenData.email.split("@")[0],
+          emailVerified: true, // We verified via invitation
         });
-      } catch (authError) {
-        if (authError.code === "auth/user-not-found") {
-          // Create new Auth user
-          authUser = await admin.auth().createUser({
-            email: tokenData.email,
+      } else {
+        throw authError;
+      }
+    }
+
+    // Mark token as used
+    await tokenDoc.ref.update({
+      used: true,
+      usedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // Update client record
+    await db.collection("clients").doc(tokenData.clientId).update({
+      hasPortalAccess: true,
+      portalActivatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      authUid: authUser.uid,
+      lastPasswordChange: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // Create custom token for auto-login
+    const customToken = await admin.auth().createCustomToken(authUser.uid, {
+      email: tokenData.email,
+      isClient: true,
+    });
+
+    console.log(`Onboarding completed for ${tokenData.email}`);
+
+    return {
+      success: true,
+      customToken: customToken,
+      email: tokenData.email,
+      message: "Account setup complete",
+    };
+
+  } catch (error) {
+    console.error("Error completing onboarding:", error);
+    if (error instanceof functionsV1.https.HttpsError) {
+      throw error;
+    }
+    throw new functionsV1.https.HttpsError("internal", error.message || "Failed to complete account setup");
+  }
+});
+
+/**
+ * Create a client account directly (for admin use).
+ * Creates both Firebase Auth user and Firestore client record.
+ * Admin only.
+ * Uses HTTP trigger with manual CORS to avoid IAM issues.
+ */
+const cors = require("cors")({ origin: true });
+
+exports.createClientAccount = functionsV1.region("us-central1").https.onRequest(
+  async (req, res) => {
+    // Handle CORS
+    cors(req, res, async () => {
+      // Only allow POST
+      if (req.method !== "POST") {
+        res.status(405).json({ error: "Method not allowed" });
+        return;
+      }
+
+      try {
+        // Verify Firebase Auth token (from header or body)
+        let idToken;
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith("Bearer ")) {
+          idToken = authHeader.split("Bearer ")[1];
+        } else if (req.body && req.body.idToken) {
+          idToken = req.body.idToken;
+        }
+
+        if (!idToken) {
+          res.status(401).json({ error: "Authentication required" });
+          return;
+        }
+
+        let decodedToken;
+        try {
+          decodedToken = await admin.auth().verifyIdToken(idToken);
+        } catch (authError) {
+          res.status(401).json({ error: "Invalid authentication token" });
+          return;
+        }
+
+        // Check admin
+        if (decodedToken.email !== ADMIN_EMAIL) {
+          res.status(403).json({ error: "Admin access required" });
+          return;
+        }
+
+        const { email, name, company, password } = req.body;
+
+        if (!email || !name || !password) {
+          res.status(400).json({ error: "Email, name, and password are required" });
+          return;
+        }
+
+        if (password.length < 8) {
+          res.status(400).json({ error: "Password must be at least 8 characters" });
+          return;
+        }
+
+        const normalizedEmail = email.toLowerCase().trim();
+        const db = admin.firestore();
+
+        // Check if Auth account already exists
+        let authUser;
+        try {
+          authUser = await admin.auth().getUserByEmail(normalizedEmail);
+          // User exists - update password
+          await admin.auth().updateUser(authUser.uid, {
             password: password,
-            displayName: clientData.name || tokenData.email.split("@")[0],
-            emailVerified: true, // We verified via invitation
+            displayName: name,
+          });
+          console.log(`Updated existing auth user: ${normalizedEmail}`);
+        } catch (authError) {
+          if (authError.code === "auth/user-not-found") {
+            // Create new Auth user
+            authUser = await admin.auth().createUser({
+              email: normalizedEmail,
+              password: password,
+              displayName: name,
+              emailVerified: true,
+            });
+            console.log(`Created new auth user: ${normalizedEmail}`);
+          } else {
+            throw authError;
+          }
+        }
+
+        // Check if client record exists
+        const existingClient = await db.collection("clients")
+          .where("email", "==", normalizedEmail)
+          .limit(1)
+          .get();
+
+        let clientId;
+        if (!existingClient.empty) {
+          // Update existing client
+          clientId = existingClient.docs[0].id;
+          await existingClient.docs[0].ref.update({
+            name: name,
+            company: company || "",
+            hasPortalAccess: true,
+            portalActivatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            authUid: authUser.uid,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
           });
         } else {
-          throw authError;
+          // Create new client record
+          const newClient = await db.collection("clients").add({
+            email: normalizedEmail,
+            name: name,
+            company: company || "",
+            hasPortalAccess: true,
+            portalActivatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            authUid: authUser.uid,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            createdBy: decodedToken.uid,
+          });
+          clientId = newClient.id;
         }
+
+        console.log(`Client account created/updated: ${normalizedEmail}`);
+
+        res.status(200).json({
+          success: true,
+          clientId: clientId,
+          authUid: authUser.uid,
+          email: normalizedEmail,
+          message: `Account created for ${name}`,
+        });
+
+      } catch (error) {
+        console.error("Error creating client account:", error);
+        res.status(500).json({ error: error.message || "Failed to create client account" });
+      }
+    });
+  }
+);
+
+/**
+ * Admin-only password reset via HTTP (for direct use).
+ * Sets a new password for a user by email.
+ */
+exports.adminResetPassword = functionsV1.region("us-central1").https.onRequest(
+  async (req, res) => {
+    cors(req, res, async () => {
+      if (req.method !== "POST") {
+        res.status(405).json({ error: "Method not allowed" });
+        return;
       }
 
-      // Mark token as used
-      await tokenDoc.ref.update({
-        used: true,
-        usedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
+      try {
+        // Verify Firebase Auth token
+        let idToken;
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith("Bearer ")) {
+          idToken = authHeader.split("Bearer ")[1];
+        } else if (req.body && req.body.idToken) {
+          idToken = req.body.idToken;
+        }
 
-      // Update client record
-      await db.collection("clients").doc(tokenData.clientId).update({
-        hasPortalAccess: true,
-        portalActivatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        authUid: authUser.uid,
-        lastPasswordChange: admin.firestore.FieldValue.serverTimestamp(),
-      });
+        if (!idToken) {
+          res.status(401).json({ error: "Authentication required" });
+          return;
+        }
 
-      // Create custom token for auto-login
-      const customToken = await admin.auth().createCustomToken(authUser.uid, {
-        email: tokenData.email,
-        isClient: true,
-      });
+        let decodedToken;
+        try {
+          decodedToken = await admin.auth().verifyIdToken(idToken);
+        } catch (authError) {
+          res.status(401).json({ error: "Invalid authentication token" });
+          return;
+        }
 
-      console.log(`Onboarding completed for ${tokenData.email}`);
+        if (decodedToken.email !== ADMIN_EMAIL) {
+          res.status(403).json({ error: "Admin access required" });
+          return;
+        }
 
-      return {
-        success: true,
-        customToken: customToken,
-        message: "Account setup complete",
-      };
+        const { email, newPassword } = req.body;
 
-    } catch (error) {
-      console.error("Error completing onboarding:", error);
-      throw new Error(error.message || "Failed to complete account setup");
-    }
+        if (!email || !newPassword) {
+          res.status(400).json({ error: "Email and newPassword are required" });
+          return;
+        }
+
+        if (newPassword.length < 8) {
+          res.status(400).json({ error: "Password must be at least 8 characters" });
+          return;
+        }
+
+        const normalizedEmail = email.toLowerCase().trim();
+
+        // Get user by email
+        const userRecord = await admin.auth().getUserByEmail(normalizedEmail);
+
+        // Update password
+        await admin.auth().updateUser(userRecord.uid, {
+          password: newPassword,
+        });
+
+        console.log(`Admin reset password for: ${normalizedEmail}`);
+
+        res.status(200).json({
+          success: true,
+          email: normalizedEmail,
+          message: `Password reset for ${normalizedEmail}`,
+        });
+
+      } catch (error) {
+        console.error("Error in adminResetPassword:", error);
+        res.status(500).json({ error: error.message || "Failed to reset password" });
+      }
+    });
   }
 );
 
@@ -2196,12 +2362,6 @@ exports.changePassword = onCall(
   {
     region: "us-central1",
     secrets: [gmailEmail, gmailPassword],
-    invoker: "public",
-    cors: [
-      "https://portal.lantingdigital.com",
-      "http://localhost:5000",
-      "http://127.0.0.1:5500",
-    ],
   },
   async (request) => {
     // Require authentication
@@ -2334,3 +2494,284 @@ exports.changePassword = onCall(
     }
   }
 );
+
+/**
+ * Notify Client - Send manual notification emails for contracts, invoices, payment plans
+ * Called from admin dashboard when clicking "Notify Client" buttons
+ */
+exports.notifyClient = onCall(
+  {
+    region: "us-central1",
+    secrets: [gmailEmail, gmailPassword],
+  },
+  async (request) => {
+    const { type, documentId, customMessage } = request.data;
+
+    // Validate required fields
+    if (!type || !documentId) {
+      throw new Error("Missing type or documentId");
+    }
+
+    // Validate type
+    const validTypes = ["contract", "invoice", "payment_plan", "subscription"];
+    if (!validTypes.includes(type)) {
+      throw new Error(`Invalid type: ${type}`);
+    }
+
+    const db = admin.firestore();
+
+    try {
+      // Map type to collection name
+      const collectionMap = {
+        contract: "contracts",
+        invoice: "invoices",
+        payment_plan: "paymentPlans",
+        subscription: "subscriptions",
+      };
+      const collectionName = collectionMap[type];
+
+      // Get the document
+      const docRef = db.collection(collectionName).doc(documentId);
+      const docSnapshot = await docRef.get();
+
+      if (!docSnapshot.exists) {
+        throw new Error(`${type} not found`);
+      }
+
+      const docData = docSnapshot.data();
+      const clientEmail = docData.clientEmail;
+      const clientName = docData.clientName || docData.clientCompany || "Valued Client";
+
+      if (!clientEmail) {
+        throw new Error("No client email associated with this item");
+      }
+
+      // Create transporter with secrets
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: gmailEmail.value(),
+          pass: gmailPassword.value(),
+        },
+      });
+
+      // Build email content based on type
+      let subject, heading, message, ctaText, ctaUrl;
+
+      switch (type) {
+        case "contract":
+          subject = `Your Contract is Ready | ${docData.contractName || "Lanting Digital"}`;
+          heading = "Your Contract is Ready for Review";
+          message = customMessage || "Your contract is ready for your review and signature. Please log into your client portal to view and sign.";
+          ctaText = "View & Sign Contract";
+          // Include email and contractId to ensure correct user signs in
+          ctaUrl = `https://portal.lantingdigital.com?action=contract&email=${encodeURIComponent(clientEmail)}&contractId=${documentId}`;
+          break;
+
+      case "invoice":
+        subject = `Invoice ${docData.invoiceNumber || "Ready"} | Lanting Digital`;
+        heading = "You Have a New Invoice";
+        message = customMessage || `Your invoice ${docData.invoiceNumber ? `#${docData.invoiceNumber} ` : ""}for $${(docData.total || 0).toFixed(2)} is ready for payment.`;
+        ctaText = "View Invoice & Pay";
+        ctaUrl = docData.stripePaymentLink || "https://portal.lantingdigital.com";
+        break;
+
+      case "payment_plan":
+        subject = `Payment Plan Ready | ${docData.projectName || "Lanting Digital"}`;
+        heading = "Your Payment Plan is Set Up";
+        message = customMessage || `Your payment plan for ${docData.projectName || "your project"} ($${(docData.monthlyAmount || 0).toFixed(2)}/month for ${docData.numberOfPayments || "several"} months) is ready.`;
+        ctaText = "View Payment Plan";
+        ctaUrl = docData.checkoutUrl || "https://portal.lantingdigital.com";
+        break;
+
+      case "subscription":
+        subject = `Subscription Ready | ${docData.planName || "Lanting Digital"}`;
+        heading = "Your Subscription is Ready";
+        message = customMessage || `Your ${docData.planName || "subscription"} ($${(docData.monthlyAmount || 0).toFixed(2)}/month) is ready for activation.`;
+        ctaText = "Activate Subscription";
+        ctaUrl = docData.checkoutUrl || "https://portal.lantingdigital.com";
+        break;
+    }
+
+    const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1a1f2c; background: #f8f9fa; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; background: #ffffff; }
+    .header { background: linear-gradient(135deg, #1a1f2c 0%, #2d3748 100%); color: white; padding: 40px 30px; text-align: center; }
+    .header h1 { margin: 0; font-size: 24px; font-weight: 600; }
+    .header .subtitle { margin-top: 10px; opacity: 0.9; font-size: 14px; }
+    .content { padding: 40px 30px; }
+    .content p { margin: 0 0 20px; color: #4a5568; }
+    .cta-container { text-align: center; margin: 30px 0; }
+    .cta-button { display: inline-block; background: #1a1f2c; color: white !important; padding: 14px 32px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; }
+    .cta-button:hover { background: #2d3748; }
+    .details { background: #f8f9fa; border-radius: 8px; padding: 20px; margin: 20px 0; }
+    .details-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #718096; margin-bottom: 10px; }
+    .footer { background: #f8f9fa; padding: 30px; text-align: center; font-size: 13px; color: #718096; border-top: 1px solid #e2e8f0; }
+    .footer a { color: #1a1f2c; text-decoration: none; }
+    .portal-link { margin-top: 20px; padding: 15px; background: #f1f5f9; border-radius: 6px; text-align: center; }
+    .portal-link p { margin: 0; font-size: 13px; color: #64748b; }
+    .portal-link a { color: #1a1f2c; font-weight: 500; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>${heading}</h1>
+      <div class="subtitle">Lanting Digital</div>
+    </div>
+    <div class="content">
+      <p>Hi ${clientName},</p>
+      <p>${message}</p>
+      <div class="cta-container">
+        <a href="${ctaUrl}" class="cta-button">${ctaText}</a>
+      </div>
+      <div class="portal-link">
+        <p>You can also access all your documents in your <a href="https://portal.lantingdigital.com">Client Portal</a></p>
+      </div>
+      <p style="margin-top: 30px;">
+        If you have any questions, feel free to reply to this email or reach out to me directly.
+      </p>
+      <p>
+        Best,<br>
+        <strong>Caleb Lanting</strong><br>
+        Lanting Digital
+      </p>
+    </div>
+    <div class="footer">
+      <p>Lanting Digital LLC | <a href="https://lantingdigital.com">lantingdigital.com</a></p>
+    </div>
+  </div>
+</body>
+</html>
+    `;
+
+    // Send the email
+    await transporter.sendMail({
+      from: `"Lanting Digital" <${process.env.GMAIL_EMAIL || gmailEmail.value()}>`,
+      to: clientEmail,
+      subject: subject,
+      html: emailHtml,
+    });
+
+    // Update the document to track notification
+    await docRef.update({
+      lastNotifiedAt: admin.firestore.FieldValue.serverTimestamp(),
+      notificationCount: admin.firestore.FieldValue.increment(1),
+    });
+
+    console.log(`Notification sent for ${type} ${documentId} to ${clientEmail}`);
+
+    return {
+      success: true,
+      message: `Notification sent to ${clientEmail}`,
+      sentTo: clientEmail,
+    };
+
+    } catch (error) {
+      console.error("Error sending notification:", error);
+      throw new Error(error.message || "Failed to send notification");
+    }
+  }
+);
+
+/**
+ * Sign Contract - Called from the client portal when a client signs a contract
+ * Updates the contract with signature data and triggers the existing sendContractSignedEmail function
+ */
+exports.signContract = functionsV1.https.onCall(async (data, context) => {
+  const { contractId, signature, portfolioPermission } = data;
+
+  // Require authentication
+  if (!context.auth) {
+    throw new functionsV1.https.HttpsError("unauthenticated", "You must be logged in to sign a contract");
+  }
+
+  // Validate required fields
+  if (!contractId) {
+    throw new functionsV1.https.HttpsError("invalid-argument", "Missing contract ID");
+  }
+
+  if (!signature || !signature.name || !signature.email) {
+    throw new functionsV1.https.HttpsError("invalid-argument", "Missing signature information");
+  }
+
+  const db = admin.firestore();
+  const userEmail = context.auth.token.email;
+
+  try {
+    // Get the contract
+    const contractRef = db.collection("contracts").doc(contractId);
+    const contractDoc = await contractRef.get();
+
+    if (!contractDoc.exists) {
+      throw new functionsV1.https.HttpsError("not-found", "Contract not found");
+    }
+
+    const contractData = contractDoc.data();
+
+    // Verify the user is the contract recipient
+    if (contractData.clientEmail?.toLowerCase() !== userEmail?.toLowerCase()) {
+      throw new functionsV1.https.HttpsError("permission-denied", "You are not authorized to sign this contract");
+    }
+
+    // Check if already signed
+    if (contractData.status === "signed") {
+      throw new functionsV1.https.HttpsError("failed-precondition", "This contract has already been signed");
+    }
+
+    // Get IP address from request (if available)
+    let ipAddress = "Unknown";
+    try {
+      ipAddress = context.rawRequest?.ip ||
+                  context.rawRequest?.headers?.["x-forwarded-for"]?.split(",")[0] ||
+                  context.rawRequest?.connection?.remoteAddress ||
+                  "Unknown";
+    } catch (e) {
+      console.log("Could not determine IP address");
+    }
+
+    // Get user agent
+    const userAgent = context.rawRequest?.headers?.["user-agent"] || "Unknown";
+
+    // Update contract with signature
+    const updateData = {
+      status: "signed",
+      signedAt: admin.firestore.FieldValue.serverTimestamp(),
+      portfolioPermission: portfolioPermission === true,
+      signature: {
+        name: signature.name,
+        title: signature.title || "",
+        email: signature.email,
+        signatureData: signature.signatureData || signature.name, // Typed name as signature
+        signedAt: admin.firestore.FieldValue.serverTimestamp(),
+        ipAddress: ipAddress,
+        userAgent: userAgent,
+      },
+    };
+
+    await contractRef.update(updateData);
+
+    console.log(`Contract ${contractId} signed by ${userEmail}`);
+
+    // The sendContractSignedEmail trigger will fire automatically due to the status change
+
+    return {
+      success: true,
+      message: "Contract signed successfully",
+      contractId: contractId,
+    };
+
+  } catch (error) {
+    console.error("Error signing contract:", error);
+    if (error instanceof functionsV1.https.HttpsError) {
+      throw error;
+    }
+    throw new functionsV1.https.HttpsError("internal", error.message || "Failed to sign contract");
+  }
+});

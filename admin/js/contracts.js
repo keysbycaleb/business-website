@@ -168,6 +168,11 @@ function renderContracts(contracts) {
                     <span class="cell-sub">${getTimelineSub(contract)}</span>
                 </td>
                 <td class="actions-cell">
+                    ${contract.status === 'sent' ? `
+                        <button class="btn btn-sm btn-notify" onclick="event.stopPropagation(); notifyContractClient('${contract.id}')" title="Notify Client">
+                            <i class="fas fa-bell"></i>
+                        </button>
+                    ` : ''}
                     <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); viewContract('${contract.id}')" title="View Details">
                         <i class="fas fa-eye"></i>
                     </button>
@@ -290,21 +295,22 @@ function viewContract(id) {
         }
     }
 
-    // Signing link - only for pending contracts
+    // Signing info - only for pending contracts
     const signingLinkSection = document.getElementById('signing-link-section');
     const signingLinkInput = document.getElementById('signing-link-input');
     if (isPending) {
-        signingLinkInput.value = `${SIGNING_BASE_URL}/?id=${contract.id}`;
+        // Show portal URL - signing happens in the client portal
+        signingLinkInput.value = `Client signs via portal: ${PORTAL_BASE_URL}`;
         signingLinkSection.classList.remove('hidden');
     } else {
         signingLinkSection.classList.add('hidden');
     }
 
-    // Contract content preview
+    // Contract content preview - sanitize to prevent style leakage
     const contentPreview = document.getElementById('contract-content-preview');
     const toggleBtn = document.getElementById('toggle-contract-content');
     if (contract.contractHtml) {
-        contentPreview.innerHTML = contract.contractHtml;
+        contentPreview.innerHTML = sanitizeContractHtml(contract.contractHtml);
         contentPreview.classList.add('hidden');
         toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i> Show';
     } else {
@@ -654,10 +660,53 @@ function buildFullContractHtml(contract) {
     <div class="contract-container">
         <div class="contract-content">
             ${contract.contractHtml || '<p>No contract content available.</p>'}
+            ${buildSignatureBlock(contract)}
         </div>
     </div>
 </body>
 </html>
+    `;
+}
+
+// Build signature block for signed contracts
+function buildSignatureBlock(contract) {
+    if (contract.status !== 'signed' || !contract.signature) {
+        return '';
+    }
+
+    const sig = contract.signature;
+    const signedDate = contract.signedAt?.toDate
+        ? contract.signedAt.toDate().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+        : 'N/A';
+    const providerDate = contract.providerSignedAt?.toDate
+        ? contract.providerSignedAt.toDate().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+        : 'January 6, 2026';
+    const portfolioText = contract.portfolioPermission ? 'Yes - Client allows portfolio use' : 'No';
+
+    return `
+        <div style="margin-top: 48px; padding-top: 24px; border-top: 2px solid #333; page-break-inside: avoid;">
+            <h2 style="font-size: 14pt; margin-bottom: 24px; border-bottom: 1px solid #ccc; padding-bottom: 8px;">Signatures</h2>
+            <div style="display: flex; gap: 40px; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 250px;">
+                    <p style="margin-bottom: 8px;"><strong>PROVIDER: Lanting Digital LLC</strong></p>
+                    <p style="margin: 4px 0; font-style: italic; font-size: 1.2em;">${contract.providerName || 'Caleb Lanting'}</p>
+                    <p style="margin: 4px 0;">Name: ${contract.providerName || 'Caleb Lanting'}</p>
+                    <p style="margin: 4px 0;">Title: ${contract.providerTitle || 'Owner / Member'}</p>
+                    <p style="margin: 4px 0;">Date: ${providerDate}</p>
+                </div>
+                <div style="flex: 1; min-width: 250px;">
+                    <p style="margin-bottom: 8px;"><strong>CLIENT: ${escapeHtml(contract.clientCompany || contract.clientName || 'Client')}</strong></p>
+                    <p style="margin: 4px 0; font-style: italic; font-size: 1.2em;">${escapeHtml(sig.signatureData || sig.name)}</p>
+                    <p style="margin: 4px 0;">Name: ${escapeHtml(sig.name)}</p>
+                    <p style="margin: 4px 0;">Title: ${escapeHtml(sig.title || 'N/A')}</p>
+                    <p style="margin: 4px 0;">Date: ${signedDate}</p>
+                </div>
+            </div>
+            <p style="margin-top: 20px; font-size: 0.9em; color: #666;"><strong>Portfolio Permission:</strong> ${portfolioText}</p>
+            <p style="margin-top: 8px; font-size: 0.8em; color: #888;">
+                <em>This contract was signed electronically via the Lanting Digital client portal.</em>
+            </p>
+        </div>
     `;
 }
 
@@ -731,6 +780,34 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// Sanitize contract HTML to prevent style leakage
+function sanitizeContractHtml(html) {
+    if (!html) return '';
+
+    // Remove <style> tags and their content
+    html = html.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+
+    // Remove <head> tags and their content
+    html = html.replace(/<head[^>]*>[\s\S]*?<\/head>/gi, '');
+
+    // Remove <meta> tags
+    html = html.replace(/<meta[^>]*>/gi, '');
+
+    // Remove <title> tags and their content
+    html = html.replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '');
+
+    // Remove <html> and </html> tags
+    html = html.replace(/<\/?html[^>]*>/gi, '');
+
+    // Remove <body> and </body> tags (but keep content)
+    html = html.replace(/<\/?body[^>]*>/gi, '');
+
+    // Remove <!DOCTYPE> declarations
+    html = html.replace(/<!DOCTYPE[^>]*>/gi, '');
+
+    return html.trim();
 }
 
 // Setup Create Contract Modal
@@ -834,15 +911,10 @@ async function createContract() {
         // Reload contracts list
         loadContracts();
 
-        // Show signing link
-        const signingLink = `${SIGNING_BASE_URL}/?id=${docRef.id}`;
+        // Show success message - signing now happens in the portal
         setTimeout(() => {
-            if (confirm(`Contract created! Would you like to copy the signing link?\n\n${signingLink}`)) {
-                navigator.clipboard.writeText(signingLink).then(() => {
-                    showToast('Signing link copied to clipboard!', 'success');
-                });
-            }
-        }, 500);
+            alert(`Contract created!\n\nThe client will sign this contract through their portal.\n\nClick the bell icon (🔔) on the contract to send them a notification email.`);
+        }, 300);
 
     } catch (error) {
         console.error('Error creating contract:', error);
@@ -850,6 +922,45 @@ async function createContract() {
     } finally {
         saveBtn.disabled = false;
         saveBtn.innerHTML = originalText;
+    }
+}
+
+// Notify Contract Client - Send email notification
+async function notifyContractClient(contractId) {
+    const contract = allContracts.find(c => c.id === contractId);
+    if (!contract) {
+        showToast('Contract not found', 'error');
+        return;
+    }
+
+    if (!contract.clientEmail) {
+        showToast('No client email associated with this contract', 'error');
+        return;
+    }
+
+    if (!confirm(`Send notification email to ${contract.clientEmail}?`)) {
+        return;
+    }
+
+    try {
+        showToast('Sending notification...', 'info');
+
+        const notifyClient = firebase.functions().httpsCallable('notifyClient');
+        const result = await notifyClient({
+            type: 'contract',
+            documentId: contractId
+        });
+
+        if (result.data.success) {
+            showToast(`Notification sent to ${result.data.sentTo}`, 'success');
+            // Reload to show updated notification info
+            loadContracts();
+        } else {
+            throw new Error(result.data.error || 'Failed to send notification');
+        }
+    } catch (error) {
+        console.error('Error sending notification:', error);
+        showToast(error.message || 'Failed to send notification', 'error');
     }
 }
 

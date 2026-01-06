@@ -40,8 +40,10 @@ const COLLECTIONS = {
     CONTRACTS: 'contracts'
 };
 
-// Signing page URL
-const SIGNING_BASE_URL = 'https://sign.lantingdigital.com';
+// Portal URL (contract signing happens in the portal now)
+const PORTAL_BASE_URL = 'https://portal.lantingdigital.com';
+// Legacy - kept for backwards compatibility but signing is now in portal
+const SIGNING_BASE_URL = 'https://portal.lantingdigital.com';
 
 // Helper function to check if email is admin
 function isAdminEmail(email) {
