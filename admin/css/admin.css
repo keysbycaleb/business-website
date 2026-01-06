@@ -1352,6 +1352,66 @@ tbody tr:hover {
     cursor: pointer;
 }
 
+/* Invite Success State */
+.invite-success {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.invite-success > i {
+    font-size: 3rem;
+    color: var(--success);
+    margin-bottom: 1rem;
+}
+
+.invite-success h3 {
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.15rem;
+}
+
+.invite-success p {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+
+.invite-link-box {
+    background: var(--border-hover);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius);
+    padding: 1rem;
+    text-align: left;
+}
+
+.invite-link-box label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.invite-link-input-wrapper {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.invite-link-input-wrapper input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-size: 0.8rem;
+    font-family: monospace;
+}
+
+.invite-link-input-wrapper input:focus {
+    outline: none;
+    border-color: var(--text-muted);
+}
+
 /* Detail Grid */
 .detail-grid {
     display: grid;

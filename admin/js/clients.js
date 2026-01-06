@@ -1,7 +1,11 @@
 /**
  * Admin Clients Management
- * Handles client CRUD operations and display
+ * Handles client CRUD operations, portal invitations, and display
  */
+
+// Initialize Firebase Functions
+const clientFunctions = firebase.app().functions('us-central1');
+const inviteClientFn = clientFunctions.httpsCallable('inviteClient');
 
 // State
 let allClients = [];
@@ -14,6 +18,7 @@ const clientsEmptyState = document.getElementById('clients-empty-state');
 const clientModal = document.getElementById('client-modal');
 const clientDetailModal = document.getElementById('client-detail-modal');
 const clientForm = document.getElementById('client-form');
+const inviteClientModal = document.getElementById('invite-client-modal');
 
 // =============================================
 // LOAD CLIENTS
@@ -75,10 +80,21 @@ async function loadClients() {
     }
 }
 
+function getPortalStatusBadge(client) {
+    if (client.hasPortalAccess) {
+        return '<span class="status-badge success"><i class="fas fa-check"></i> Active</span>';
+    } else if (client.invitedAt) {
+        return '<span class="status-badge warning"><i class="fas fa-envelope"></i> Invited</span>';
+    } else {
+        return '<span class="status-badge muted"><i class="fas fa-minus"></i> Not Set Up</span>';
+    }
+}
+
 function renderClients(clients, contractCounts = {}) {
     clientsBody.innerHTML = clients.map(client => {
         const contracts = contractCounts[client.email] || 0;
         const initials = (client.name || 'UN').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        const portalBadge = getPortalStatusBadge(client);
 
         return `
             <tr data-id="${client.id}">
@@ -92,6 +108,7 @@ function renderClients(clients, contractCounts = {}) {
                 <td>
                     <a href="mailto:${client.email}" class="email-link">${escapeHtml(client.email)}</a>
                 </td>
+                <td>${portalBadge}</td>
                 <td>
                     <span class="contracts-count">${contracts}</span>
                 </td>
@@ -152,6 +169,33 @@ async function showClientDetail(clientId) {
     document.getElementById('client-detail-phone').textContent = client.phone || '-';
     document.getElementById('client-detail-notes').textContent = client.notes || 'No notes';
 
+    // Portal status
+    const portalStatusEl = document.getElementById('client-detail-portal-status');
+    const portalDateEl = document.getElementById('client-detail-portal-date');
+    const inviteBtn = document.getElementById('invite-client-btn');
+    const resetPasswordBtn = document.getElementById('reset-password-btn');
+
+    if (client.hasPortalAccess) {
+        portalStatusEl.innerHTML = '<span class="status-badge success"><i class="fas fa-check"></i> Active</span>';
+        const activatedDate = client.portalActivatedAt?.toDate();
+        portalDateEl.textContent = activatedDate ? formatDate(activatedDate) : '-';
+        inviteBtn.style.display = 'none';
+        resetPasswordBtn.style.display = 'inline-flex';
+    } else if (client.invitedAt) {
+        portalStatusEl.innerHTML = '<span class="status-badge warning"><i class="fas fa-envelope"></i> Invited</span>';
+        const invitedDate = client.invitedAt?.toDate();
+        portalDateEl.textContent = invitedDate ? `Invited ${formatDate(invitedDate)}` : '-';
+        inviteBtn.style.display = 'inline-flex';
+        inviteBtn.innerHTML = '<i class="fas fa-redo"></i> Resend Invite';
+        resetPasswordBtn.style.display = 'none';
+    } else {
+        portalStatusEl.innerHTML = '<span class="status-badge muted"><i class="fas fa-minus"></i> Not Set Up</span>';
+        portalDateEl.textContent = '-';
+        inviteBtn.style.display = 'inline-flex';
+        inviteBtn.innerHTML = '<i class="fas fa-envelope"></i> Send Invite';
+        resetPasswordBtn.style.display = 'none';
+    }
+
     // Load contracts for this client
     const contractsList = document.getElementById('client-contracts-list');
     contractsList.innerHTML = '<div class="loading-inline"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
@@ -187,6 +231,80 @@ async function showClientDetail(clientId) {
     }
 
     clientDetailModal.classList.add('active');
+}
+
+// =============================================
+// INVITE CLIENT TO PORTAL
+// =============================================
+
+function openInviteClientModal(prefillData = null) {
+    // Reset modal state
+    document.getElementById('invite-client-form').reset();
+    document.getElementById('invite-success').classList.add('hidden');
+    document.getElementById('invite-client-form').classList.remove('hidden');
+    document.getElementById('invite-modal-footer').classList.remove('hidden');
+    document.getElementById('invite-success-footer').classList.add('hidden');
+
+    // Pre-fill if data provided
+    if (prefillData) {
+        document.getElementById('invite-name').value = prefillData.name || '';
+        document.getElementById('invite-email').value = prefillData.email || '';
+        document.getElementById('invite-company').value = prefillData.company || '';
+    }
+
+    inviteClientModal.classList.add('active');
+}
+
+async function sendInvite() {
+    const name = document.getElementById('invite-name').value.trim();
+    const email = document.getElementById('invite-email').value.trim();
+    const company = document.getElementById('invite-company').value.trim();
+
+    if (!name || !email) {
+        alert('Please fill in the required fields');
+        return;
+    }
+
+    const sendBtn = document.getElementById('send-invite-btn');
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+
+    try {
+        const result = await inviteClientFn({ email, name, company });
+
+        if (result.data.success) {
+            // Show success state
+            document.getElementById('invite-client-form').classList.add('hidden');
+            document.getElementById('invite-modal-footer').classList.add('hidden');
+            document.getElementById('invite-success').classList.remove('hidden');
+            document.getElementById('invite-success-footer').classList.remove('hidden');
+
+            document.getElementById('invite-success-email').textContent = email;
+            document.getElementById('invite-link').value = result.data.inviteLink;
+
+            // Reload clients to show updated status
+            loadClients();
+        }
+    } catch (error) {
+        console.error('Error sending invite:', error);
+        alert(error.message || 'Failed to send invitation. Please try again.');
+    } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Invitation';
+    }
+}
+
+function copyInviteLink() {
+    const linkInput = document.getElementById('invite-link');
+    linkInput.select();
+    document.execCommand('copy');
+
+    const copyBtn = document.getElementById('copy-invite-link');
+    const originalHTML = copyBtn.innerHTML;
+    copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+    setTimeout(() => {
+        copyBtn.innerHTML = originalHTML;
+    }, 2000);
 }
 
 // =============================================
@@ -293,6 +411,19 @@ function openMessageForClient(clientId) {
     }, 100);
 }
 
+// Invite from client detail modal
+function inviteCurrentClient() {
+    const client = allClients.find(c => c.id === currentClientId);
+    if (!client) return;
+
+    clientDetailModal.classList.remove('active');
+    openInviteClientModal({
+        name: client.name,
+        email: client.email,
+        company: client.company
+    });
+}
+
 // =============================================
 // EVENT LISTENERS
 // =============================================
@@ -302,6 +433,15 @@ document.getElementById('save-client-btn')?.addEventListener('click', saveClient
 document.getElementById('edit-client-btn')?.addEventListener('click', () => openEditClientModal(currentClientId));
 document.getElementById('delete-client-btn')?.addEventListener('click', () => deleteClient(currentClientId));
 document.getElementById('message-client-btn')?.addEventListener('click', () => openMessageForClient(currentClientId));
+
+// Invite buttons
+document.getElementById('invite-new-client-btn')?.addEventListener('click', () => openInviteClientModal());
+document.getElementById('invite-client-btn')?.addEventListener('click', inviteCurrentClient);
+document.getElementById('send-invite-btn')?.addEventListener('click', sendInvite);
+document.getElementById('copy-invite-link')?.addEventListener('click', copyInviteLink);
+document.getElementById('invite-done-btn')?.addEventListener('click', () => {
+    inviteClientModal.classList.remove('active');
+});
 
 // Close modals
 clientModal?.querySelector('.modal-close')?.addEventListener('click', () => {
@@ -314,6 +454,14 @@ clientModal?.querySelector('.modal-cancel')?.addEventListener('click', () => {
 
 clientDetailModal?.querySelector('.modal-close')?.addEventListener('click', () => {
     clientDetailModal.classList.remove('active');
+});
+
+inviteClientModal?.querySelector('.modal-close')?.addEventListener('click', () => {
+    inviteClientModal.classList.remove('active');
+});
+
+inviteClientModal?.querySelector('.modal-cancel')?.addEventListener('click', () => {
+    inviteClientModal.classList.remove('active');
 });
 
 // =============================================

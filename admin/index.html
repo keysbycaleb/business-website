@@ -332,6 +332,9 @@
                     <div class="panel-header">
                         <h3>Client Directory</h3>
                         <div class="panel-header-actions">
+                            <button class="btn btn-secondary btn-sm" id="invite-new-client-btn">
+                                <i class="fas fa-envelope"></i> Invite to Portal
+                            </button>
                             <button class="btn btn-primary btn-sm" id="add-client-btn">
                                 <i class="fas fa-plus"></i> Add Client
                             </button>
@@ -344,6 +347,7 @@
                                     <th>Client</th>
                                     <th>Company</th>
                                     <th>Email</th>
+                                    <th>Portal</th>
                                     <th>Contracts</th>
                                     <th>Actions</th>
                                 </tr>
@@ -867,6 +871,16 @@
                         <div class="detail-value" id="client-detail-phone"></div>
                     </div>
                 </div>
+                <div class="detail-grid">
+                    <div>
+                        <span class="detail-label">Portal Status</span>
+                        <div class="detail-value" id="client-detail-portal-status"></div>
+                    </div>
+                    <div>
+                        <span class="detail-label">Portal Activated</span>
+                        <div class="detail-value" id="client-detail-portal-date"></div>
+                    </div>
+                </div>
                 <div class="detail-group">
                     <span class="detail-label">Notes</span>
                     <div class="message-box" id="client-detail-notes"></div>
@@ -887,9 +901,71 @@
                 <button class="btn btn-danger" id="delete-client-btn">
                     <i class="fas fa-trash"></i> Delete
                 </button>
+                <button class="btn btn-secondary" id="invite-client-btn" style="display: none;">
+                    <i class="fas fa-envelope"></i> Send Invite
+                </button>
+                <button class="btn btn-secondary" id="reset-password-btn" style="display: none;">
+                    <i class="fas fa-key"></i> Reset Password
+                </button>
                 <button class="btn btn-primary" id="message-client-btn">
                     <i class="fas fa-comment"></i> Message
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- INVITE CLIENT MODAL -->
+    <div id="invite-client-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Invite Client to Portal</h2>
+                <button class="modal-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="invite-client-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="invite-name">Client Name <span class="required">*</span></label>
+                            <input type="text" id="invite-name" placeholder="Full Name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="invite-email">Email <span class="required">*</span></label>
+                            <input type="email" id="invite-email" placeholder="email@company.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="invite-company">Company (optional)</label>
+                        <input type="text" id="invite-company" placeholder="Company Name">
+                    </div>
+                    <p class="form-hint" style="margin-top: 1rem;">
+                        <i class="fas fa-info-circle"></i>
+                        An email invitation will be sent to the client with a link to set up their portal account.
+                        The link expires in 7 days.
+                    </p>
+                </form>
+                <div id="invite-success" class="invite-success hidden">
+                    <i class="fas fa-check-circle"></i>
+                    <h3>Invitation Sent!</h3>
+                    <p>An email has been sent to <strong id="invite-success-email"></strong></p>
+                    <div class="invite-link-box">
+                        <label>Or share this link directly:</label>
+                        <div class="invite-link-input-wrapper">
+                            <input type="text" id="invite-link" readonly>
+                            <button class="btn btn-sm btn-secondary" id="copy-invite-link">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" id="invite-modal-footer">
+                <button class="btn btn-secondary modal-cancel">Cancel</button>
+                <button class="btn btn-primary" id="send-invite-btn">
+                    <i class="fas fa-paper-plane"></i> Send Invitation
+                </button>
+            </div>
+            <div class="modal-footer hidden" id="invite-success-footer">
+                <button class="btn btn-primary" id="invite-done-btn">Done</button>
             </div>
         </div>
     </div>

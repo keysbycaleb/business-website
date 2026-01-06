@@ -100,5 +100,12 @@ service cloud.firestore {
       // Clients can read their own payments
       allow read: if request.auth != null && resource.data.clientEmail == request.auth.token.email;
     }
+
+    // Auth tokens collection (password reset, invitations)
+    // Only Cloud Functions can read/write (no client access)
+    // This ensures tokens are secure and managed server-side only
+    match /authTokens/{tokenId} {
+      allow read, write: if false;
+    }
   }
 }
