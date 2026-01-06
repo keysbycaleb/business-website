@@ -9,6 +9,9 @@ const firebaseConfig = {
     measurementId: "G-8J16C9BMXS"
 };
 
+// Detect if running locally
+const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
@@ -16,6 +19,13 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+// Connect to emulators if running locally
+if (isLocalDev) {
+    console.log('🔧 Running in LOCAL DEV MODE - Using Firebase Emulators');
+    db.useEmulator('localhost', 9199);
+    auth.useEmulator('http://localhost:9099');
+}
 
 // Admin email(s) - only these can access admin portal
 const ADMIN_EMAILS = [

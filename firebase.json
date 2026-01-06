@@ -43,6 +43,12 @@
           "source": "**/*.css",
           "headers": [{"key": "Cache-Control", "value": "no-cache, no-store, must-revalidate"}]
         }
+      ],
+      "rewrites": [
+        {
+          "source": "/api/createClientAccount",
+          "function": "createClientAccount"
+        }
       ]
     },
     {
@@ -88,5 +94,25 @@
   },
   "firestore": {
     "rules": "firestore.rules"
+  },
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "firestore": {
+      "port": 9199,
+      "rules": "firestore.rules"
+    },
+    "functions": {
+      "port": 9299
+    },
+    "hosting": {
+      "port": 9399
+    },
+    "ui": {
+      "enabled": true,
+      "port": 9499
+    },
+    "singleProjectMode": true
   }
 }
