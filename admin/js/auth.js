@@ -22,7 +22,7 @@ auth.onAuthStateChanged((user) => {
             showLogin();
         }
     } else {
-        // User is signed out
+        // Show login screen
         showLogin();
     }
 });
@@ -141,7 +141,8 @@ loginForm.addEventListener('submit', async (e) => {
 logoutBtn.addEventListener('click', async () => {
     try {
         await auth.signOut();
-        showToast('Logged out successfully', 'success');
+        // Redirect to main site after logout
+        window.location.href = 'https://lantingdigital.com/clients';
     } catch (error) {
         console.error('Logout error:', error);
         showToast('Logout failed', 'error');

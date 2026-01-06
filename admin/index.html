@@ -9,10 +9,10 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="https://lantingdigital.com/images/favicon.ico">
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts - Source Sans Pro (Dimension Theme) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300italic,600italic,300,600" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -21,6 +21,9 @@
     <link rel="stylesheet" href="css/admin.css?v=20260103a">
 </head>
 <body>
+    <!-- Dimension Background -->
+    <div class="dimension-bg" aria-hidden="true"></div>
+
     <!-- LOGIN SCREEN -->
     <div id="login-screen" class="screen login-screen active">
         <div class="login-container">
@@ -41,7 +44,7 @@
             <form id="login-form">
                 <div class="form-group">
                     <label for="login-email">Email</label>
-                    <input type="email" id="login-email" required placeholder="caleb@lantingdigital.com">
+                    <input type="email" id="login-email" required placeholder="Enter your email">
                 </div>
                 <div class="form-group">
                     <label for="login-password">Password</label>
@@ -84,6 +87,10 @@
                 <button class="nav-tab" data-section="invoices">
                     <i class="fas fa-file-invoice-dollar"></i>
                     Invoices
+                </button>
+                <button class="nav-tab" data-section="subscriptions">
+                    <i class="fas fa-sync-alt"></i>
+                    Subscriptions
                     <span class="nav-badge" id="unread-messages-badge" style="display: none;"></span>
                 </button>
             </nav>
@@ -411,9 +418,14 @@
                         <h2>Invoices</h2>
                         <p>Create and manage client invoices</p>
                     </div>
-                    <button class="btn btn-primary" id="create-invoice-btn">
-                        <i class="fas fa-plus"></i> Create Invoice
-                    </button>
+                    <div class="section-header-actions">
+                        <button class="btn btn-secondary" id="create-payment-plan-from-invoice-btn">
+                            <i class="fas fa-calendar-alt"></i> Payment Plan
+                        </button>
+                        <button class="btn btn-primary" id="create-invoice-btn">
+                            <i class="fas fa-plus"></i> Create Invoice
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Invoice Stats -->
@@ -485,6 +497,102 @@
                                             <i class="fas fa-file-invoice"></i>
                                             <p>No invoices yet</p>
                                             <button class="btn btn-primary btn-sm" onclick="openCreateInvoiceModal()">Create Your First Invoice</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUBSCRIPTIONS SECTION -->
+            <div id="subscriptions-section" class="section-content">
+                <div class="section-header">
+                    <div class="section-title">
+                        <h2>Subscriptions & Payment Plans</h2>
+                        <p>Manage recurring billing and installment payments</p>
+                    </div>
+                    <div class="section-header-actions">
+                        <button class="btn btn-secondary" id="create-payment-plan-btn">
+                            <i class="fas fa-calendar-alt"></i> New Payment Plan
+                        </button>
+                        <button class="btn btn-primary" id="create-subscription-btn">
+                            <i class="fas fa-sync-alt"></i> New Subscription
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Subscription Stats -->
+                <div class="subscription-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="active-subscriptions">0</span>
+                            <span class="stat-label">Active Subscriptions</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="active-payment-plans">0</span>
+                            <span class="stat-label">Active Payment Plans</span>
+                        </div>
+                    </div>
+                    <div class="stat-card revenue">
+                        <div class="stat-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="monthly-recurring">$0</span>
+                            <span class="stat-label">Monthly Recurring</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="failed-payments">0</span>
+                            <span class="stat-label">Failed Payments</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subscriptions Tabs -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="subscription-filters">
+                            <button class="filter-btn active" data-sub-filter="all">All</button>
+                            <button class="filter-btn" data-sub-filter="subscriptions">Subscriptions</button>
+                            <button class="filter-btn" data-sub-filter="payment_plans">Payment Plans</button>
+                            <button class="filter-btn" data-sub-filter="failed">Failed</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <table class="data-table" id="subscriptions-table">
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th>Type</th>
+                                    <th>Plan / Project</th>
+                                    <th>Amount</th>
+                                    <th>Progress</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subscriptions-body">
+                                <tr class="empty-row">
+                                    <td colspan="7">
+                                        <div class="empty-state">
+                                            <i class="fas fa-sync-alt"></i>
+                                            <p>No subscriptions yet</p>
+                                            <button class="btn btn-primary btn-sm" onclick="openCreateSubscriptionModal()">Create First Subscription</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -882,18 +990,187 @@
         </div>
     </div>
 
+    <!-- CREATE SUBSCRIPTION MODAL -->
+    <div id="subscription-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>Create Subscription</h2>
+                <button class="modal-close" onclick="closeSubscriptionModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="subscription-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="sub-client">Client <span class="required">*</span></label>
+                            <select id="sub-client" required>
+                                <option value="">Select a client...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="sub-plan-type">Plan Type <span class="required">*</span></label>
+                            <select id="sub-plan-type" required>
+                                <option value="">Select plan type...</option>
+                                <option value="retainer">Maintenance Retainer</option>
+                                <option value="saas">SaaS Hosting</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="sub-plan-tier">Plan Tier <span class="required">*</span></label>
+                        <select id="sub-plan-tier" required disabled>
+                            <option value="">Select plan type first...</option>
+                        </select>
+                    </div>
+                    <div class="subscription-preview hidden" id="sub-preview">
+                        <div class="preview-card">
+                            <div class="preview-header">
+                                <span class="preview-label">Subscription Preview</span>
+                            </div>
+                            <div class="preview-body">
+                                <div class="preview-row">
+                                    <span>Monthly Amount:</span>
+                                    <strong id="sub-preview-amount">$0.00</strong>
+                                </div>
+                                <div class="preview-row">
+                                    <span>Billing:</span>
+                                    <span>Recurring until cancelled</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeSubscriptionModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" id="create-sub-btn" onclick="createSubscription()">
+                    <i class="fas fa-sync-alt"></i> Create & Send Payment Link
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CREATE PAYMENT PLAN MODAL -->
+    <div id="payment-plan-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>Create Payment Plan</h2>
+                <button class="modal-close" onclick="closePaymentPlanModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="payment-plan-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pp-client">Client <span class="required">*</span></label>
+                            <select id="pp-client" required>
+                                <option value="">Select a client...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="pp-project-name">Project Name <span class="required">*</span></label>
+                            <input type="text" id="pp-project-name" placeholder="e.g., Website Redesign" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pp-total-amount">Total Project Amount <span class="required">*</span></label>
+                            <div class="input-with-prefix">
+                                <span class="input-prefix">$</span>
+                                <input type="number" id="pp-total-amount" placeholder="5000" step="0.01" min="1" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="pp-num-payments">Number of Payments <span class="required">*</span></label>
+                            <select id="pp-num-payments" required>
+                                <option value="2">2 payments</option>
+                                <option value="3" selected>3 payments</option>
+                                <option value="4">4 payments</option>
+                                <option value="5">5 payments</option>
+                                <option value="6">6 payments</option>
+                                <option value="12">12 payments</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="pp-start-date">First Payment Date</label>
+                            <input type="date" id="pp-start-date" class="form-input">
+                            <span class="form-hint">Leave blank to charge immediately when client pays</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="pp-description">Description (optional)</label>
+                            <textarea id="pp-description" rows="2" placeholder="Brief description of what this payment plan covers..."></textarea>
+                        </div>
+                    </div>
+                    <div class="payment-plan-preview" id="pp-preview">
+                        <div class="preview-card">
+                            <div class="preview-header">
+                                <span class="preview-label">Payment Plan Preview</span>
+                            </div>
+                            <div class="preview-body">
+                                <div class="preview-row">
+                                    <span>Monthly Payment:</span>
+                                    <strong id="pp-preview-monthly">$0.00</strong>
+                                </div>
+                                <div class="preview-row">
+                                    <span>Total Amount:</span>
+                                    <span id="pp-preview-total">$0.00</span>
+                                </div>
+                                <div class="preview-row">
+                                    <span>Duration:</span>
+                                    <span id="pp-preview-duration">0 months</span>
+                                </div>
+                                <div class="preview-row">
+                                    <span>First Charge:</span>
+                                    <span id="pp-preview-start">Immediately</span>
+                                </div>
+                            </div>
+                            <div class="preview-note">
+                                <i class="fas fa-info-circle"></i>
+                                Client will be auto-charged monthly. Plan ends automatically after final payment.
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closePaymentPlanModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" id="create-pp-btn" onclick="createPaymentPlan()">
+                    <i class="fas fa-calendar-alt"></i> Create & Send Payment Link
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW SUBSCRIPTION MODAL -->
+    <div id="view-subscription-modal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>Subscription Details</h2>
+                <button class="modal-close" onclick="closeViewSubscriptionModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body" id="view-subscription-content">
+                <!-- Subscription details loaded by JS -->
+            </div>
+            <div class="modal-footer" id="view-subscription-actions">
+                <!-- Actions loaded by JS based on status -->
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-functions-compat.js"></script>
 
     <!-- Admin Scripts -->
-    <script src="js/config.js?v=20260102g"></script>
-    <script src="js/auth.js?v=20260102g"></script>
-    <script src="js/dashboard.js?v=20260103a"></script>
-    <script src="js/contracts.js?v=20260102f"></script>
-    <script src="js/clients.js?v=20260102a"></script>
-    <script src="js/messages.js?v=20260102a"></script>
-    <script src="js/invoices.js?v=20260103a"></script>
+    <script src="js/config.js?v=20260103f"></script>
+    <script src="js/auth.js?v=20260103f"></script>
+    <script src="js/dashboard.js?v=20260103f"></script>
+    <script src="js/contracts.js?v=20260103f"></script>
+    <script src="js/clients.js?v=20260103f"></script>
+    <script src="js/messages.js?v=20260103f"></script>
+    <script src="js/invoices.js?v=20260103f"></script>
+    <script src="js/subscriptions.js?v=20260103f"></script>
 </body>
 </html>

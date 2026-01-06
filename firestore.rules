@@ -76,5 +76,29 @@ service cloud.firestore {
       // Only admin can write settings
       allow write: if isAdmin();
     }
+
+    // Subscriptions collection
+    match /subscriptions/{subscriptionId} {
+      // Admin can do everything
+      allow read, create, update, delete: if isAdmin();
+      // Clients can read their own subscriptions
+      allow read: if request.auth != null && resource.data.clientEmail == request.auth.token.email;
+    }
+
+    // Payment Plans collection
+    match /paymentPlans/{planId} {
+      // Admin can do everything
+      allow read, create, update, delete: if isAdmin();
+      // Clients can read their own payment plans
+      allow read: if request.auth != null && resource.data.clientEmail == request.auth.token.email;
+    }
+
+    // Payments collection (tracks individual payments)
+    match /payments/{paymentId} {
+      // Admin can do everything
+      allow read, create, update, delete: if isAdmin();
+      // Clients can read their own payments
+      allow read: if request.auth != null && resource.data.clientEmail == request.auth.token.email;
+    }
   }
 }

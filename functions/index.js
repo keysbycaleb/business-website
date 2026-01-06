@@ -1,11 +1,64 @@
 const { onDocumentCreated, onDocumentUpdated } = require("firebase-functions/v2/firestore");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
-const { onRequest } = require("firebase-functions/v2/https");
+const { onRequest, onCall } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
 
 admin.initializeApp();
+
+// Admin email for admin portal access
+const ADMIN_EMAIL = "caleb@lantingdigital.com";
+
+/**
+ * Create a custom token for cross-subdomain authentication.
+ * Takes an ID token, verifies it, and returns a custom token.
+ */
+exports.createCustomToken = onCall(
+  {
+    region: "us-central1",
+    cors: true, // Allow all origins for this function
+  },
+  async (request) => {
+    const { idToken } = request.data;
+
+    if (!idToken) {
+      throw new Error("Missing ID token");
+    }
+
+    try {
+      // Verify the ID token
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      const uid = decodedToken.uid;
+      const email = decodedToken.email;
+
+      // Create custom token with additional claims
+      const customToken = await admin.auth().createCustomToken(uid, {
+        email: email,
+        isAdmin: email === ADMIN_EMAIL,
+      });
+
+      return {
+        success: true,
+        customToken,
+        email,
+        isAdmin: email === ADMIN_EMAIL,
+      };
+    } catch (error) {
+      console.error("Error creating custom token:", error);
+      throw new Error(`Failed to create custom token: ${error.message}`);
+    }
+  }
+);
+
+// Stripe Price IDs for recurring products
+const STRIPE_PRICES = {
+  retainer_standard: "price_1SldKB5CaLIi8KGPhzEhw1Jj",  // $139/month
+  retainer_priority: "price_1SldKC5CaLIi8KGPvh8rsrMo",  // $199/month
+  saas_starter: "price_1SldKC5CaLIi8KGPa90LOPpP",      // $149/month
+  saas_growth: "price_1SldKC5CaLIi8KGPMqkjWwlm",       // $299/month
+  saas_scale: "price_1SldKD5CaLIi8KGPHOWVo9xG",        // $499/month
+};
 
 // Define secrets
 const gmailEmail = defineSecret("GMAIL_EMAIL");
@@ -828,12 +881,12 @@ exports.createStripePaymentLink = onDocumentUpdated(
 
 /**
  * Stripe webhook handler for payment events.
- * Updates invoice status when payment is completed.
+ * Handles invoices, subscriptions, and payment plans.
  */
 exports.stripeWebhook = onRequest(
   {
     region: "us-central1",
-    secrets: [stripeSecretKey, stripeWebhookSecret],
+    secrets: [stripeSecretKey, stripeWebhookSecret, gmailEmail, gmailPassword],
     invoker: "public", // Allow Stripe to call this endpoint
   },
   async (req, res) => {
@@ -862,13 +915,12 @@ exports.stripeWebhook = onRequest(
 
     console.log(`Received Stripe event: ${event.type}`);
 
-    // Handle checkout.session.completed event
+    // Handle checkout.session.completed event (one-time payments & initial subscription setup)
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
 
-      // Get invoice ID from metadata
+      // Handle one-time invoice payment
       const invoiceId = session.metadata?.invoiceId;
-
       if (invoiceId) {
         try {
           await db.collection("invoices").doc(invoiceId).update({
@@ -883,8 +935,596 @@ exports.stripeWebhook = onRequest(
           console.error("Error updating invoice:", error);
         }
       }
+
+      // Handle subscription/payment plan activation
+      if (session.mode === "subscription" && session.subscription) {
+        const isPaymentPlan = session.metadata?.isPaymentPlan === "true";
+        const clientId = session.metadata?.clientId;
+
+        try {
+          // Find the pending subscription/payment plan by checkout session ID
+          const collection = isPaymentPlan ? "paymentPlans" : "subscriptions";
+          const query = await db.collection(collection)
+            .where("stripeCheckoutSessionId", "==", session.id)
+            .limit(1)
+            .get();
+
+          if (!query.empty) {
+            const docRef = query.docs[0].ref;
+            await docRef.update({
+              status: "active",
+              stripeSubscriptionId: session.subscription,
+              activatedAt: admin.firestore.FieldValue.serverTimestamp(),
+              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
+            console.log(`${collection} activated with subscription ${session.subscription}`);
+          }
+        } catch (error) {
+          console.error("Error activating subscription:", error);
+        }
+      }
+    }
+
+    // Handle subscription created (backup in case checkout.session.completed doesn't catch it)
+    if (event.type === "customer.subscription.created") {
+      const subscription = event.data.object;
+      console.log(`Subscription created: ${subscription.id}`);
+    }
+
+    // Handle recurring invoice paid (subscription payments)
+    if (event.type === "invoice.paid") {
+      const invoice = event.data.object;
+
+      // Only process subscription invoices
+      if (invoice.subscription) {
+        const subscriptionId = invoice.subscription;
+        const isPaymentPlan = invoice.subscription_details?.metadata?.isPaymentPlan === "true";
+
+        try {
+          // Find the subscription in Firestore
+          const collection = isPaymentPlan ? "paymentPlans" : "subscriptions";
+
+          // Search by stripeSubscriptionId
+          let query = await db.collection(collection)
+            .where("stripeSubscriptionId", "==", subscriptionId)
+            .limit(1)
+            .get();
+
+          if (!query.empty) {
+            const docRef = query.docs[0].ref;
+            const docData = query.docs[0].data();
+
+            const updateData = {
+              lastPaymentAt: admin.firestore.FieldValue.serverTimestamp(),
+              lastPaymentAmount: invoice.amount_paid / 100,
+              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            };
+
+            // For payment plans, track payment count
+            if (isPaymentPlan) {
+              const newPaymentCount = (docData.paymentsCompleted || 0) + 1;
+              updateData.paymentsCompleted = newPaymentCount;
+
+              // Check if payment plan is complete
+              if (newPaymentCount >= docData.numberOfPayments) {
+                updateData.status = "completed";
+                updateData.completedAt = admin.firestore.FieldValue.serverTimestamp();
+
+                // Cancel the subscription in Stripe since payment plan is done
+                try {
+                  await stripe.subscriptions.cancel(subscriptionId);
+                  console.log(`Payment plan completed, subscription ${subscriptionId} cancelled`);
+                } catch (cancelError) {
+                  console.error("Error cancelling completed payment plan:", cancelError);
+                }
+              }
+            }
+
+            await docRef.update(updateData);
+            console.log(`Payment recorded for ${collection}: ${docRef.id}`);
+
+            // Create a payment record for tracking
+            await db.collection("payments").add({
+              type: isPaymentPlan ? "payment_plan" : "subscription",
+              parentId: docRef.id,
+              clientId: docData.clientId,
+              clientEmail: docData.clientEmail,
+              amount: invoice.amount_paid / 100,
+              stripeInvoiceId: invoice.id,
+              stripeSubscriptionId: subscriptionId,
+              paidAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
+          }
+        } catch (error) {
+          console.error("Error processing invoice.paid:", error);
+        }
+      }
+    }
+
+    // Handle invoice payment failed
+    if (event.type === "invoice.payment_failed") {
+      const invoice = event.data.object;
+
+      if (invoice.subscription) {
+        const subscriptionId = invoice.subscription;
+        const isPaymentPlan = invoice.subscription_details?.metadata?.isPaymentPlan === "true";
+
+        try {
+          const collection = isPaymentPlan ? "paymentPlans" : "subscriptions";
+          const query = await db.collection(collection)
+            .where("stripeSubscriptionId", "==", subscriptionId)
+            .limit(1)
+            .get();
+
+          if (!query.empty) {
+            const docRef = query.docs[0].ref;
+            const docData = query.docs[0].data();
+
+            await docRef.update({
+              status: "payment_failed",
+              lastFailedPaymentAt: admin.firestore.FieldValue.serverTimestamp(),
+              lastFailureReason: invoice.last_payment_error?.message || "Payment failed",
+              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
+
+            // Send notification email
+            const transporter = nodemailer.createTransport({
+              service: "gmail",
+              auth: {
+                user: gmailEmail.value(),
+                pass: gmailPassword.value(),
+              },
+            });
+
+            await transporter.sendMail({
+              from: `"Lanting Digital" <${gmailEmail.value()}>`,
+              to: "caleb@lantingdigital.com",
+              subject: `⚠️ Payment Failed: ${docData.clientName || docData.clientEmail}`,
+              html: `
+                <h2>Payment Failed</h2>
+                <p><strong>Client:</strong> ${docData.clientName || "N/A"} (${docData.clientEmail})</p>
+                <p><strong>Type:</strong> ${isPaymentPlan ? "Payment Plan" : "Subscription"}</p>
+                <p><strong>Amount:</strong> $${(invoice.amount_due / 100).toFixed(2)}</p>
+                <p><strong>Reason:</strong> ${invoice.last_payment_error?.message || "Unknown"}</p>
+                <p><a href="https://admin.lantingdigital.com/#subscriptions">View in Admin</a></p>
+              `,
+            });
+
+            console.log(`Payment failure recorded and notification sent for ${collection}`);
+          }
+        } catch (error) {
+          console.error("Error processing payment failure:", error);
+        }
+      }
+    }
+
+    // Handle subscription deleted/cancelled
+    if (event.type === "customer.subscription.deleted") {
+      const subscription = event.data.object;
+      const isPaymentPlan = subscription.metadata?.isPaymentPlan === "true";
+
+      try {
+        const collection = isPaymentPlan ? "paymentPlans" : "subscriptions";
+        const query = await db.collection(collection)
+          .where("stripeSubscriptionId", "==", subscription.id)
+          .limit(1)
+          .get();
+
+        if (!query.empty) {
+          const docRef = query.docs[0].ref;
+          const docData = query.docs[0].data();
+
+          // Only update to cancelled if not already completed
+          if (docData.status !== "completed") {
+            await docRef.update({
+              status: "cancelled",
+              cancelledAt: admin.firestore.FieldValue.serverTimestamp(),
+              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
+            console.log(`${collection} marked as cancelled: ${docRef.id}`);
+          }
+        }
+      } catch (error) {
+        console.error("Error processing subscription deletion:", error);
+      }
+    }
+
+    // Handle subscription updated (e.g., cancel_at_period_end changes)
+    if (event.type === "customer.subscription.updated") {
+      const subscription = event.data.object;
+      const isPaymentPlan = subscription.metadata?.isPaymentPlan === "true";
+
+      try {
+        const collection = isPaymentPlan ? "paymentPlans" : "subscriptions";
+        const query = await db.collection(collection)
+          .where("stripeSubscriptionId", "==", subscription.id)
+          .limit(1)
+          .get();
+
+        if (!query.empty) {
+          const docRef = query.docs[0].ref;
+
+          await docRef.update({
+            cancelAtPeriodEnd: subscription.cancel_at_period_end,
+            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            stripeStatus: subscription.status,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+        }
+      } catch (error) {
+        console.error("Error processing subscription update:", error);
+      }
     }
 
     res.status(200).json({ received: true });
+  }
+);
+
+/**
+ * Create a regular subscription (for retainers/SaaS - ongoing until cancelled)
+ */
+exports.createSubscription = onCall(
+  {
+    region: "us-central1",
+    secrets: [stripeSecretKey],
+    invoker: "public",
+    cors: [
+      "https://admin.lantingdigital.com",
+      "https://lanting-digital-admin.web.app",
+      "http://localhost:5000",
+    ],
+  },
+  async (request) => {
+    // Verify admin is authenticated
+    if (!request.auth) {
+      throw new Error("Authentication required");
+    }
+
+    const { clientId, clientEmail, clientName, planType, planTier } = request.data;
+
+    if (!clientId || !clientEmail || !planType || !planTier) {
+      throw new Error("Missing required fields: clientId, clientEmail, planType, planTier");
+    }
+
+    const stripe = require("stripe")(stripeSecretKey.value());
+    const db = admin.firestore();
+
+    // Determine price ID based on plan
+    const priceKey = `${planType}_${planTier}`;
+    const priceId = STRIPE_PRICES[priceKey];
+
+    if (!priceId) {
+      throw new Error(`Invalid plan: ${priceKey}. Valid plans: ${Object.keys(STRIPE_PRICES).join(", ")}`);
+    }
+
+    try {
+      // Get or create Stripe customer
+      let stripeCustomerId;
+      const customers = await stripe.customers.list({ email: clientEmail, limit: 1 });
+
+      if (customers.data.length > 0) {
+        stripeCustomerId = customers.data[0].id;
+      } else {
+        const customer = await stripe.customers.create({
+          email: clientEmail,
+          name: clientName || undefined,
+          metadata: { clientId, source: "lanting-digital-admin" },
+        });
+        stripeCustomerId = customer.id;
+      }
+
+      // Create a checkout session for the subscription
+      const session = await stripe.checkout.sessions.create({
+        customer: stripeCustomerId,
+        payment_method_types: ["card"],
+        line_items: [{ price: priceId, quantity: 1 }],
+        mode: "subscription",
+        success_url: `https://portal.lantingdigital.com/#invoices?subscription=success`,
+        cancel_url: `https://portal.lantingdigital.com/#invoices?subscription=cancelled`,
+        metadata: {
+          clientId,
+          planType,
+          planTier,
+          source: "admin-created",
+        },
+      });
+
+      // Create subscription record in Firestore (pending until checkout completes)
+      const subscriptionDoc = await db.collection("subscriptions").add({
+        clientId,
+        clientEmail,
+        clientName: clientName || "",
+        planType,
+        planTier,
+        priceId,
+        status: "pending_payment",
+        stripeCustomerId,
+        stripeCheckoutSessionId: session.id,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdBy: request.auth.uid,
+      });
+
+      return {
+        success: true,
+        subscriptionId: subscriptionDoc.id,
+        checkoutUrl: session.url,
+      };
+
+    } catch (error) {
+      console.error("Error creating subscription:", error);
+      throw new Error(`Failed to create subscription: ${error.message}`);
+    }
+  }
+);
+
+/**
+ * Create a payment plan (subscription schedule that auto-ends after X payments)
+ */
+exports.createPaymentPlan = onCall(
+  {
+    region: "us-central1",
+    secrets: [stripeSecretKey],
+    invoker: "public",
+    cors: [
+      "https://admin.lantingdigital.com",
+      "https://lanting-digital-admin.web.app",
+      "http://localhost:5000",
+    ],
+  },
+  async (request) => {
+    // Verify admin is authenticated
+    if (!request.auth) {
+      throw new Error("Authentication required");
+    }
+
+    const {
+      clientId,
+      clientEmail,
+      clientName,
+      projectName,
+      totalAmount,
+      numberOfPayments,
+      description,
+      startDate,
+    } = request.data;
+
+    if (!clientId || !clientEmail || !totalAmount || !numberOfPayments) {
+      throw new Error("Missing required fields: clientId, clientEmail, totalAmount, numberOfPayments");
+    }
+
+    // Calculate trial_end timestamp if startDate is provided
+    let trialEndTimestamp = null;
+    if (startDate) {
+      const startDateObj = new Date(startDate + "T00:00:00");
+      trialEndTimestamp = Math.floor(startDateObj.getTime() / 1000);
+    }
+
+    const stripe = require("stripe")(stripeSecretKey.value());
+    const db = admin.firestore();
+
+    // Calculate payment amount per installment
+    const paymentAmount = Math.round((totalAmount / numberOfPayments) * 100); // in cents
+
+    try {
+      // Get or create Stripe customer
+      let stripeCustomerId;
+      const customers = await stripe.customers.list({ email: clientEmail, limit: 1 });
+
+      if (customers.data.length > 0) {
+        stripeCustomerId = customers.data[0].id;
+      } else {
+        const customer = await stripe.customers.create({
+          email: clientEmail,
+          name: clientName || undefined,
+          metadata: { clientId, source: "lanting-digital-admin" },
+        });
+        stripeCustomerId = customer.id;
+      }
+
+      // Create a product for this payment plan
+      const product = await stripe.products.create({
+        name: `Payment Plan: ${projectName || "Project"}`,
+        description: description || `${numberOfPayments} monthly payments of $${(paymentAmount / 100).toFixed(2)}`,
+        metadata: { clientId, projectName: projectName || "" },
+      });
+
+      // Create a recurring price for the monthly payment
+      const price = await stripe.prices.create({
+        product: product.id,
+        unit_amount: paymentAmount,
+        currency: "usd",
+        recurring: { interval: "month" },
+      });
+
+      // Build subscription_data with optional trial_end
+      const subscriptionData = {
+        metadata: {
+          clientId,
+          projectName: projectName || "",
+          totalAmount: totalAmount.toString(),
+          numberOfPayments: numberOfPayments.toString(),
+          paymentPlanId: "pending", // Will update after doc is created
+          isPaymentPlan: "true",
+        },
+      };
+
+      // If start date is in the future, use trial_end to delay first charge
+      if (trialEndTimestamp) {
+        subscriptionData.trial_end = trialEndTimestamp;
+      }
+
+      // Create checkout session for the subscription schedule
+      const session = await stripe.checkout.sessions.create({
+        customer: stripeCustomerId,
+        payment_method_types: ["card"],
+        line_items: [{ price: price.id, quantity: 1 }],
+        mode: "subscription",
+        success_url: `https://portal.lantingdigital.com/#invoices?payment_plan=success`,
+        cancel_url: `https://portal.lantingdigital.com/#invoices?payment_plan=cancelled`,
+        subscription_data: subscriptionData,
+        metadata: {
+          clientId,
+          projectName: projectName || "",
+          isPaymentPlan: "true",
+          numberOfPayments: numberOfPayments.toString(),
+          startDate: startDate || "",
+        },
+      });
+
+      // Create payment plan record in Firestore
+      const paymentPlanDoc = await db.collection("paymentPlans").add({
+        clientId,
+        clientEmail,
+        clientName: clientName || "",
+        projectName: projectName || "",
+        totalAmount,
+        numberOfPayments,
+        monthlyAmount: paymentAmount / 100, // Store in dollars for display
+        paymentAmount: paymentAmount / 100, // Store in dollars
+        description: description || "",
+        status: "pending_payment",
+        paymentsCompleted: 0,
+        startDate: startDate || null,
+        billingStartsAt: trialEndTimestamp ? new Date(trialEndTimestamp * 1000) : null,
+        stripeCustomerId,
+        stripeProductId: product.id,
+        stripePriceId: price.id,
+        stripeCheckoutSessionId: session.id,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdBy: request.auth.uid,
+      });
+
+      return {
+        success: true,
+        paymentPlanId: paymentPlanDoc.id,
+        checkoutUrl: session.url,
+        monthlyAmount: paymentAmount / 100,
+      };
+
+    } catch (error) {
+      console.error("Error creating payment plan:", error);
+      throw new Error(`Failed to create payment plan: ${error.message}`);
+    }
+  }
+);
+
+/**
+ * Cancel a subscription or payment plan
+ */
+exports.cancelSubscription = onCall(
+  {
+    region: "us-central1",
+    secrets: [stripeSecretKey],
+    invoker: "public",
+    cors: [
+      "https://admin.lantingdigital.com",
+      "https://lanting-digital-admin.web.app",
+      "http://localhost:5000",
+    ],
+  },
+  async (request) => {
+    // Verify admin is authenticated
+    if (!request.auth) {
+      throw new Error("Authentication required");
+    }
+
+    const { subscriptionId, stripeSubscriptionId, cancelImmediately } = request.data;
+
+    if (!stripeSubscriptionId) {
+      throw new Error("Missing required field: stripeSubscriptionId");
+    }
+
+    const stripe = require("stripe")(stripeSecretKey.value());
+    const db = admin.firestore();
+
+    try {
+      let result;
+
+      if (cancelImmediately) {
+        // Cancel immediately
+        result = await stripe.subscriptions.cancel(stripeSubscriptionId);
+      } else {
+        // Cancel at end of current period
+        result = await stripe.subscriptions.update(stripeSubscriptionId, {
+          cancel_at_period_end: true,
+        });
+      }
+
+      // Update Firestore record if subscriptionId provided
+      if (subscriptionId) {
+        // Check both collections
+        const subDoc = await db.collection("subscriptions").doc(subscriptionId).get();
+        const planDoc = await db.collection("paymentPlans").doc(subscriptionId).get();
+
+        const docRef = subDoc.exists
+          ? db.collection("subscriptions").doc(subscriptionId)
+          : planDoc.exists
+            ? db.collection("paymentPlans").doc(subscriptionId)
+            : null;
+
+        if (docRef) {
+          await docRef.update({
+            status: cancelImmediately ? "cancelled" : "cancelling",
+            cancelledAt: admin.firestore.FieldValue.serverTimestamp(),
+            cancelAtPeriodEnd: !cancelImmediately,
+          });
+        }
+      }
+
+      return {
+        success: true,
+        status: result.status,
+        cancelAtPeriodEnd: result.cancel_at_period_end,
+      };
+
+    } catch (error) {
+      console.error("Error cancelling subscription:", error);
+      throw new Error(`Failed to cancel subscription: ${error.message}`);
+    }
+  }
+);
+
+/**
+ * Get subscription/payment plan status from Stripe
+ */
+exports.getSubscriptionStatus = onCall(
+  {
+    region: "us-central1",
+    secrets: [stripeSecretKey],
+    invoker: "public",
+    cors: [
+      "https://admin.lantingdigital.com",
+      "https://lanting-digital-admin.web.app",
+      "http://localhost:5000",
+    ],
+  },
+  async (request) => {
+    if (!request.auth) {
+      throw new Error("Authentication required");
+    }
+
+    const { stripeSubscriptionId } = request.data;
+
+    if (!stripeSubscriptionId) {
+      throw new Error("Missing required field: stripeSubscriptionId");
+    }
+
+    const stripe = require("stripe")(stripeSecretKey.value());
+
+    try {
+      const subscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+
+      return {
+        success: true,
+        status: subscription.status,
+        currentPeriodEnd: subscription.current_period_end,
+        cancelAtPeriodEnd: subscription.cancel_at_period_end,
+        canceledAt: subscription.canceled_at,
+      };
+
+    } catch (error) {
+      console.error("Error getting subscription status:", error);
+      throw new Error(`Failed to get subscription status: ${error.message}`);
+    }
   }
 );

@@ -347,6 +347,21 @@
 			}
 
 			// Handle nav link clicks - use clean URLs
+			// Use a direct handler on all internal links (not delegated) to work inside articles
+			$('a[href^="/"]').on('click', function(event) {
+				var href = $(this).attr('href');
+				var articleId = href.replace(/^\//, '');
+
+				// Only handle internal article links
+				if (validArticles.indexOf(articleId) !== -1) {
+					event.preventDefault();
+					event.stopPropagation(); // Prevent article close
+					history.pushState({ article: articleId }, '', '/' + articleId);
+					$main._show(articleId);
+				}
+			});
+
+			// Also handle dynamically added links via delegation
 			$(document).on('click', 'a[href^="/"]', function(event) {
 				var href = $(this).attr('href');
 				var articleId = href.replace(/^\//, '');

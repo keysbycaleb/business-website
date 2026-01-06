@@ -1,7 +1,7 @@
 // Firebase Configuration for Lanting Digital Contract Signing
 const firebaseConfig = {
     apiKey: "AIzaSyBUs5dd7zghmv8dQen9bdqROmHyKSupcEE",
-    authDomain: "lanting-digital-website.firebaseapp.com",
+    authDomain: "lantingdigital.com",
     projectId: "lanting-digital-website",
     storageBucket: "lanting-digital-website.firebasestorage.app",
     messagingSenderId: "48115587377",

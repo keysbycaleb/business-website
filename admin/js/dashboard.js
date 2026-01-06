@@ -112,7 +112,8 @@ function setupSidebarNavigation() {
                     'contracts': 'Contracts & Proposals',
                     'clients': 'Clients',
                     'messages': 'Messages',
-                    'invoices': 'Invoices'
+                    'invoices': 'Invoices',
+                    'subscriptions': 'Subscriptions & Payment Plans'
                 };
                 pageHeaderTitle.textContent = titles[tab.dataset.section] || 'Dashboard';
             }
@@ -130,6 +131,8 @@ function setupSidebarNavigation() {
                 loadConversations();
             } else if (section === 'invoices' && typeof loadInvoices === 'function') {
                 loadInvoices();
+            } else if (section === 'subscriptions' && typeof loadSubscriptionsSection === 'function') {
+                loadSubscriptionsSection();
             }
         });
     });

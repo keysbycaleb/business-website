@@ -958,7 +958,7 @@
 					</div>
 
 				<footer id="footer">
-						<p class="copyright">&copy; Lanting Digital LLC | <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> | Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
+						<p class="copyright">&copy; Lanting Digital LLC | <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="https://portal.lantingdigital.com">Client Login</a> | Design: <a href="https://html5up.net">HTML5 UP</a>.</p>
 					</footer>
 
 			</div>
@@ -977,10 +977,9 @@
 
 		<script>
 		  // Your web app's Firebase configuration
-		  // This is the exact code you pasted from your Firebase project
 		  const firebaseConfig = {
 			apiKey: "AIzaSyBUs5dd7zghmv8dQen9bdqROmHyKSupcEE",
-			authDomain: "lanting-digital-website.firebaseapp.com",
+			authDomain: "lantingdigital.com",
 			projectId: "lanting-digital-website",
 			storageBucket: "lanting-digital-website.firebasestorage.app",
 			messagingSenderId: "48115587377",
@@ -990,10 +989,7 @@
 
 		  // Initialize Firebase
 		  firebase.initializeApp(firebaseConfig);
-		  
-		  // *** THE FIX IS HERE ***
-		  // We attach 'db' and 'analytics' to the global 'window' object
-		  // so that other scripts (like main.js) can access them.
+
 		  window.db = firebase.firestore();
 		  window.analytics = firebase.analytics();
 
